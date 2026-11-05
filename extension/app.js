@@ -238,7 +238,7 @@ function render(){
   if(!V.date)V.date=defaultDate();
   if(!V.p)V.p=curPeriod(S.settings.times).idx;
   ensureAuto();
-  app.innerHTML=header()+({now:nowView,day:dayView,week:weekView,month:monthView,setup:setupView}[V.tab]||nowView)()+
+  app.innerHTML=header()+'<main class="panel">'+({now:nowView,day:dayView,week:weekView,month:monthView,setup:setupView}[V.tab]||nowView)()+'</main>'+
     `<footer>راصد المبسّط · البيانات محفوظة على هذا الجهاز فقط<br><span class="credit">إعداد وتطوير: عبدالمجيد السيد · 0561955430</span> · جميع الحقوق محفوظة © 2026</footer>`;
   bind();
 }
@@ -328,7 +328,7 @@ function setupView(){const s=S.settings;const nT=new Set(S.rows.map(r=>r.t)).siz
   </div></div>
   <div class="section"><h3>٢. بيانات المدرسة</h3><div class="card" style="display:grid;gap:12px">
    <div class="grid2"><label class="f">اسم المدرسة<input id="s-school" value="${esc(s.school)}"></label>
-    <label class="f">رمز دخول المشرف<input id="s-pin" inputmode="numeric" value="${esc(s.pin)}" placeholder="اتركه فارغًا لإلغاء القفل"></label>
+    <label class="f">رمز دخول المدير<input id="s-pin" inputmode="numeric" value="${esc(s.pin)}" placeholder="اتركه فارغًا لإلغاء القفل"></label>
     <label class="f">اسم المدير<input id="s-mgr" value="${esc(s.mgr)}"></label>
     <label class="f">جوال المدير<input id="s-mgrPh" inputmode="tel" dir="ltr" value="${esc(s.mgrPh)}" placeholder="05xxxxxxxx"></label></div>
    <div><div class="small muted" style="margin-bottom:6px">أوقات الحصص السبع (بداية – نهاية)</div><div class="times num">
@@ -343,7 +343,7 @@ function setupView(){const s=S.settings;const nT=new Set(S.rows.map(r=>r.t)).siz
   </div></div>${autoSetupHTML()}`}
 
 function lockView(){return `<div class="lock"><span class="mark" style="margin:auto;width:48px;height:48px;border-radius:12px" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="width:26px;height:26px"><path d="M4 12.5 9 17 20 6"/></svg></span>
-  <h1 style="font-size:24px">راصد المبسّط</h1><div class="muted">${esc(S.settings.school)}</div>
+  <h1 style="font-size:24px">راصد المبسّط</h1><div class="muted">${esc(S.settings.school)}</div><div class="pill" style="justify-self:center">دخول المدير</div>
   <form id="lockF"><input id="pin" type="password" inputmode="numeric" autocomplete="off" aria-label="رمز الدخول" placeholder="••••"><p id="lockErr" class="small" style="color:var(--bad);min-height:1.5em;margin:6px 0"></p>
   <button class="btn primary" style="width:100%;justify-content:center">دخول</button></form>
   ${S.demo?'<p class="small muted">رمز المدرسة التجريبية: <b class="num">1234</b></p>':''}
@@ -443,14 +443,14 @@ async function readSchedule(f){try{let aoa;const isCSV=/\.csv$/i.test(f.name)||f
 function weekHTML(W){const s=S.settings;
   return `<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${W.title} – ${esc(s.school)}</title>
 <style>body{font-family:Tahoma,"Segoe UI",sans-serif;margin:32px;color:#15211d}h1{font-size:20px;margin:0}p{color:#5a6964}table{border-collapse:collapse;width:100%;margin-top:14px;font-size:13px}
-th,td{border:1px solid #cfd8d3;padding:6px 10px;text-align:right}th{background:#eef2ef}.k{display:flex;gap:24px;margin:16px 0}.k b{display:block;font-size:22px}.bad{color:#b0281f}
+th,td{border:1px solid #d5e3e2;padding:6px 10px;text-align:right}th{background:#e4f2f1}.k{display:flex;gap:24px;margin:16px 0}.k b{display:block;font-size:22px}.bad{color:#b0281f}
 button{padding:8px 16px;margin-top:16px}@media print{button{display:none}body{margin:12mm}}</style></head><body>
 <h1>${W.title} لحضور المعلمين – ${esc(s.school)}</h1><p>${esc(W.span)}</p>
 <div class="k"><div><b>${W.pct}%</b>نسبة الحضور</div><div><b>${W.T.ok}</b>حاضر</div><div><b>${W.T.late}</b>متأخر</div><div class="bad"><b>${W.T.bad}</b>غائب</div></div>
 <table><tr><th>المعلم</th><th>مرصودة</th><th>حاضر</th><th>متأخر</th><th>غائب</th><th>النسبة</th><th>مواضع الغياب</th></tr>
 ${W.teachers.map(o=>`<tr><td>الأستاذ/ ${esc(o.t)}</td><td>${o.n}</td><td>${o.ok}</td><td>${o.late}</td><td class="${o.bad?'bad':''}">${o.bad}</td><td>${o.pct}%</td><td>${esc(o.list.join('، '))}</td></tr>`).join('')}</table>
 <p style="margin-top:24px">المدير: الأستاذ/ ${esc(s.mgr||'')} &nbsp;&nbsp; التوقيع: ............</p>
-<div style="margin-top:28px;font-size:12px;color:#5a6964;border-top:1px solid #cfd8d3;padding-top:8px">راصد المبسّط · إعداد وتطوير: عبدالمجيد السيد · 0561955430</div>
+<div style="margin-top:28px;font-size:12px;color:#5a6964;border-top:1px solid #d5e3e2;padding-top:8px">راصد المبسّط · إعداد وتطوير: عبدالمجيد السيد · 0561955430</div>
 <button onclick="print()">طباعة / حفظ PDF</button></body></html>`}
 
 async function dayHTML(date){const R=dayReport(date);const s=S.settings;let res={};
@@ -460,8 +460,8 @@ async function dayHTML(date){const R=dayReport(date);const s=S.settings;let res=
   const imgs=EXT&&ids.length?await chrome.storage.local.get(ids):{};
   return `<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>تقرير اليوم – ${esc(s.school)} – ${date}</title>
 <style>body{font-family:Tahoma,"Segoe UI",sans-serif;margin:32px;color:#15211d}h1{font-size:20px;margin:0}p{color:#5a6964}table{border-collapse:collapse;width:100%;margin-top:14px;font-size:13px}
-th,td{border:1px solid #cfd8d3;padding:6px 10px;text-align:right;vertical-align:top}th{background:#eef2ef}.k{display:flex;gap:24px;margin:16px 0}.k b{display:block;font-size:22px}.bad{color:#b0281f}.late{color:#a86200}
-td img{width:260px;display:block;margin:4px 0;border:1px solid #cfd8d3}.f{margin-top:28px;font-size:12px;color:#5a6964;border-top:1px solid #cfd8d3;padding-top:8px}button{padding:8px 16px;margin-top:16px}@media print{button{display:none}body{margin:10mm}tr{page-break-inside:avoid}}</style></head><body>
+th,td{border:1px solid #d5e3e2;padding:6px 10px;text-align:right;vertical-align:top}th{background:#e4f2f1}.k{display:flex;gap:24px;margin:16px 0}.k b{display:block;font-size:22px}.bad{color:#b0281f}.late{color:#a86200}
+td img{width:260px;display:block;margin:4px 0;border:1px solid #d5e3e2}.f{margin-top:28px;font-size:12px;color:#5a6964;border-top:1px solid #d5e3e2;padding-top:8px}button{padding:8px 16px;margin-top:16px}@media print{button{display:none}body{margin:10mm}tr{page-break-inside:avoid}}</style></head><body>
 <h1>تقرير حضور المعلمين – ${esc(s.school)}</h1><p>${DAYS[wd(date)]||''} ${fmtDate(date)}</p>
 <div class="k"><div><b>${R.pct}%</b>نسبة الحضور</div><div><b>${R.t.ok}</b>حاضر</div><div class="late"><b>${R.t.late}</b>متأخر</div><div class="bad"><b>${R.t.bad}</b>غائب</div><div><b>${R.t.un}</b>لم يُرصد</div></div>
 ${items.length?`<table><tr><th>الحصة</th><th>الصف</th><th>المعلم</th><th>الحالة</th><th>الوقت</th><th>لقطات الفحص</th></tr>

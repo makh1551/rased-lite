@@ -312,7 +312,7 @@ async function stamp(dataUrl, text) {
   const W = bmp.width, H = bmp.height, band = Math.max(44, Math.round(H * 0.055));
   const c = new OffscreenCanvas(W, H + band), x = c.getContext('2d');
   x.drawImage(bmp, 0, 0);
-  x.fillStyle = '#0d6452'; x.fillRect(0, H, W, band);
+  x.fillStyle = '#0d4f57'; x.fillRect(0, H, W, band);
   x.fillStyle = '#ffffff'; x.font = `600 ${Math.round(band * 0.42)}px Tahoma, "Segoe UI", Arial, sans-serif`;
   x.direction = 'rtl'; x.textAlign = 'right'; x.textBaseline = 'middle';
   x.fillText(text, W - 18, H + band / 2);

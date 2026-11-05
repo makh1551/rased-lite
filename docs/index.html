@@ -3,30 +3,33 @@
 <title>راصد المبسّط</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Readex+Pro:wght@500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap">
 <style>
-/* دفتر المناوبة: شريط الحصص السبع في الأعلى يقود الشاشة، وتحته بطاقات الفصول */
+/* هوية راصد: شريط علوي بتدرّج التيل الداكن، وبطاقة بيضاء تعلوه، وخط IBM Plex Sans Arabic */
 :root{
-  --bg:#eef2ef; --surface:#ffffff; --sunk:#e3e9e5; --ink:#15211d; --muted:#5a6964; --line:#d3dcd7;
-  --accent:#0d6452; --accent-ink:#ffffff; --accent-soft:#d6ebe4;
-  --ok:#1d7a3d; --ok-soft:#dcf0e2; --late:#a86200; --late-soft:#fbecd2; --bad:#b0281f; --bad-soft:#f8dcd9;
-  --font-display:"Readex Pro","IBM Plex Sans Arabic",Tahoma,sans-serif;
+  --bg:#f2f5f5; --surface:#ffffff; --sunk:#e7eeee; --tint:#f1f8f7; --ink:#10272b; --muted:#5f7376; --line:#e2e9e9;
+  --accent:#0d4f57; --accent-ink:#ffffff; --accent-soft:#e4f2f1; --teal:#1b8a8f;
+  --ok:#15803d; --ok-soft:#e3f3e8; --late:#a65508; --late-soft:#fdf0d8; --bad:#b42318; --bad-soft:#fde7e4;
+  --band:radial-gradient(120% 140% at 100% 0%,#1b8a8f 0%,#0d4f57 55%,#083a40 100%);
+  --sh:0 1px 2px rgba(16,39,43,.05),0 4px 14px rgba(16,39,43,.06);
+  --font-display:"IBM Plex Sans Arabic",Tahoma,"Segoe UI",sans-serif;
   --font-body:"IBM Plex Sans Arabic",Tahoma,"Segoe UI",sans-serif;
-  --r:10px;
+  --r:16px;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --bg:#0f1513; --surface:#18211e; --sunk:#121a17; --ink:#e4ebe8; --muted:#97a6a0; --line:#2b3833;
-  --accent:#4cbca1; --accent-ink:#06231c; --accent-soft:#173a31;
-  --ok:#62c784; --ok-soft:#173826; --late:#e6a640; --late-soft:#3a2c12; --bad:#f2786d; --bad-soft:#40201d; color-scheme:dark}}
+  --bg:#0c1517; --surface:#142124; --sunk:#1b2a2d; --tint:#132c2f; --ink:#e4efee; --muted:#9db1b0; --line:#24363a;
+  --accent:#4cc3c0; --accent-ink:#06231c; --accent-soft:#173a3e; --teal:#4cc3c0;
+  --ok:#5fd394; --ok-soft:#16301f; --late:#f2b45a; --late-soft:#3a2a12; --bad:#ff8f84; --bad-soft:#3c1b18;
+  --band:radial-gradient(120% 140% at 100% 0%,#14666b 0%,#0a3a40 55%,#06282c 100%); --sh:0 1px 2px rgba(0,0,0,.3); color-scheme:dark}}
 :root[data-theme="dark"]{
-  --bg:#0f1513; --surface:#18211e; --sunk:#121a17; --ink:#e4ebe8; --muted:#97a6a0; --line:#2b3833;
-  --accent:#4cbca1; --accent-ink:#06231c; --accent-soft:#173a31;
-  --ok:#62c784; --ok-soft:#173826; --late:#e6a640; --late-soft:#3a2c12; --bad:#f2786d; --bad-soft:#40201d; color-scheme:dark}
+  --bg:#0c1517; --surface:#142124; --sunk:#1b2a2d; --tint:#132c2f; --ink:#e4efee; --muted:#9db1b0; --line:#24363a;
+  --accent:#4cc3c0; --accent-ink:#06231c; --accent-soft:#173a3e; --teal:#4cc3c0;
+  --ok:#5fd394; --ok-soft:#16301f; --late:#f2b45a; --late-soft:#3a2a12; --bad:#ff8f84; --bad-soft:#3c1b18;
+  --band:radial-gradient(120% 140% at 100% 0%,#14666b 0%,#0a3a40 55%,#06282c 100%); --sh:0 1px 2px rgba(0,0,0,.3); color-scheme:dark}
 *{box-sizing:border-box}
 html{direction:rtl}
-body{background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:15px;line-height:1.6;
+body{background:var(--band) top/100% 230px no-repeat,var(--bg);color:var(--ink);font-family:var(--font-body);font-size:15px;line-height:1.6;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 48px}
-body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
 button,input,select,textarea{font:inherit;color:inherit}
 button{cursor:pointer}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
@@ -37,16 +40,26 @@ h1,h2,h3{font-family:var(--font-display);text-wrap:balance;margin:0;line-height:
 .small{font-size:13px}
 
 /* header */
-.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:14px 10px;border-bottom:1px solid var(--line)}
+.top{padding-block:18px 14px;color:#fff}
 .brand{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
-.brand h1{font-size:20px;display:flex;align-items:center;gap:10px}
+.brand h1{font-size:26px;color:#fff;display:flex;align-items:center;gap:10px}
 .mark{width:30px;height:30px;border-radius:8px;background:var(--accent);display:grid;place-items:center;flex:none}
 .mark svg{width:18px;height:18px}
 .school{font-size:13px;color:var(--muted);font-weight:500}
 .clock{font-family:var(--font-display);font-size:22px;letter-spacing:.02em}
 .tabs{display:flex;gap:4px;margin-top:12px;overflow-x:auto;scrollbar-width:none}
 .tabs a{padding:7px 14px;border-radius:999px;text-decoration:none;color:var(--muted);font-weight:600;font-size:14px;white-space:nowrap}
-.tabs a[aria-current="page"]{background:var(--ink);color:var(--bg)}
+.tabs a[aria-current="page"]{background:var(--accent);color:var(--accent-ink)}
+.top .tabs a{color:rgba(255,255,255,.78)}
+.top .tabs a[aria-current="page"]{background:#fff;color:#0d4f57}
+.top .mark{background:#fff;width:40px;height:40px;border-radius:12px}.top .mark svg{stroke:#0d4f57;width:22px;height:22px}
+.top .school{color:rgba(255,255,255,.8)}
+.top .clock{color:#fff}
+.top .demo-bar{background:rgba(255,255,255,.13);color:#fff;border:1px solid rgba(255,255,255,.18)}
+.top .demo-bar b{color:#fff}
+.panel{background:var(--surface);border-radius:var(--r);box-shadow:var(--sh);padding:4px 16px 20px;margin-top:6px;min-width:0}
+.panel .row,.panel .card,.panel .stat,.panel .per,.panel .empty{background:var(--tint)}
+.panel .tbl{background:var(--surface)}
 .demo-bar{margin-top:10px;background:var(--accent-soft);color:var(--ink);border-radius:var(--r);padding:8px 12px;font-size:13px;display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap}
 .demo-bar b{color:var(--accent)}
 
@@ -139,7 +152,7 @@ label.f input,label.f select{background:var(--bg);border:1px solid var(--line);b
 .cols code{background:var(--sunk);border-radius:6px;padding:2px 8px;font-family:var(--font-body);font-size:13px}
 
 /* lock */
-.lock{max-width:360px;width:100%;margin:12vh auto 0;text-align:center;display:grid;gap:14px}
+.lock{max-width:380px;width:100%;background:var(--surface);border-radius:var(--r);box-shadow:var(--sh);padding:28px 22px;margin:70px auto 0;text-align:center;display:grid;gap:14px}
 .lock input{width:100%;min-width:0;text-align:center;font-size:24px;letter-spacing:.4em;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:10px}
 
 .toast{position:fixed;inset-inline:0;bottom:calc(16px + env(safe-area-inset-bottom,0px));margin:auto;width:max-content;max-width:calc(100% - 32px);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:999px;font-size:14px;font-weight:600;z-index:20;opacity:0;transform:translateY(8px);transition:.2s;pointer-events:none}
@@ -403,7 +416,7 @@ function render(){
   if(!V.date)V.date=defaultDate();
   if(!V.p)V.p=curPeriod(S.settings.times).idx;
   ensureAuto();
-  app.innerHTML=header()+({now:nowView,day:dayView,week:weekView,month:monthView,setup:setupView}[V.tab]||nowView)()+
+  app.innerHTML=header()+'<main class="panel">'+({now:nowView,day:dayView,week:weekView,month:monthView,setup:setupView}[V.tab]||nowView)()+'</main>'+
     `<footer>راصد المبسّط · البيانات محفوظة على هذا الجهاز فقط<br><span class="credit">إعداد وتطوير: عبدالمجيد السيد · 0561955430</span> · جميع الحقوق محفوظة © 2026</footer>`;
   bind();
 }
@@ -493,7 +506,7 @@ function setupView(){const s=S.settings;const nT=new Set(S.rows.map(r=>r.t)).siz
   </div></div>
   <div class="section"><h3>٢. بيانات المدرسة</h3><div class="card" style="display:grid;gap:12px">
    <div class="grid2"><label class="f">اسم المدرسة<input id="s-school" value="${esc(s.school)}"></label>
-    <label class="f">رمز دخول المشرف<input id="s-pin" inputmode="numeric" value="${esc(s.pin)}" placeholder="اتركه فارغًا لإلغاء القفل"></label>
+    <label class="f">رمز دخول المدير<input id="s-pin" inputmode="numeric" value="${esc(s.pin)}" placeholder="اتركه فارغًا لإلغاء القفل"></label>
     <label class="f">اسم المدير<input id="s-mgr" value="${esc(s.mgr)}"></label>
     <label class="f">جوال المدير<input id="s-mgrPh" inputmode="tel" dir="ltr" value="${esc(s.mgrPh)}" placeholder="05xxxxxxxx"></label></div>
    <div><div class="small muted" style="margin-bottom:6px">أوقات الحصص السبع (بداية – نهاية)</div><div class="times num">
@@ -508,7 +521,7 @@ function setupView(){const s=S.settings;const nT=new Set(S.rows.map(r=>r.t)).siz
   </div></div>${autoSetupHTML()}`}
 
 function lockView(){return `<div class="lock"><span class="mark" style="margin:auto;width:48px;height:48px;border-radius:12px" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="width:26px;height:26px"><path d="M4 12.5 9 17 20 6"/></svg></span>
-  <h1 style="font-size:24px">راصد المبسّط</h1><div class="muted">${esc(S.settings.school)}</div>
+  <h1 style="font-size:24px">راصد المبسّط</h1><div class="muted">${esc(S.settings.school)}</div><div class="pill" style="justify-self:center">دخول المدير</div>
   <form id="lockF"><input id="pin" type="password" inputmode="numeric" autocomplete="off" aria-label="رمز الدخول" placeholder="••••"><p id="lockErr" class="small" style="color:var(--bad);min-height:1.5em;margin:6px 0"></p>
   <button class="btn primary" style="width:100%;justify-content:center">دخول</button></form>
   ${S.demo?'<p class="small muted">رمز المدرسة التجريبية: <b class="num">1234</b></p>':''}
@@ -608,14 +621,14 @@ async function readSchedule(f){try{let aoa;const isCSV=/\.csv$/i.test(f.name)||f
 function weekHTML(W){const s=S.settings;
   return `<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${W.title} – ${esc(s.school)}</title>
 <style>body{font-family:Tahoma,"Segoe UI",sans-serif;margin:32px;color:#15211d}h1{font-size:20px;margin:0}p{color:#5a6964}table{border-collapse:collapse;width:100%;margin-top:14px;font-size:13px}
-th,td{border:1px solid #cfd8d3;padding:6px 10px;text-align:right}th{background:#eef2ef}.k{display:flex;gap:24px;margin:16px 0}.k b{display:block;font-size:22px}.bad{color:#b0281f}
+th,td{border:1px solid #d5e3e2;padding:6px 10px;text-align:right}th{background:#e4f2f1}.k{display:flex;gap:24px;margin:16px 0}.k b{display:block;font-size:22px}.bad{color:#b0281f}
 button{padding:8px 16px;margin-top:16px}@media print{button{display:none}body{margin:12mm}}</style></head><body>
 <h1>${W.title} لحضور المعلمين – ${esc(s.school)}</h1><p>${esc(W.span)}</p>
 <div class="k"><div><b>${W.pct}%</b>نسبة الحضور</div><div><b>${W.T.ok}</b>حاضر</div><div><b>${W.T.late}</b>متأخر</div><div class="bad"><b>${W.T.bad}</b>غائب</div></div>
 <table><tr><th>المعلم</th><th>مرصودة</th><th>حاضر</th><th>متأخر</th><th>غائب</th><th>النسبة</th><th>مواضع الغياب</th></tr>
 ${W.teachers.map(o=>`<tr><td>الأستاذ/ ${esc(o.t)}</td><td>${o.n}</td><td>${o.ok}</td><td>${o.late}</td><td class="${o.bad?'bad':''}">${o.bad}</td><td>${o.pct}%</td><td>${esc(o.list.join('، '))}</td></tr>`).join('')}</table>
 <p style="margin-top:24px">المدير: الأستاذ/ ${esc(s.mgr||'')} &nbsp;&nbsp; التوقيع: ............</p>
-<div style="margin-top:28px;font-size:12px;color:#5a6964;border-top:1px solid #cfd8d3;padding-top:8px">راصد المبسّط · إعداد وتطوير: عبدالمجيد السيد · 0561955430</div>
+<div style="margin-top:28px;font-size:12px;color:#5a6964;border-top:1px solid #d5e3e2;padding-top:8px">راصد المبسّط · إعداد وتطوير: عبدالمجيد السيد · 0561955430</div>
 <button onclick="print()">طباعة / حفظ PDF</button></body></html>`}
 
 async function dayHTML(date){const R=dayReport(date);const s=S.settings;let res={};
@@ -625,8 +638,8 @@ async function dayHTML(date){const R=dayReport(date);const s=S.settings;let res=
   const imgs=EXT&&ids.length?await chrome.storage.local.get(ids):{};
   return `<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>تقرير اليوم – ${esc(s.school)} – ${date}</title>
 <style>body{font-family:Tahoma,"Segoe UI",sans-serif;margin:32px;color:#15211d}h1{font-size:20px;margin:0}p{color:#5a6964}table{border-collapse:collapse;width:100%;margin-top:14px;font-size:13px}
-th,td{border:1px solid #cfd8d3;padding:6px 10px;text-align:right;vertical-align:top}th{background:#eef2ef}.k{display:flex;gap:24px;margin:16px 0}.k b{display:block;font-size:22px}.bad{color:#b0281f}.late{color:#a86200}
-td img{width:260px;display:block;margin:4px 0;border:1px solid #cfd8d3}.f{margin-top:28px;font-size:12px;color:#5a6964;border-top:1px solid #cfd8d3;padding-top:8px}button{padding:8px 16px;margin-top:16px}@media print{button{display:none}body{margin:10mm}tr{page-break-inside:avoid}}</style></head><body>
+th,td{border:1px solid #d5e3e2;padding:6px 10px;text-align:right;vertical-align:top}th{background:#e4f2f1}.k{display:flex;gap:24px;margin:16px 0}.k b{display:block;font-size:22px}.bad{color:#b0281f}.late{color:#a86200}
+td img{width:260px;display:block;margin:4px 0;border:1px solid #d5e3e2}.f{margin-top:28px;font-size:12px;color:#5a6964;border-top:1px solid #d5e3e2;padding-top:8px}button{padding:8px 16px;margin-top:16px}@media print{button{display:none}body{margin:10mm}tr{page-break-inside:avoid}}</style></head><body>
 <h1>تقرير حضور المعلمين – ${esc(s.school)}</h1><p>${DAYS[wd(date)]||''} ${fmtDate(date)}</p>
 <div class="k"><div><b>${R.pct}%</b>نسبة الحضور</div><div><b>${R.t.ok}</b>حاضر</div><div class="late"><b>${R.t.late}</b>متأخر</div><div class="bad"><b>${R.t.bad}</b>غائب</div><div><b>${R.t.un}</b>لم يُرصد</div></div>
 ${items.length?`<table><tr><th>الحصة</th><th>الصف</th><th>المعلم</th><th>الحالة</th><th>الوقت</th><th>لقطات الفحص</th></tr>
