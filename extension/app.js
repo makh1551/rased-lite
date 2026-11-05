@@ -66,7 +66,7 @@ function demoState(){
       if(h===0||h===7||(r.t==='يوسف الغامدي'&&p%3===0))st='bad';else if(h===3||h===11||h===19)st='late';
       marks[mk(date,p,c)]={st,at:DEF_TIMES[p-1][0].replace(/:(\d\d)/,(m,x)=>':'+pad(+x+4))};
       if(st!=='ok')sent[mk(date,p,c)]=DEF_TIMES[p-1][0].replace(/:(\d\d)/,(m,x)=>':'+pad(+x+3));});}
-  return{demo:true,settings:{school:'ابتدائية النموذج (مدرسة تجريبية)',mgr:'خالد المالكي',mgrPh:'0550000099',pin:'1234',times:DEF_TIMES.map(x=>x.slice())},rows,marks,sent};
+  return{demo:true,settings:{school:'ابتدائية النموذج (مدرسة تجريبية)',mgr:'خالد المالكي',mgrPh:'0550000099',pin:'1234',fpin:'5678',times:DEF_TIMES.map(x=>x.slice())},rows,marks,sent};
 }
 
 /* ============ الحالة ============ */
@@ -82,9 +82,71 @@ function updBar(){if(!EXT||!UPD)return'';return `<div class="alertbar" style="ba
   <div class="bar-row" style="margin-top:8px">${UPD.zip?`<a class="btn primary" href="${esc(UPD.zip)}" target="_blank" rel="noopener">${IC.dl} تنزيل التحديث</a>`:''}<span class="small" style="font-weight:500">فك الضغط داخل مجلد الإضافة نفسه (استبدال الملفات)، ثم اضغط ↻ على الإضافة في صفحة الإضافات. بياناتك لا تتأثر.</span></div></div>`}
 function pushCfg(){if(!EXT)return;const c={rows:S.rows,times:S.settings.times,school:S.settings.school,auto:S.auto};const j=JSON.stringify(c);if(j===lastCfg)return;lastCfg=j;chrome.storage.local.set({cfg:c})}
 function save(){store.set(KEY,JSON.stringify(S));pushCfg()}
+/* ---- الأدوار: المدير والمتابع ---- */
+const role=()=>store.sget('rl-role')||'';
+function needLock(){return !!(S.settings.pin||S.settings.fpin||(S.sync&&S.sync.key))&&!role()}
+const isFol=()=>role()==='fol';
+const byName=()=>isFol()?((S.sync&&S.sync.name)||'المتابع'):'المدير';
+function roleBar(){if(!(S.settings.pin||S.settings.fpin||S.sync)||!role())return'';
+  return `<div style="display:flex;gap:6px;align-items:center"><span class="pill">${isFol()?'👤 '+esc(byName()):'المدير'}</span><button class="btn ghost" id="logout">خروج</button></div>`}
+/* ---- المزامنة بين الأجهزة (Supabase) ---- */
+const SB_URL='https://knrpjgppxdhkdyxcwroe.supabase.co',SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtucnBqZ3BweGRoa2R5eGN3cm9lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE5OTk4MzMsImV4cCI6MjEwNzU3NTgzM30.T_M5u9G1Ix9nMGCt2Ysm1bmiDzpBppOPsHdJTYVH6Qc';
+const ERRS={bad:'رمز الدخول غير صحيح',none:'رمز المدرسة غير موجود',locked:'محاولات خاطئة كثيرة، حاول بعد ساعة',too_many:'تغييرات كثيرة دفعة واحدة',too_big:'الجدول كبير جدًا'};
+const fmtCode=c=>c?c.slice(0,4)+'-'+c.slice(4):'';
+async function rpc(fn,args){let r;try{r=await fetch(`${SB_URL}/rest/v1/rpc/${fn}`,{method:'POST',headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY,'Content-Type':'application/json'},body:JSON.stringify(args)})}
+  catch(e){throw new Error('تعذّر الاتصال بالإنترنت. المزامنة تعمل من موقع راصد أو من الإضافة.')}
+  const j=await r.json().catch(()=>null);if(!r.ok)throw new Error((j&&j.message)||('خطأ '+r.status));if(j&&j.err)throw new Error(ERRS[j.err]||j.err);return j}
+S.pend=S.pend||{};
+let SYNC_ST={at:'',err:''},syncBusy=false;
+const cfgObj=()=>({school:S.settings.school,mgr:S.settings.mgr,mgrPh:S.settings.mgrPh,times:S.settings.times});
+const cfgSig=()=>JSON.stringify([cfgObj(),S.rows,S.settings.fpin||'']);
+function markSync(k){if(!S.sync)return;S.pend[k]=1;clearTimeout(markSync.t);markSync.t=setTimeout(syncNow,800)}
+function applyServerCfg(r){if(!r.cfg)return;const c=r.cfg;S.settings.school=c.school||r.name||S.settings.school;S.settings.mgr=c.mgr||'';S.settings.mgrPh=c.mgrPh||'';
+  if(Array.isArray(c.times)&&c.times.length===7)S.settings.times=c.times;if(Array.isArray(r.rows))S.rows=r.rows;S.demo=false}
+function applyServerMarks(list){let ch=false;(list||[]).forEach(m=>{if(S.pend[m.k])return;
+  if(m.st)S.marks[m.k]={st:m.st,at:m.at,t:m.t,by:m.by,src:m.src};else delete S.marks[m.k];
+  if(m.sent)S.sent[m.k]=m.sent;else delete S.sent[m.k];ch=true});return ch}
+function syncStHTML(){if(!S.sync)return'';const n=Object.keys(S.pend).length;
+  return SYNC_ST.err?`<span style="color:var(--bad)">❌ ${esc(SYNC_ST.err)}</span>`:(SYNC_ST.at?`✅ آخر مزامنة ${SYNC_ST.at}`:'⏳ جارٍ الاتصال…')+(n?` · بانتظار الإرسال: ${n}`:'')}
+async function syncNow(){if(!S.sync||syncBusy||needLock())return;syncBusy=true;let ch=false;try{
+  const keys=Object.keys(S.pend);
+  if(keys.length){const marks=keys.map(k=>{const m=S.marks[k]||{};return{k,st:m.st||null,at:m.at||null,t:m.t||null,by:m.by||null,src:m.src||null,sent:S.sent[k]||null}});
+    await rpc('lite_push',{p_code:S.sync.code,p_key:S.sync.key,p_marks:marks});keys.forEach(k=>delete S.pend[k])}
+  if(S.sync.role==='mgr'){const sg=cfgSig();const nk=S.settings.pin&&S.settings.pin!==S.sync.key?S.settings.pin:null;
+    if(sg!==S.sync.cfgSig||nk){await rpc('lite_set_cfg',{p_code:S.sync.code,p_key:S.sync.key,p_name:S.settings.school,p_cfg:cfgObj(),p_rows:S.rows,p_fol_key:S.settings.fpin||'',p_new_key:nk});
+      S.sync.cfgSig=sg;if(nk)S.sync.key=nk}}
+  const r=await rpc('lite_pull',{p_code:S.sync.code,p_key:S.sync.key,p_since:S.sync.since||null});
+  if(r.cfg&&(S.sync.role==='fol'||cfgSig()===S.sync.cfgSig)){applyServerCfg(r);if(S.sync.role==='mgr')S.sync.cfgSig=cfgSig();ch=true}
+  if(applyServerMarks(r.marks))ch=true;
+  S.sync.since=r.now;SYNC_ST={at:hm(),err:''};store.set(KEY,JSON.stringify(S));
+}catch(e){SYNC_ST.err=String(e.message||e)}finally{syncBusy=false;const el=$('#syncSt');if(el)el.innerHTML=syncStHTML();
+  if(ch&&V.tab!=='setup'&&!document.querySelector('.lb,.sheet'))render()}}
+setInterval(syncNow,10000);
+async function enableSync(){if(!S.settings.pin){toast('ضع رمز دخول المدير أولًا');return}
+  const b=$('#syncOn');if(b)b.disabled=true;
+  try{const code=await rpc('lite_create',{p_name:S.settings.school,p_mgr_key:S.settings.pin,p_fol_key:S.settings.fpin||null,p_cfg:cfgObj(),p_rows:S.rows});
+    S.sync={code,key:S.settings.pin,role:'mgr',name:'المدير',since:null,cfgSig:cfgSig()};S.pend={};
+    Object.keys(S.marks).concat(Object.keys(S.sent)).forEach(k=>S.pend[k]=1);save();render();toast('فُعّلت المزامنة');syncNow()}
+  catch(e){toast(String(e.message||e));if(b)b.disabled=false}}
+async function joinSchool(code,key,name){code=code.toUpperCase().replace(/[^A-Z0-9]/g,'');if(code.length!==8)throw new Error('رمز المدرسة 8 أحرف، مثل ABCD-2345');if(!key)throw new Error('اكتب رمز الدخول');
+  const r=await rpc('lite_pull',{p_code:code,p_key:key,p_since:null});
+  S={demo:false,settings:{school:'',mgr:'',mgrPh:'',pin:r.role==='mgr'?key:'',fpin:'',times:DEF_TIMES.map(x=>x.slice())},rows:[],marks:{},sent:{},auto:{on:false,sound:true,skip:[],sk:[]},pend:{},
+    sync:{code,key,role:r.role,name:name||(r.role==='mgr'?'المدير':'المتابع'),since:r.now,cfgSig:''}};
+  applyServerCfg(r);applyServerMarks(r.marks);S.sync.cfgSig=cfgSig();save();store.sset('rl-role',r.role);V.date=null;V.p=null;V.tab='now';
+  SYNC_ST={at:hm(),err:''};render();toast(r.role==='mgr'?'انضممت بصلاحية المدير':'انضممت متابعًا')}
+function syncSetupHTML(){
+  if(!S.sync)return `<div class="section"><h3>٥. المزامنة بين الأجهزة</h3><div class="card" style="display:grid;gap:10px">
+   <p class="small muted" style="margin:0">تجعل رصد المتابعين على أجهزتهم يظهر عند المدير خلال ثوانٍ، ويصلهم الجدول وتعديلاته تلقائيًا. تحتاج اتصالًا بالإنترنت، والبيانات محمية برمز المدرسة والرموز السرية.</p>
+   ${S.settings.pin?'':'<p class="small" style="color:var(--bad);margin:0">ضع «رمز دخول المدير» في بيانات المدرسة واحفظ أولًا.</p>'}
+   <div><button class="btn primary" id="syncOn" ${S.settings.pin?'':'disabled'}>تفعيل المزامنة</button></div></div></div>`;
+  return `<div class="section"><h3>٥. المزامنة بين الأجهزة</h3><div class="card" style="display:grid;gap:10px">
+   <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">رمز المدرسة: <b class="num" style="font-size:22px;letter-spacing:.08em" dir="ltr">${fmtCode(S.sync.code)}</b><button class="btn" id="cpCode">${IC.copy} نسخ</button></div>
+   <ol class="steps small"><li>في جهاز المتابع: افتح راصد ← «الانضمام لمدرسة من جهاز آخر».</li><li>يكتب رمز المدرسة، ورمز المتابع${S.settings.fpin?'':' (حدّده أولًا في «بيانات المدرسة»)'}، واسمه.</li><li>يظهر رصده هنا مع اسمه، ويصله الجدول وكل تعديل عليه تلقائيًا.</li></ol>
+   <div class="small" id="syncSt">${syncStHTML()}</div>
+   <div class="bar-row" style="margin:0"><button class="btn" id="syncNowB">مزامنة الآن</button><button class="btn danger" id="syncOff">إيقاف المزامنة في هذا الجهاز</button></div></div></div>`}
 function teacherOf(k,m){if(m&&m.t)return m.t;const[d,p,c]=k.split('|');const r=S.rows.find(x=>x.d===wd(d)&&x.p===+p&&x.c===c);return r?r.t:''}
 function mergeAuto(){let ch=false;for(const[k,r]of Object.entries(AUTO)){if(k[0]==='_'||!r||!r.final||r.st==='unk')continue;const m=S.marks[k];
-  if((!m||m.src==='auto')&&(!m||m.st!==r.st)){S.marks[k]={st:r.st,at:r.at,src:'auto',t:r.t||teacherOf(k)};ch=true}}if(ch)store.set(KEY,JSON.stringify(S))}
+  if((!m||m.src==='auto')&&(!m||m.st!==r.st)){S.marks[k]={st:r.st,at:r.at,src:'auto',t:r.t||teacherOf(k),by:'🤖 آلي'};markSync(k);ch=true}}if(ch)store.set(KEY,JSON.stringify(S))}
 function ensureAuto(){if(!EXT||AUTO._date===V.date)return;const d=V.date;AUTO={_date:d};PRE={};
   chrome.storage.local.get(['res:'+d,'pre:'+d,'hb','test:last']).then(o=>{if(V.date!==d)return;AUTO=Object.assign({_date:d},o['res:'+d]||{});PRE=o['pre:'+d]||{};HB=o.hb||null;TEST=o['test:last']||null;mergeAuto();render()})}
 function beep(){try{const A=new(window.AudioContext||window.webkitAudioContext)();[880,660,880].forEach((f,i)=>{const o=A.createOscillator(),g=A.createGain();o.frequency.value=f;o.connect(g);g.connect(A.destination);
@@ -105,7 +167,7 @@ function linkText(r,kind){return `الأستاذ/ ${r.t}\nالسلام عليك�
   `\nنأمل إنشاء الاجتماع وإرسال الرابط قبل موعد الحصة ${S.settings.times[r.p-1][0]}.\nشاكرين تعاونكم\n${S.settings.school}`}
 function isLow(a){if(!a||!a.final||!(a.st==='ok'||a.st==='late'))return false;const l=a.checks[a.checks.length-1];return l&&l.att!=null&&l.att<LOWN}
 function noteHTML(k,m,sent,r){const a=AUTO[k],pr=PRE[k];const P=[];
-  if(m)P.push(`<span>${m.src==='auto'?'🤖 ':''}رُصد «${ST[m.st]}» ${m.at}</span>`);
+  if(m)P.push(`<span>${m.src==='auto'?'🤖 ':''}رُصد «${ST[m.st]}» ${m.at}${m.by&&m.src!=='auto'?' · '+esc(m.by):''}</span>`);
   if(a&&a.checks&&a.checks.length){const last=a.checks[a.checks.length-1];
     if(!a.final)P.push(`<span style="color:var(--late)">🤖 الفحص ${last.n} (${last.at}): ${esc(a.why||'غير موجود')}${a.next?` · الفحص التالي ${a.next}`:''}</span>`);
     else if(a.st==='unk')P.push(`<span style="color:var(--bad)">🤖 تعذّر التحقق: ${esc(a.why||'')}</span>`);
@@ -115,7 +177,7 @@ function noteHTML(k,m,sent,r){const a=AUTO[k],pr=PRE[k];const P=[];
     const sh=a.checks.filter(c=>c.img);if(sh.length)P.push(`<span>${sh.map(c=>`<button class="shot" data-img="${esc(c.img)}">📷 ${c.n}</button>`).join(' ')}</span>`)}
   if(r&&r.l&&pr&&pr.bad)P.push(`<span style="color:var(--bad)">⚠️ الرابط لا يعمل (فُحص ${pr.at})</span>`);
   if(r&&(!r.l||(pr&&pr.bad))){if(normPhone(r.ph))P.push(`<a class="shot" href="${esc(waUrl(r.ph,linkText(r,r.l?'bad':'none')))}" target="_blank" rel="noopener">📩 طلب رابط</a>`);
-    P.push(`<button class="shot" data-edit="${esc(k)}">✎ ${r.l?'تعديل الرابط':'إضافة رابط'}</button>`)}
+    if(!isFol())P.push(`<button class="shot" data-edit="${esc(k)}">✎ ${r.l?'تعديل الرابط':'إضافة رابط'}</button>`)}
   if(sent)P.push(`<span class="sent">✓ أُرسل التذكير ${sent}</span>`);
   return P.length?`<div class="note num">${P.join('')}</div>`:''}
 function hotWA(k,m,sent){if(sent)return false;if(m&&m.st!=='ok')return true;const a=AUTO[k];return !!(a&&!a.final)}
@@ -169,7 +231,7 @@ async function openTeacher(name,range){range=range||'month';const ref=V.date;let
     const rg=e.target.closest('[data-range]');if(rg){e.preventDefault();openTeacher(name,rg.dataset.range);return}
     const im=e.target.closest('[data-img]');if(im)showImg(im.dataset.img)});
   document.body.append(el)}
-document.addEventListener('click',e=>{const t=e.target.closest('[data-teacher]');if(t){openTeacher(t.dataset.teacher);return}const ed=e.target.closest('[data-edit]');if(ed)editLink(ed.dataset.edit)});
+document.addEventListener('click',e=>{if(isFol())return;const t=e.target.closest('[data-teacher]');if(t){openTeacher(t.dataset.teacher);return}const ed=e.target.closest('[data-edit]');if(ed)editLink(ed.dataset.edit)});
 const V={tab:'now',date:null,p:null};
 
 function curPeriod(times){const n=new Date(),m=n.getHours()*60+n.getMinutes();
@@ -234,7 +296,8 @@ function monthView(){const W=monthData(V.date),T=W.T;const weeks={};
 /* ============ العرض ============ */
 function render(){
   const app=$('#app');
-  if(S.settings.pin&&store.sget('rl-unlock')!==S.settings.pin){app.innerHTML=lockView();bindLock();return}
+  if(needLock()){app.innerHTML=lockView();bindLock();return}
+  if(isFol()&&V.tab!=='now')V.tab='now';
   if(!V.date)V.date=defaultDate();
   if(!V.p)V.p=curPeriod(S.settings.times).idx;
   ensureAuto();
@@ -242,12 +305,12 @@ function render(){
     `<footer>راصد المبسّط · البيانات محفوظة على هذا الجهاز فقط<br><span class="credit">إعداد وتطوير: عبدالمجيد السيد · 0561955430</span> · جميع الحقوق محفوظة © 2026</footer>`;
   bind();
 }
-function topBars(){return `${S.demo?`<div class="demo-bar"><span>تعرض الآن <b>مدرسة تجريبية وهمية</b> للتجربة. ارفع جدول مدرستك من «الإعداد والجدول» لتبدأ.</span><a class="btn" href="#setup">${IC.up} رفع الجدول</a></div>`:''}${updBar()}`}
+function topBars(){return `${S.demo&&!isFol()?`<div class="demo-bar"><span>تعرض الآن <b>مدرسة تجريبية وهمية</b> للتجربة. ارفع جدول مدرستك من «الإعداد والجدول» لتبدأ.</span><a class="btn" href="#setup">${IC.up} رفع الجدول</a></div>`:''}${updBar()}`}
 function header(){const cp=curPeriod(S.settings.times);const isToday=V.date===today();
   const tab=(id,t)=>`<a href="#${id}" ${V.tab===id?'aria-current="page"':''}>${t}</a>`;
   return `<header class="top"><div class="brand"><div><h1><span class="mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5 9 17 20 6"/></svg></span>راصد المبسّط</h1>
-   <div class="school">${esc(S.settings.school)}</div></div><div class="clock num" id="clock">${hm()}</div></div>
-   <nav class="tabs" aria-label="الأقسام">${tab('now','الآن')}${tab('day','اليوم')}${tab('week','الأسبوع')}${tab('month','الشهر')}${tab('setup','الإعداد والجدول')}</nav>
+   <div class="school">${esc(S.settings.school)}</div></div><div style="display:grid;gap:6px;justify-items:end"><div class="clock num" id="clock">${hm()}</div>${roleBar()}</div></div>
+   <nav class="tabs" aria-label="الأقسام">${tab('now','الآن')}${isFol()?'':`${tab('day','اليوم')}${tab('week','الأسبوع')}${tab('month','الشهر')}${tab('setup','الإعداد والجدول')}`}</nav>
   </header>`}
 
 function stripHTML(){const cp=curPeriod(S.settings.times);const isToday=V.date===today();const d=wd(V.date);
@@ -329,6 +392,7 @@ function setupView(){const s=S.settings;const nT=new Set(S.rows.map(r=>r.t)).siz
   <div class="section"><h3>٢. بيانات المدرسة</h3><div class="card" style="display:grid;gap:12px">
    <div class="grid2"><label class="f">اسم المدرسة<input id="s-school" value="${esc(s.school)}"></label>
     <label class="f">رمز دخول المدير<input id="s-pin" inputmode="numeric" value="${esc(s.pin)}" placeholder="اتركه فارغًا لإلغاء القفل"></label>
+    <label class="f">رمز دخول المتابع<input id="s-fpin" inputmode="numeric" value="${esc(s.fpin||'')}" placeholder="اتركه فارغًا لتعطيل دخول المتابع"></label>
     <label class="f">اسم المدير<input id="s-mgr" value="${esc(s.mgr)}"></label>
     <label class="f">جوال المدير<input id="s-mgrPh" inputmode="tel" dir="ltr" value="${esc(s.mgrPh)}" placeholder="05xxxxxxxx"></label></div>
    <div><div class="small muted" style="margin-bottom:6px">أوقات الحصص السبع (بداية – نهاية)</div><div class="times num">
@@ -340,19 +404,29 @@ function setupView(){const s=S.settings;const nT=new Set(S.rows.map(r=>r.t)).siz
    <div class="bar-row" style="margin:0"><button class="btn" id="exp">${IC.dl} تصدير نسخة (JSON)</button><button class="btn" id="expCp">${IC.copy} نسخ النسخة</button>
     <label class="btn" for="imp">${IC.up} استيراد نسخة</label><input type="file" id="imp" accept=".json,application/json" hidden></div>
    <div class="bar-row" style="margin:0"><button class="btn danger" id="clrMarks">مسح الرصد فقط</button><button class="btn danger" id="reset">مسح كل شيء والعودة للمدرسة التجريبية</button></div>
-  </div></div>${autoSetupHTML()}`}
+  </div></div>${autoSetupHTML()}${syncSetupHTML()}`}
 
 function lockView(){return `<div class="lock"><span class="mark" style="margin:auto;width:48px;height:48px;border-radius:12px" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="width:26px;height:26px"><path d="M4 12.5 9 17 20 6"/></svg></span>
-  <h1 style="font-size:24px">راصد المبسّط</h1><div class="muted">${esc(S.settings.school)}</div><div class="pill" style="justify-self:center">دخول المدير</div>
+  <h1 style="font-size:24px">راصد المبسّط</h1><div class="muted">${esc(S.settings.school)}</div><div class="pill" style="justify-self:center">دخول المدير أو المتابع</div>
   <form id="lockF"><input id="pin" type="password" inputmode="numeric" autocomplete="off" aria-label="رمز الدخول" placeholder="••••"><p id="lockErr" class="small" style="color:var(--bad);min-height:1.5em;margin:6px 0"></p>
   <button class="btn primary" style="width:100%;justify-content:center">دخول</button></form>
-  ${S.demo?'<p class="small muted">رمز المدرسة التجريبية: <b class="num">1234</b></p>':''}
+  <details class="join"><summary>الانضمام لمدرسة من جهاز آخر</summary>
+   <form id="joinF" style="display:grid;gap:8px;margin-top:10px"><input id="jCode" dir="ltr" autocomplete="off" placeholder="رمز المدرسة (مثل ABCD-2345)" aria-label="رمز المدرسة">
+   <input id="jKey" type="password" inputmode="numeric" autocomplete="off" placeholder="رمز الدخول (المدير أو المتابع)" aria-label="رمز الدخول">
+   <input id="jName" autocomplete="off" placeholder="اسمك (يظهر بجانب رصدك)" aria-label="الاسم">
+   <button class="btn primary" style="justify-content:center">انضمام</button><p id="jErr" class="small" style="color:var(--bad);margin:0"></p></form>
+   <p class="small muted" style="margin:6px 0 0">الانضمام يستبدل بيانات هذا الجهاز ببيانات المدرسة.</p></details>
+  ${S.demo?'<p class="small muted">المدرسة التجريبية: المدير <b class="num">1234</b> · المتابع <b class="num">5678</b></p>':''}
   <button class="btn danger" id="forgot" style="justify-self:center">نسيت الرمز</button><p class="small muted">إعداد وتطوير: عبدالمجيد السيد · 0561955430</p></div>`}
 
 /* ============ الأحداث ============ */
 function bindLock(){$('#pin').focus();
-  $('#lockF').addEventListener('submit',e=>{e.preventDefault();if($('#pin').value===S.settings.pin){store.sset('rl-unlock',S.settings.pin);render()}else{$('#lockErr').textContent='الرمز غير صحيح، حاول مرة أخرى.';$('#pin').select()}});
-  twoStep($('#forgot'),'اضغط مرة أخرى لمسح كل البيانات',()=>{S=demoState();S.auto={on:false,sound:true,skip:[],sk:[]};save();store.sset('rl-unlock','');render();toast('مُسحت البيانات وعادت المدرسة التجريبية')})}
+  const jf=$('#joinF');if(jf)jf.addEventListener('submit',async e=>{e.preventDefault();const b=jf.querySelector('button');b.disabled=true;$('#jErr').textContent='';
+    try{await joinSchool($('#jCode').value.trim(),$('#jKey').value.trim(),$('#jName').value.trim())}catch(err){$('#jErr').textContent=String(err.message||err)}finally{b.disabled=false}});
+  $('#lockF').addEventListener('submit',e=>{e.preventDefault();const v=$('#pin').value.trim();let r='';
+    if(S.settings.pin&&v===S.settings.pin)r='mgr';else if(S.settings.fpin&&v===S.settings.fpin)r='fol';else if(S.sync&&v===S.sync.key)r=S.sync.role;
+    if(r){store.sset('rl-role',r);if(r==='fol')V.tab='now';render();syncNow()}else{$('#lockErr').textContent='الرمز غير صحيح، حاول مرة أخرى.';$('#pin').select()}});
+  twoStep($('#forgot'),'اضغط مرة أخرى لمسح كل البيانات',()=>{S=demoState();S.auto={on:false,sound:true,skip:[],sk:[]};save();store.sset('rl-role','');render();toast('مُسحت البيانات وعادت المدرسة التجريبية')})}
 
 function twoStep(btn,msg,fn){if(!btn)return;const orig=btn.innerHTML;btn.addEventListener('click',()=>{if(btn.dataset.arm){fn();return}
   btn.dataset.arm=1;btn.textContent=msg;setTimeout(()=>{if(btn.isConnected){delete btn.dataset.arm;btn.innerHTML=orig}},4000)})}
@@ -362,8 +436,8 @@ function bind(){
   const di=$('#date');if(di)di.onchange=()=>{if(di.value){V.date=di.value;render()}};
   const gt=$('#goToday');if(gt)gt.onclick=()=>{V.date=today();V.p=curPeriod(S.settings.times).idx;render()};
   document.querySelectorAll('.seg button').forEach(b=>b.onclick=()=>{const k=b.dataset.k,v=b.dataset.v;
-    if(S.marks[k]&&S.marks[k].st===v)delete S.marks[k];else S.marks[k]={st:v,at:hm(),t:b.dataset.t};save();render()});
-  document.querySelectorAll('[data-sent]').forEach(a=>a.addEventListener('click',()=>{S.sent[a.dataset.sent]=hm();save();setTimeout(render,50)}));
+    if(S.marks[k]&&S.marks[k].st===v){delete S.marks[k];markSync(k);save();render();return}else S.marks[k]={st:v,at:hm(),t:b.dataset.t,by:byName()};markSync(k);save();render()});
+  document.querySelectorAll('[data-sent]').forEach(a=>a.addEventListener('click',()=>{S.sent[a.dataset.sent]=hm();markSync(a.dataset.sent);save();setTimeout(render,50)}));
   document.querySelectorAll('[data-goto]').forEach(b=>b.onclick=()=>{V.p=+b.dataset.goto;location.hash='now'});
   document.querySelectorAll('[data-day]').forEach(b=>b.onclick=()=>{V.date=b.dataset.day;location.hash='day'});
   document.querySelectorAll('[data-copy]').forEach(b=>b.onclick=()=>copyText($('#'+b.dataset.copy).textContent));
@@ -372,6 +446,7 @@ function bind(){
   document.querySelectorAll('[data-week]').forEach(b=>b.onclick=()=>{V.date=b.dataset.week;location.hash='week'});
   const rn=$('#runNow');if(rn)rn.onclick=()=>{chrome.runtime.sendMessage({cmd:'runNow',date:V.date,p:V.p});toast('بدأ الفحص، وستفتح الإضافة نافذة Teams')};
   document.querySelectorAll('[data-img]').forEach(b=>b.onclick=()=>showImg(b.dataset.img));
+  const lo=$('#logout');if(lo)lo.onclick=()=>{store.sset('rl-role','');V.tab='now';render()};
   if(V.tab==='setup')bindSetup();
 }
 
@@ -387,16 +462,16 @@ function bindSetup(){
   ['dragenter','dragover'].forEach(e=>drop.addEventListener(e,ev=>{ev.preventDefault();drop.classList.add('over')}));
   ['dragleave','drop'].forEach(e=>drop.addEventListener(e,ev=>{ev.preventDefault();drop.classList.remove('over')}));
   drop.addEventListener('drop',ev=>{const f=ev.dataTransfer.files[0];if(f)readSchedule(f)});
-  $('#saveSet').onclick=()=>{const s=S.settings;s.school=$('#s-school').value.trim()||s.school;s.pin=$('#s-pin').value.trim();
+  $('#saveSet').onclick=()=>{const s=S.settings;s.school=$('#s-school').value.trim()||s.school;s.pin=$('#s-pin').value.trim();s.fpin=$('#s-fpin').value.trim();if(s.fpin&&s.fpin===s.pin){toast('رمز المتابع يجب أن يختلف عن رمز المدير');return}if(S.sync&&!s.pin){toast('لا يمكن حذف رمز المدير والمزامنة مفعّلة');return}
     s.mgr=$('#s-mgr').value.trim();s.mgrPh=$('#s-mgrPh').value.trim();
     s.times=s.times.map((t,i)=>[$('#t-'+i+'-0').value||t[0],$('#t-'+i+'-1').value||t[1]]);
-    if(s.pin)store.sset('rl-unlock',s.pin);save();render();toast('حُفظ الإعداد')};
+    store.sset('rl-role','mgr');save();render();toast('حُفظ الإعداد')};
   const backup=()=>JSON.stringify({app:'rased-lite',v:1,saved:new Date().toISOString(),...S},null,1);
   $('#exp').onclick=()=>saveFile(`نسخة-راصد-${today()}.json`,backup(),'application/json');
   $('#expCp').onclick=()=>copyText(backup());
   $('#imp').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const o=JSON.parse(await f.text());
     if(!o.settings||!Array.isArray(o.rows))throw 0;S={demo:!!o.demo,settings:o.settings,rows:o.rows,marks:o.marks||{},sent:o.sent||{},auto:Object.assign({on:false,sound:true,skip:[],sk:[]},o.auto||{})};
-    if(S.settings.pin)store.sset('rl-unlock',S.settings.pin);save();V.date=null;V.p=null;render();toast('استُوردت النسخة')}catch(_){toast('الملف ليس نسخة راصد صالحة')}};
+    store.sset('rl-role','mgr');save();V.date=null;V.p=null;render();toast('استُوردت النسخة')}catch(_){toast('الملف ليس نسخة راصد صالحة')}};
   const sa=$('#saveAuto');if(sa)sa.onclick=()=>{const raw=$('#autoSkip').value;const list=raw.split(/[،,]/).map(x=>x.trim()).filter(Boolean);const sk=[];
     list.forEach(x=>{const p=parseInt(x.replace(/\D/g,''),10);const d=dayIdx(x.replace(/\d/g,''));if(d>=0&&p>=1&&p<=7)sk.push(d+'-'+p)});
     S.auto={on:$('#autoOn').checked,sound:$('#autoSound').checked,skip:list,sk};save();render();toast(S.auto.on?'الفحص الآلي مفعّل':'الفحص الآلي متوقف')};
@@ -405,8 +480,12 @@ function bindSetup(){
     if(!link){toast('لا يوجد رابط للاختبار');return}
     TEST={at:hm(),done:false,steps:[{m:'إرسال الطلب للإضافة',at:hm()}]};$('#testOut').innerHTML=testHTML();
     chrome.runtime.sendMessage({cmd:'test',link,teacher:t});toast('بدأ الاختبار، راقب نافذة الفحص')};
-  twoStep($('#clrMarks'),'اضغط مرة أخرى لمسح الرصد',()=>{S.marks={};S.sent={};save();render();toast('مُسح الرصد')});
-  twoStep($('#reset'),'اضغط مرة أخرى لمسح كل شيء',()=>{S=demoState();S.auto={on:false,sound:true,skip:[],sk:[]};save();store.sset('rl-unlock','1234');V.date=null;V.p=null;render();toast('عادت المدرسة التجريبية')});
+  const so=$('#syncOn');if(so)so.onclick=enableSync;
+  const cc=$('#cpCode');if(cc)cc.onclick=()=>copyText(fmtCode(S.sync.code));
+  const sn=$('#syncNowB');if(sn)sn.onclick=()=>{SYNC_ST.err='';syncNow()};
+  twoStep($('#syncOff'),'اضغط مرة أخرى لإيقاف المزامنة هنا',()=>{S.sync=null;S.pend={};save();render();toast('أُوقفت المزامنة في هذا الجهاز')});
+  twoStep($('#clrMarks'),'اضغط مرة أخرى لمسح الرصد',()=>{Object.keys(S.marks).concat(Object.keys(S.sent)).forEach(markSync);S.marks={};S.sent={};save();render();toast('مُسح الرصد')});
+  twoStep($('#reset'),'اضغط مرة أخرى لمسح كل شيء',()=>{S=demoState();S.auto={on:false,sound:true,skip:[],sk:[]};save();store.sset('rl-role','mgr');V.date=null;V.p=null;render();toast('عادت المدرسة التجريبية')});
 }
 
 /* ============ قراءة الجدول ============ */
@@ -476,3 +555,4 @@ addEventListener('hashchange',route);
 setInterval(()=>{const c=$('#clock');if(c)c.textContent=hm()},15000);
 pushCfg();
 route();
+syncNow();
