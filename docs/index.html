@@ -208,8 +208,8 @@ th{background:transparent}
 .stat b{font-size:24px}
 .prog{height:6px;margin-top:14px}
 .fold-h{cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px 14px;background:var(--tint);border-radius:14px;margin:0!important;user-select:none}
-.fold-h::after{content:"";width:8px;height:8px;border-inline-end:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg);transition:transform .2s;margin-top:-4px}
-.section.closed>.fold-h::after{transform:rotate(-45deg);margin-top:2px}
+.fold-h::after{content:"";width:8px;height:8px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg);transition:transform .2s;margin-top:-4px}
+.section.closed>.fold-h::after{transform:rotate(135deg);margin-top:2px}
 .section.closed>:not(.fold-h){display:none!important}
 .section.fold{margin-top:10px}
 .section.fold>.card{margin-top:8px}
