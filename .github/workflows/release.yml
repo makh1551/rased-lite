@@ -28,6 +28,21 @@ jobs:
           else
             gh release create "v$V" rased-auto.zip --title "راصد الآلي $V" --notes-file release-notes.txt
           fi
+      - name: رفع التحديث لمتجر Edge (إن وُجدت المفاتيح)
+        env:
+          PID: "${{ secrets.EDGE_PRODUCT_ID }}"
+          CID: "${{ secrets.EDGE_CLIENT_ID }}"
+          KEY: "${{ secrets.EDGE_API_KEY }}"
+        run: |
+          if [ -z "$PID" ] || [ -z "$CID" ] || [ -z "$KEY" ]; then echo "لا توجد مفاتيح متجر Edge – تخطّي"; exit 0; fi
+          API="https://api.addons.microsoftedge.microsoft.com/v1/products/$PID/submissions"
+          H=(-H "Authorization: ApiKey $KEY" -H "X-ClientID: $CID")
+          OP=$(curl -sSi -X POST "$API/draft/package" "${H[@]}" -H "Content-Type: application/zip" --data-binary @rased-auto.zip | awk -F': ' 'tolower($1)=="location"{print $2}' | tr -d '\r')
+          for i in $(seq 1 30); do S=$(curl -sS "$API/draft/package/operations/$OP" "${H[@]}" | jq -r .status); echo "رفع الحزمة: $S"; [ "$S" = "InProgress" ] || break; sleep 10; done
+          [ "$S" = "Succeeded" ] || { echo "فشل رفع الحزمة"; exit 1; }
+          OP=$(curl -sSi -X POST "$API" "${H[@]}" -H "Content-Type: text/plain" --data-binary "$(head -1 release-notes.txt)" | awk -F': ' 'tolower($1)=="location"{print $2}' | tr -d '\r')
+          for i in $(seq 1 30); do R=$(curl -sS "$API/operations/$OP" "${H[@]}"); S=$(echo "$R" | jq -r .status); echo "الإرسال للمراجعة: $S"; [ "$S" = "InProgress" ] || break; sleep 10; done
+          echo "$R"; [ "$S" = "Succeeded" ] || { echo "::warning::لم يُرسل التحديث للمتجر"; }
       - name: بناء الموقع
         run: |
           V="${{ steps.v.outputs.version }}"
