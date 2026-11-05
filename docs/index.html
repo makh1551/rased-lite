@@ -60,7 +60,7 @@ h1,h2,h3{font-family:var(--font-display);text-wrap:balance;margin:0;line-height:
 .panel{background:var(--surface);border-radius:var(--r);box-shadow:var(--sh);padding:4px 16px 20px;margin-top:6px;min-width:0}
 .panel .row,.panel .card,.panel .stat,.panel .per,.panel .empty{background:var(--tint)}
 .panel .tbl{background:var(--surface)}
-.demo-bar{margin-top:10px;background:var(--accent-soft);color:var(--ink);border-radius:var(--r);padding:8px 12px;font-size:13px;display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.demo-bar{margin-top:14px;background:var(--accent-soft);color:var(--ink);border-radius:var(--r);padding:8px 12px;font-size:13px;display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap}
 .demo-bar b{color:var(--accent)}
 
 /* period strip */
@@ -416,16 +416,16 @@ function render(){
   if(!V.date)V.date=defaultDate();
   if(!V.p)V.p=curPeriod(S.settings.times).idx;
   ensureAuto();
-  app.innerHTML=header()+'<main class="panel">'+({now:nowView,day:dayView,week:weekView,month:monthView,setup:setupView}[V.tab]||nowView)()+'</main>'+
+  app.innerHTML=header()+'<main class="panel">'+topBars()+({now:nowView,day:dayView,week:weekView,month:monthView,setup:setupView}[V.tab]||nowView)()+'</main>'+
     `<footer>راصد المبسّط · البيانات محفوظة على هذا الجهاز فقط<br><span class="credit">إعداد وتطوير: عبدالمجيد السيد · 0561955430</span> · جميع الحقوق محفوظة © 2026</footer>`;
   bind();
 }
+function topBars(){return `${S.demo?`<div class="demo-bar"><span>تعرض الآن <b>مدرسة تجريبية وهمية</b> للتجربة. ارفع جدول مدرستك من «الإعداد والجدول» لتبدأ.</span><a class="btn" href="#setup">${IC.up} رفع الجدول</a></div>`:''}${updBar()}`}
 function header(){const cp=curPeriod(S.settings.times);const isToday=V.date===today();
   const tab=(id,t)=>`<a href="#${id}" ${V.tab===id?'aria-current="page"':''}>${t}</a>`;
   return `<header class="top"><div class="brand"><div><h1><span class="mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5 9 17 20 6"/></svg></span>راصد المبسّط</h1>
    <div class="school">${esc(S.settings.school)}</div></div><div class="clock num" id="clock">${hm()}</div></div>
    <nav class="tabs" aria-label="الأقسام">${tab('now','الآن')}${tab('day','اليوم')}${tab('week','الأسبوع')}${tab('month','الشهر')}${tab('setup','الإعداد والجدول')}</nav>
-   ${S.demo?`<div class="demo-bar"><span>تعرض الآن <b>مدرسة تجريبية وهمية</b> للتجربة. ارفع جدول مدرستك من «الإعداد والجدول» لتبدأ.</span><a class="btn" href="#setup">${IC.up} رفع الجدول</a></div>`:''}${updBar()}
   </header>`}
 
 function stripHTML(){const cp=curPeriod(S.settings.times);const isToday=V.date===today();const d=wd(V.date);
