@@ -190,6 +190,7 @@ body{background:var(--band) top/100% 190px no-repeat,var(--bg);font-size:15px}
 .section>h3{font-size:15px;color:var(--ink)}
 .panel .row,.panel .card,.panel .stat,.panel .empty{border:0;background:var(--tint);box-shadow:none}
 .panel .per{border:1px solid transparent;background:var(--tint)}
+.panel .per[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
 .row{border-radius:14px;padding:12px 14px}
 .row[data-st]{border-inline-start:0;position:relative;overflow:hidden}
 .row[data-st="ok"]::before,.row[data-st="late"]::before,.row[data-st="bad"]::before{content:"";position:absolute;inset-block:10px;inset-inline-start:0;width:4px;border-radius:0 4px 4px 0}
