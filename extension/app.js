@@ -301,7 +301,7 @@ function render(){
   if(!V.date)V.date=defaultDate();
   if(!V.p)V.p=curPeriod(S.settings.times).idx;
   ensureAuto();
-  app.innerHTML=header()+'<main class="panel">'+topBars()+({now:nowView,day:dayView,week:weekView,month:monthView,setup:setupView}[V.tab]||nowView)()+'</main>'+
+  app.innerHTML=header()+'<main class="panel'+(V.anim?' enter':'')+'">'+topBars()+({now:nowView,day:dayView,week:weekView,month:monthView,setup:setupView}[V.tab]||nowView)()+'</main>'+
     `<footer>راصد المبسّط · البيانات محفوظة على هذا الجهاز فقط<br><span class="credit">إعداد وتطوير: عبدالمجيد السيد · 0561955430</span> · جميع الحقوق محفوظة © 2026</footer>`;
   bind();
 }
@@ -454,7 +454,13 @@ const TPL_HEAD=['اليوم','الحصة','الصف','المعلم','الجوا�
 function tplCSV(){return '﻿'+[TPL_HEAD,['الأحد','1','الأول أ','اسم المعلم','05xxxxxxxx','https://teams.microsoft.com/l/meetup-join/...'],['الأحد','2','الأول أ','اسم المعلم','05xxxxxxxx','']]
   .map(r=>r.map(c=>/[",\n]/.test(c)?`"${c.replace(/"/g,'""')}"`:c).join(',')).join('\r\n')}
 
+const OPENSEC=new Set([0]);
 function bindSetup(){
+  document.querySelectorAll('.panel .section').forEach((sec,i)=>{const h=sec.querySelector(':scope>h3');if(!h)return;
+    sec.classList.add('fold');h.classList.add('fold-h');h.setAttribute('role','button');h.tabIndex=0;h.setAttribute('aria-expanded',OPENSEC.has(i));
+    if(!OPENSEC.has(i))sec.classList.add('closed');
+    const tg=()=>{const c=sec.classList.toggle('closed');h.setAttribute('aria-expanded',!c);c?OPENSEC.delete(i):OPENSEC.add(i)};
+    h.onclick=tg;h.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();tg()}}});
   $('#dlTpl').onclick=()=>saveFile('قالب-جدول-راصد.csv',tplCSV(),'text/csv');
   $('#cpTpl').onclick=()=>copyText(TPL_HEAD.join('\t')+'\nالأحد\t1\tالأول أ\tاسم المعلم\t05xxxxxxxx\t');
   const drop=$('#drop'),fi=$('#file');
@@ -550,7 +556,7 @@ ${items.map(it=>{const m=S.marks[mk(date,it.r.p,it.r.c)]||{};return `<tr><td>${i
 <button onclick="print()">طباعة / حفظ PDF</button></body></html>`}
 
 /* ============ التوجيه والساعة ============ */
-function route(){const h=(location.hash||'').slice(1);V.tab=['now','day','week','month','setup'].includes(h)?h:'now';render();window.scrollTo(0,0)}
+function route(){V.anim=true;setTimeout(()=>{V.anim=false},50);const h=(location.hash||'').slice(1);V.tab=['now','day','week','month','setup'].includes(h)?h:'now';render();window.scrollTo(0,0)}
 addEventListener('hashchange',route);
 setInterval(()=>{const c=$('#clock');if(c)c.textContent=hm()},15000);
 pushCfg();

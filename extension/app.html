@@ -174,6 +174,46 @@ label.f input,label.f select{background:var(--bg);border:1px solid var(--line);b
 .autobar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:10px;font-size:13px;color:var(--muted)}
 footer{margin-top:40px;font-size:12px;color:var(--muted);text-align:center}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+/* ===== تبسيط وسلاسة ===== */
+:where(#app svg){width:18px;height:18px;flex:none;vertical-align:-3px}
+body{background:var(--band) top/100% 190px no-repeat,var(--bg);font-size:15px}
+.top{padding-block:16px 12px}
+.brand h1{font-size:22px}
+.top .mark{width:34px;height:34px;border-radius:10px}.top .mark svg{width:18px;height:18px}
+.tabs{gap:2px;margin-top:10px}
+.tabs a{padding:6px 14px;font-size:14px;transition:background .15s,color .15s}
+.panel{padding:6px 18px 22px;border-radius:18px}
+.panel.enter{animation:rise .22s ease-out}
+@keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.daybar h2{font-size:20px}
+.section{margin-top:18px}
+.section>h3{font-size:15px;color:var(--ink)}
+.panel .row,.panel .card,.panel .stat,.panel .empty{border:0;background:var(--tint);box-shadow:none}
+.panel .per{border:1px solid transparent;background:var(--tint)}
+.row{border-radius:14px;padding:12px 14px}
+.row[data-st]{border-inline-start:0;position:relative;overflow:hidden}
+.row[data-st="ok"]::before,.row[data-st="late"]::before,.row[data-st="bad"]::before{content:"";position:absolute;inset-block:10px;inset-inline-start:0;width:4px;border-radius:0 4px 4px 0}
+.row[data-st="ok"]::before{background:var(--ok)}.row[data-st="late"]::before{background:var(--late)}.row[data-st="bad"]::before{background:var(--bad)}
+.btn{border-radius:10px;min-height:36px;transition:border-color .15s,background .15s,transform .1s}
+.btn:active{transform:scale(.98)}
+.seg{border-radius:10px;border:0;background:var(--sunk)}
+.seg button{min-height:36px;transition:background .15s,color .15s}
+.seg button+button{border-inline-start:0}
+.tbl{border:0;border-radius:14px;background:var(--tint)}
+.panel .tbl{background:var(--tint)}
+th{background:transparent}
+.drop{padding:14px;border-radius:14px;background:var(--surface)}
+.drop b{display:inline-flex;gap:8px;align-items:center}
+.demo-bar{border-radius:12px;padding:10px 14px}
+.stat b{font-size:24px}
+.prog{height:6px;margin-top:14px}
+.fold-h{cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px 14px;background:var(--tint);border-radius:14px;margin:0!important;user-select:none}
+.fold-h::after{content:"";width:8px;height:8px;border-inline-end:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg);transition:transform .2s;margin-top:-4px}
+.section.closed>.fold-h::after{transform:rotate(-45deg);margin-top:2px}
+.section.closed>:not(.fold-h){display:none!important}
+.section.fold{margin-top:10px}
+.section.fold>.card{margin-top:8px}
+@media (prefers-reduced-motion:reduce){.panel.enter{animation:none}}
 </style>
 
 </head><body>
