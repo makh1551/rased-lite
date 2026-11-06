@@ -371,9 +371,9 @@ function sendSetupHTML(){if(isFol())return'';const via=(S.auto.wa&&S.auto.wa.via
    <label style="display:flex;gap:8px;align-items:flex-start"><input type="radio" name="via" value="api" ${via==='api'?'checked':''} ${can?'':'disabled'}><span><b>الإرسال من الخادم</b><br><span class="small muted">ضغطة واحدة دون فتح واتساب، ولا يحتاج جهازًا مفتوحًا للإرسال الآلي. تربط المدرسة مزوّدها مرة واحدة: واتساب برمز QR، و/أو رسائل نصية سعودية احتياطية.</span>${can?'':`<br><span class="small" style="color:var(--late)">يتطلب تفعيل المزامنة والباقة الاحترافية.</span>`}</span></label>
    ${via==='api'&&can?`<div style="display:grid;gap:12px;background:var(--surface);border-radius:12px;padding:12px">
     <div style="display:grid;gap:8px"><b>واتساب برقم المدرسة (بوابة QR)</b>
-     <p class="small muted" style="margin:0">أنشئ حسابًا في UltraMsg أو Green-API، وامسح رمز QR من واتساب رقم المدرسة، ثم انسخ رقم الخدمة (Instance) والرمز (Token) هنا. خدمة غير رسمية: أبقِ الرسائل معتدلة.</p>
-     <select id="waProv" style="max-width:240px;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:7px">${opt('','بدون',W.provider||'')}${opt('ultramsg','UltraMsg',W.provider)}${opt('greenapi','Green-API',W.provider)}</select>
-     <div class="grid2">${inp('waInst','Instance ID',W.instance)}${inp('waTok','Token',W.token)}</div>
+     <p class="small muted" style="margin:0">الواتس المباشر: انسخ «مفتاح API» من صفحة «توثيق API» والصقه هنا. UltraMsg أو Green-API: امسح رمز QR من واتساب رقم المدرسة ثم انسخ Instance و Token. خدمات غير رسمية: أبقِ الرسائل معتدلة.</p>
+     <select id="waProv" style="max-width:240px;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:7px">${opt('','بدون',W.provider||'')}${opt('smartwhats','الواتس المباشر (smart-whats)',W.provider)}${opt('ultramsg','UltraMsg',W.provider)}${opt('greenapi','Green-API',W.provider)}</select>
+     <div class="grid2"><span id="waInstW" ${W.provider==='smartwhats'?'hidden':''}>${inp('waInst','Instance ID',W.instance)}</span>${inp('waTok',W.provider==='smartwhats'?'مفتاح API (wsk_...)':'Token',W.token)}</div>
      <div id="waUrlW" ${W.provider==='greenapi'?'':'hidden'}>${inp('waUrl','apiUrl (من لوحة Green-API، اختياري)',W.url)}</div></div>
     <div style="display:grid;gap:8px"><b>رسائل نصية (SMS) سعودية</b>
      <p class="small muted" style="margin:0">تُستخدم إن لم يُضبط واتساب أو فشل الإرسال إليه. يلزم اسم مرسل معتمد من المزوّد.</p>
@@ -384,7 +384,7 @@ function sendSetupHTML(){if(isFol())return'';const via=(S.auto.wa&&S.auto.wa.via
     <div class="bar-row" style="margin:0"><button class="btn" id="apiTest" type="button">رسالة اختبار لجوال المدير</button><span class="small" id="apiOut"></span></div></div>`:''}
    <div><button class="btn primary" id="viaSave" type="button">حفظ</button></div></div></div>`}
 function bindSend(){
-  const wp=$('#waProv');if(wp)wp.onchange=()=>{$('#waUrlW').hidden=wp.value!=='greenapi'};
+  const wp=$('#waProv');if(wp)wp.onchange=()=>{$('#waUrlW').hidden=wp.value!=='greenapi';$('#waInstW').hidden=wp.value==='smartwhats';$('#waTok').placeholder=wp.value==='smartwhats'?'مفتاح API (wsk_...)':'Token'};
   const sp=$('#smsProv');if(sp)sp.onchange=()=>{$('#smsUserW').hidden=sp.value!=='msegat';$('#smsTok').placeholder=sp.value==='unifonic'?'AppSid':sp.value==='msegat'?'API Key':'Bearer Token'};
   document.querySelectorAll('input[name=via]').forEach(r=>r.onchange=()=>{S.auto.wa=Object.assign({},S.auto.wa,{via:r.value});save();render()});
   const vs=$('#viaSave');if(vs)vs.onclick=async()=>{const v=(document.querySelector('input[name=via]:checked')||{}).value||'web';S.auto.wa=Object.assign({},S.auto.wa,{via:v});save();

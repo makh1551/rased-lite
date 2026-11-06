@@ -1,6 +1,6 @@
 // راصد المبسّط – خدمة الإرسال من الخادم
 // لكل مدرسة مزوّدها الخاص (يضبطه المدير من راصد ← «طريقة إرسال الرسائل»):
-//   واتساب عبر بوابة QR: UltraMsg أو Green-API (نص حر من رقم المدرسة)
+//   واتساب عبر بوابة: الواتس المباشر (smart-whats) أو UltraMsg أو Green-API (نص حر من رقم المدرسة)
 //   رسائل نصية سعودية: تقنيات أو مسجات أو Unifonic
 // واحتياطيًا على مستوى المنصة: Bird (قوالب واتساب الرسمي / SMS) إن ضُبطت أسراره.
 // المفتاح السري لا يغادر الخادم. الطلب يُقبل فقط برمز مدرسة ورمز دخول صحيحين وباقة احترافية سارية.
@@ -86,6 +86,15 @@ Deno.serve(async (req) => {
       const j: any = await r.json().catch(() => ({}));
       if (r.ok && j.idMessage) { channel = "whatsapp"; id = String(j.idMessage); } else addErr("Green-API: " + (j.message || r.status));
     } catch (e) { addErr("Green-API: " + e); }
+  }
+  if (!channel && text && W.provider === "smartwhats" && W.token) {
+    try {
+      const base = (W.url || "https://wa.smart-whats.com").replace(/\/+$/, "");
+      const r = await fetch(`${base}/api/messages`, { method: "POST", headers: { "X-API-Key": W.token, "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify({ phone: digits, message: text, text }) });
+      const j: any = await r.json().catch(() => ({}));
+      if (r.ok && j.success !== false && !j.error) { channel = "whatsapp"; id = String(j.id || j.message_id || j.data?.id || ""); } else addErr("الواتس المباشر: " + (j.message || j.error || r.status));
+    } catch (e) { addErr("الواتس المباشر: " + e); }
   }
   // 2) رسائل نصية عبر مزوّد سعودي للمدرسة
   if (!channel && text && M.provider === "taqnyat" && M.token && M.sender) {
