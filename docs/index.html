@@ -696,7 +696,7 @@ function render(){
 function topBars(){return installBar()+planBar()+`${S.demo&&!isFol()?`<div class="demo-bar"><span>تعرض الآن <b>مدرسة تجريبية وهمية</b> للتجربة. ارفع جدول مدرستك من «الإعداد والجدول» لتبدأ.</span><button class="btn" id="wizB">ابدأ مدرستك في 3 خطوات</button></div>`:''}${updBar()}${mpBar()}`}
 function header(){const cp=curPeriod(S.settings.times);const isToday=V.date===today();
   const tab=(id,t)=>`<a href="#${id}" ${V.tab===id?'aria-current="page"':''}>${t}</a>`;
-  return `<header class="top"><div class="brand"><div><h1><span class="mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5 9 17 20 6"/></svg></span>راصد المبسّط</h1>
+  return `<header class="top"><div class="brand"><div><h1><span class="mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" ><path d="M7.5 9.75A6.75 6.75 0 0 1 14.25 16.5" stroke="#1b8a8f"/><path d="M7.5 4.5A12 12 0 0 1 19.5 16.5"/><circle cx="7.5" cy="16.5" r="2.4" fill="#1b8a8f" stroke="none"/></svg></span>راصد المبسّط</h1>
    <div class="school">${esc(S.settings.school)}</div></div><div style="display:grid;gap:6px;justify-items:end"><div class="clock num" id="clock">${hm()}</div>${roleBar()}</div></div>
    <nav class="tabs" aria-label="الأقسام">${tab('now','الآن')}${isFol()?'':`${tab('day','اليوم')}${tab('week','الأسبوع')}${tab('month','الشهر')}${tab('setup','الإعداد والجدول')}`}</nav>
   </header>`}
@@ -811,7 +811,7 @@ function setupView(){const s=S.settings;const nT=new Set(S.rows.map(r=>r.t)).siz
    <div class="bar-row" style="margin:0"><button class="btn danger" id="clrMarks">مسح الرصد فقط</button><button class="btn danger" id="reset">مسح كل شيء والعودة للمدرسة التجريبية</button></div>
   </div></div>${autoSetupHTML()}${syncSetupHTML()}${planSetupHTML()}${sendSetupHTML()}${tplHTML()}`}
 
-function lockView(){return `<div class="lock"><span class="mark" style="margin:auto;width:48px;height:48px;border-radius:12px" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="width:26px;height:26px"><path d="M4 12.5 9 17 20 6"/></svg></span>
+function lockView(){return `<div class="lock"><span class="mark" style="margin:auto;width:48px;height:48px;border-radius:12px" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"  style="width:26px;height:26px"><path d="M7.5 9.75A6.75 6.75 0 0 1 14.25 16.5" stroke="#7fe0d6"/><path d="M7.5 4.5A12 12 0 0 1 19.5 16.5"/><circle cx="7.5" cy="16.5" r="2.4" fill="#7fe0d6" stroke="none"/></svg></span>
   <h1 style="font-size:24px">راصد المبسّط</h1><div class="muted">${esc(S.settings.school)}</div><div class="pill" style="justify-self:center">دخول المدير أو المتابع</div>
   <form id="lockF"><input id="pin" type="password" inputmode="numeric" autocomplete="off" aria-label="رمز الدخول" placeholder="••••"><p id="lockErr" class="small" style="color:var(--bad);min-height:1.5em;margin:6px 0"></p>
   <button class="btn primary" style="width:100%;justify-content:center">دخول</button></form>

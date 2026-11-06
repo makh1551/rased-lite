@@ -27,7 +27,7 @@ button:disabled{opacity:.55}
 footer{text-align:center;color:var(--muted);font-size:12px;margin-top:18px}
 </style></head><body>
 <div class="box" id="box">
-  <span class="mark"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5 9 17 20 6"/></svg></span>
+  <span class="mark"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" ><path d="M7.5 9.75A6.75 6.75 0 0 1 14.25 16.5" stroke="#7fe0d6"/><path d="M7.5 4.5A12 12 0 0 1 19.5 16.5"/><circle cx="7.5" cy="16.5" r="2.4" fill="#7fe0d6" stroke="none"/></svg></span>
   <h1>تسجيل جوال المعلم</h1><p class="sc" id="sc">…</p>
   <label>الاسم كما في منصة مدرستي<input id="nm" autocomplete="name" placeholder="مثال: خالد أحمد السالم"></label>
   <label>رقم الجوال (واتساب)<input id="ph" dir="ltr" inputmode="tel" autocomplete="tel" placeholder="05xxxxxxxx"></label>
@@ -50,6 +50,6 @@ loadSchool();
 $('#go').onclick=async()=>{const b=$('#go'),m=$('#msg');if(!$('#cdL').hidden){code=$('#cd').value.toUpperCase().replace(/[^A-Z0-9]/g,'')}
   const nm=$('#nm').value.trim(),ph=$('#ph').value.trim();if(!nm||!ph){m.innerHTML='<span class="bad">اكتب الاسم والجوال</span>';return}
   b.disabled=true;m.textContent='⏳ …';
-  try{await rpc('lite_phone_submit',{p_code:code,p_name:nm,p_phone:ph});$('#box').innerHTML=`<span class="mark"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5 9 17 20 6"/></svg></span><h1>تم التسجيل</h1><p class="note" style="font-size:15px">شكرًا لك. ستصلك تذكيرات الحصص على هذا الرقم.</p>`}
+  try{await rpc('lite_phone_submit',{p_code:code,p_name:nm,p_phone:ph});$('#box').innerHTML=`<span class="mark"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" ><path d="M7.5 9.75A6.75 6.75 0 0 1 14.25 16.5" stroke="#7fe0d6"/><path d="M7.5 4.5A12 12 0 0 1 19.5 16.5"/><circle cx="7.5" cy="16.5" r="2.4" fill="#7fe0d6" stroke="none"/></svg></span><h1>تم التسجيل</h1><p class="note" style="font-size:15px">شكرًا لك. ستصلك تذكيرات الحصص على هذا الرقم.</p>`}
   catch(e){m.innerHTML=`<span class="bad">${e.message.replace(/[<>&]/g,'')}</span>`;b.disabled=false}};
 </script></body></html>

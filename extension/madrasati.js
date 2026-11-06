@@ -207,7 +207,7 @@
   }
   function draw(inner) {
     const sc = detectSchool();
-    box.innerHTML = `<div class="hd"><span class="mk"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0d4f57" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5 9 17 20 6"/></svg></span><b>راصد · السحب من مدرستي</b><button class="x" id="mpX" title="إغلاق">×</button></div>
+    box.innerHTML = `<div class="hd"><span class="mk"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0d4f57" stroke-width="2.6" stroke-linecap="round" ><path d="M7.5 9.75A6.75 6.75 0 0 1 14.25 16.5" stroke="#1b8a8f"/><path d="M7.5 4.5A12 12 0 0 1 19.5 16.5"/><circle cx="7.5" cy="16.5" r="2.4" fill="#1b8a8f" stroke="none"/></svg></span><b>راصد · السحب من مدرستي</b><button class="x" id="mpX" title="إغلاق">×</button></div>
       <div class="bd">${inner || `<div class="mu">${sc ? 'المدرسة محددة ✓' : '⚠️ اختر المدرسة وافتح صفحة «الفصول» أولًا.'} يقرأ راصد جدول كل فصل لهذا الأسبوع (الحصة، المادة، المعلم)، ولا يغيّر شيئًا في مدرستي.</div>
         <div class="row"><button class="b" id="mpS">فحص عينة (فصل واحد)</button><button class="b p" id="mpA">سحب جدول كل الفصول</button></div>
         <hr style="border:0;border-top:1px solid #e7eeee;margin:4px 0">
