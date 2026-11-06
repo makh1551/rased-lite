@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>راصد المبسّط</title>
+<meta name="description" content="أداة مجانية لمتابعة حضور المعلمين في الحصص الافتراضية على Teams: رصد، تذكير واتساب، تقارير، ومتابعون، وفحص آلي.">
+<meta name="theme-color" content="#0d4f57">
+<link rel="icon" href="../icon-192.png">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap">
+<style>
+/* صفحة تعريفية بهوية راصد: شريط تيل علوي، وبطاقات بيضاء هادئة */
+:root{--bg:#f2f5f5;--surface:#fff;--tint:#f1f8f7;--ink:#10272b;--muted:#5f7376;--accent:#0d4f57;--teal:#1b8a8f;--ok:#15803d;
+  --band:radial-gradient(120% 140% at 100% 0%,#1b8a8f 0%,#0d4f57 55%,#083a40 100%);--sh:0 1px 2px rgba(16,39,43,.05),0 4px 14px rgba(16,39,43,.06);
+  --f:"IBM Plex Sans Arabic",Tahoma,"Segoe UI",sans-serif}
+@media (prefers-color-scheme:dark){:root{--bg:#0c1517;--surface:#142124;--tint:#132c2f;--ink:#e4efee;--muted:#9db1b0;--accent:#4cc3c0;--teal:#4cc3c0;--ok:#5fd394;
+  --band:radial-gradient(120% 140% at 100% 0%,#14666b 0%,#0a3a40 55%,#06282c 100%);--sh:0 1px 2px rgba(0,0,0,.3);color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;font-family:var(--f);color:var(--ink);background:var(--band) top/100% 420px no-repeat,var(--bg);line-height:1.75;font-size:16px}
+.w{max-width:960px;margin:0 auto;padding-inline:max(18px,env(safe-area-inset-left,0px)) max(18px,env(safe-area-inset-right,0px))}
+a{color:inherit}
+header{color:#fff;padding-block:28px 40px}
+.brand{display:flex;align-items:center;gap:12px;font-weight:700;font-size:20px}
+.mark{width:40px;height:40px;border-radius:12px;background:#fff;display:grid;place-items:center}
+.mark svg{width:22px;height:22px}
+h1{font-size:clamp(28px,5vw,42px);line-height:1.3;margin:28px 0 10px;text-wrap:balance}
+.lead{font-size:18px;opacity:.88;max-width:40em;margin:0}
+.cta{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:11px 20px;border-radius:12px;font-weight:600;text-decoration:none;border:1px solid transparent;transition:transform .1s}
+.btn:active{transform:scale(.98)}
+.btn.w1{background:#fff;color:#0d4f57}.btn.w2{border-color:rgba(255,255,255,.5);color:#fff}
+.btn.p{background:var(--accent);color:#fff}@media (prefers-color-scheme:dark){.btn.p{color:#06231c}}
+.btn.o{border-color:var(--accent);color:var(--accent)}
+main{display:grid;gap:18px;padding-bottom:40px}
+.card{background:var(--surface);border-radius:18px;box-shadow:var(--sh);padding:22px}
+h2{font-size:21px;margin:0 0 12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.f{background:var(--tint);border-radius:14px;padding:14px 16px}
+.f b{display:block;font-size:16px;margin-bottom:2px}.f span{color:var(--muted);font-size:14px}
+ol.steps{margin:0;padding:0;list-style:none;display:grid;gap:10px;counter-reset:s}
+ol.steps li{display:flex;gap:12px;align-items:flex-start;background:var(--tint);border-radius:14px;padding:12px 14px;counter-increment:s}
+ol.steps li::before{content:counter(s);flex:none;width:28px;height:28px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;font-weight:700;font-size:14px}
+@media (prefers-color-scheme:dark){ol.steps li::before{color:#06231c}}
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+.muted{color:var(--muted)}
+footer{text-align:center;color:var(--muted);font-size:13px;padding-block:10px 32px}
+:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+</style></head><body>
+<header><div class="w">
+  <div class="brand"><span class="mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#0d4f57" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5 9 17 20 6"/></svg></span>راصد المبسّط</div>
+  <h1>متابعة حضور المعلمين في الحصص الافتراضية، بخطوات بسيطة</h1>
+  <p class="lead">صفحة واحدة يرصد فيها المدير والمتابعون حضور المعلمين في حصص Teams، ويذكّرون المتأخر برسالة واتساب جاهزة، ويستخرجون تقارير اليوم والأسبوع والشهر. مجانية، ولا تحتاج حسابًا.</p>
+  <div class="cta"><a class="btn w1" href="../">افتح راصد</a><a class="btn w2" href="../">جرّب المدرسة التجريبية (رمز المدير 1234)</a></div>
+</div></header>
+<div class="w"><main>
+  <section class="card"><h2>ما الذي يقدمه</h2><div class="grid">
+    <div class="f"><b>شاشة «الآن»</b><span>الحصة الحالية تلقائيًا، ولكل صف: رابط Teams، وحاضر أو متأخر أو غائب.</span></div>
+    <div class="f"><b>تذكير بضغطة</b><span>رسالة واتساب جاهزة للمعلم، وتذكير جماعي لكل من لم يُرصد.</span></div>
+    <div class="f"><b>تقارير جاهزة</b><span>اليوم والأسبوع والشهر، وسجل كل معلم، وإرسالها للمدير مباشرة.</span></div>
+    <div class="f"><b>مدير ومتابعون</b><span>لكل متابع اسمه وحصصه المسندة، ورصده يصل للمدير خلال ثوانٍ.</span></div>
+  </div></section>
+
+  <section class="card"><h2>كيف تبدأ</h2><ol class="steps">
+    <li><span>افتح راصد، وادخل برمز المدير التجريبي <b>1234</b>، ثم اضغط «ابدأ مدرستك في 3 خطوات».</span></li>
+    <li><span>اكتب اسم المدرسة، ثم ارفع جدول الحصص أو الصقه من Excel أو منصة مدرستي.</span></li>
+    <li><span>اختر رمز المدير ورمز المتابعين وأسماءهم، وفعّل المزامنة إن أردت متابعين على أجهزة أخرى.</span></li>
+  </ol>
+  <div class="cta"><a class="btn p" href="../">ابدأ الآن</a><a class="btn o" href="../rased-template.csv">قالب الجدول (CSV)</a></div></section>
+
+  <div class="two">
+    <section class="card"><h2>على الجوال كتطبيق</h2><p class="muted" style="margin:0">افتح راصد من الجوال واضغط «تثبيت» في أعلى الصفحة، أو من الآيفون: زر المشاركة ← «إضافة إلى الشاشة الرئيسية». يفتح بأيقونة ويعمل حتى مع ضعف الإنترنت.</p></section>
+    <section class="card"><h2>الفحص الآلي (اختياري)</h2><p class="muted" style="margin:0 0 12px">إضافة لمتصفح Edge أو Chrome تدخل الحصص في مواعيدها بصمت، وتتأكد من وجود المعلم، وتلتقط لقطة شاشة مختومة بالوقت تُحفظ في جهازك.</p>
+      <a class="btn o" href="../rased-auto.zip">تنزيل الإضافة</a></section>
+  </div>
+
+  <section class="card"><h2>الخصوصية</h2><p class="muted" style="margin:0">الجدول والرصد محفوظان في جهازك. عند تفعيل المزامنة تُحفظ بيانات الرصد في قاعدة بيانات محمية برمز المدرسة والرموز السرية، ولا يطّلع عليها غير من يملك الرمز. <a href="../privacy.html">سياسة الخصوصية</a></p></section>
+</main></div>
+<footer>راصد المبسّط · إعداد وتطوير: عبدالمجيد السيد · 0561955430 · جميع الحقوق محفوظة © 2026</footer>
+</body></html>

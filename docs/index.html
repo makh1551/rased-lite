@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>body{margin:0;font-size:14px}[hidden]{display:none!important}img{max-width:100%}</style>
+<html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>body{margin:0;font-size:14px}[hidden]{display:none!important}img{max-width:100%}</style><link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#0d4f57"><link rel="apple-touch-icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="راصد">
 <title>راصد المبسّط</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -174,6 +174,20 @@ label.f input,label.f select{background:var(--bg);border:1px solid var(--line);b
 .autobar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:10px;font-size:13px;color:var(--muted)}
 footer{margin-top:40px;font-size:12px;color:var(--muted);text-align:center}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+/* ===== متابعون، معالج، تثبيت ===== */
+.folrow{display:grid;grid-template-columns:minmax(0,1fr);gap:6px;background:var(--surface);border-radius:12px;padding:10px}
+.folrow .pers{display:flex;gap:4px;flex-wrap:wrap}
+.folrow .pers label{display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:32px;border-radius:8px;background:var(--sunk);font-weight:600;cursor:pointer;font-size:13px}
+.folrow .pers input{position:absolute;opacity:0;pointer-events:none}
+.folrow .pers label:has(input:checked){background:var(--accent);color:var(--accent-ink)}
+.folrow .top-r{display:flex;gap:6px;align-items:center}
+.folrow .top-r input{flex:1;min-width:0;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 10px}
+.wiz-steps{display:flex;gap:6px}.wiz-steps i{flex:1;height:4px;border-radius:4px;background:var(--sunk)}.wiz-steps i.on{background:var(--accent)}
+textarea.pastebox{width:100%;min-height:120px;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:10px;font:inherit;font-size:13px;color:var(--ink);direction:rtl}
+.picklist{display:grid;gap:8px}
+.picklist button{justify-content:center;min-height:44px;font-size:16px}
+.bulk-row{display:flex;gap:10px;align-items:center;justify-content:space-between;background:var(--tint);border-radius:12px;padding:10px 12px}
+.per.mine{box-shadow:inset 0 -3px 0 var(--teal)}
 /* ===== تبسيط وسلاسة ===== */
 :where(#app svg){width:18px;height:18px;flex:none;vertical-align:-3px}
 body{background:var(--band) top/100% 190px no-repeat,var(--bg);font-size:15px}
@@ -310,7 +324,18 @@ function save(){store.set(KEY,JSON.stringify(S));pushCfg()}
 const role=()=>store.sget('rl-role')||'';
 function needLock(){return !!(S.settings.pin||S.settings.fpin||(S.sync&&S.sync.key))&&!role()}
 const isFol=()=>role()==='fol';
-const byName=()=>isFol()?((S.sync&&S.sync.name)||'المتابع'):'المدير';
+S.settings.fols=Array.isArray(S.settings.fols)?S.settings.fols:[];
+const fname=()=>store.get('rl-fname')||'';
+const byName=()=>isFol()?(fname()||(S.sync&&S.sync.name)||'المتابع'):'المدير';
+const myFol=()=>isFol()?S.settings.fols.find(f=>f.name===fname()):null;
+const myPeriods=()=>{const f=myFol();return f&&f.periods&&f.periods.length?f.periods:[]};
+const needName=()=>isFol()&&S.settings.fols.length>0&&!myFol();
+function pickNameView(){return `<div class="lock"><h1 style="font-size:22px">من أنت؟</h1><p class="muted small" style="margin:0">اختر اسمك ليظهر بجانب رصدك وتظهر حصصك المسندة.</p>
+  <div class="picklist">${S.settings.fols.map((f,i)=>`<button class="btn" data-fi="${i}">${esc(f.name)}${f.periods&&f.periods.length?` <span class="small muted">· الحصص ${f.periods.join('، ')}</span>`:''}</button>`).join('')}</div>
+  <button class="btn" id="pickOut" style="justify-self:center">خروج</button></div>`}
+function bindPick(){document.querySelectorAll('[data-fi]').forEach(b=>b.onclick=()=>{const f=S.settings.fols[+b.dataset.fi];store.set('rl-fname',f.name);V.p=null;render()});
+  $('#pickOut').onclick=()=>{store.sset('rl-role','');render()}}
+function defaultP(){const c=curPeriod(S.settings.times).idx;const mine=myPeriods();if(!mine.length)return c;return mine.find(p=>p>=c)||mine[0]}
 function roleBar(){if(!(S.settings.pin||S.settings.fpin||S.sync)||!role())return'';
   return `<div style="display:flex;gap:6px;align-items:center"><span class="pill">${isFol()?'👤 '+esc(byName()):'المدير'}</span><button class="btn ghost" id="logout">خروج</button></div>`}
 /* ---- المزامنة بين الأجهزة (Supabase) ---- */
@@ -322,10 +347,10 @@ async function rpc(fn,args){let r;try{r=await fetch(`${SB_URL}/rest/v1/rpc/${fn}
   const j=await r.json().catch(()=>null);if(!r.ok)throw new Error((j&&j.message)||('خطأ '+r.status));if(j&&j.err)throw new Error(ERRS[j.err]||j.err);return j}
 S.pend=S.pend||{};
 let SYNC_ST={at:'',err:''},syncBusy=false;
-const cfgObj=()=>({school:S.settings.school,mgr:S.settings.mgr,mgrPh:S.settings.mgrPh,times:S.settings.times});
+const cfgObj=()=>({school:S.settings.school,mgr:S.settings.mgr,mgrPh:S.settings.mgrPh,times:S.settings.times,fols:S.settings.fols||[]});
 const cfgSig=()=>JSON.stringify([cfgObj(),S.rows,S.settings.fpin||'']);
 function markSync(k){if(!S.sync)return;S.pend[k]=1;clearTimeout(markSync.t);markSync.t=setTimeout(syncNow,800)}
-function applyServerCfg(r){if(!r.cfg)return;const c=r.cfg;S.settings.school=c.school||r.name||S.settings.school;S.settings.mgr=c.mgr||'';S.settings.mgrPh=c.mgrPh||'';
+function applyServerCfg(r){if(!r.cfg)return;const c=r.cfg;S.settings.school=c.school||r.name||S.settings.school;S.settings.mgr=c.mgr||'';S.settings.mgrPh=c.mgrPh||'';S.settings.fols=Array.isArray(c.fols)?c.fols:[];
   if(Array.isArray(c.times)&&c.times.length===7)S.settings.times=c.times;if(Array.isArray(r.rows))S.rows=r.rows;S.demo=false}
 function applyServerMarks(list){let ch=false;(list||[]).forEach(m=>{if(S.pend[m.k])return;
   if(m.st)S.marks[m.k]={st:m.st,at:m.at,t:m.t,by:m.by,src:m.src};else delete S.marks[m.k];
@@ -356,7 +381,7 @@ async function joinSchool(code,key,name){code=code.toUpperCase().replace(/[^A-Z0
   const r=await rpc('lite_pull',{p_code:code,p_key:key,p_since:null});
   S={demo:false,settings:{school:'',mgr:'',mgrPh:'',pin:r.role==='mgr'?key:'',fpin:'',times:DEF_TIMES.map(x=>x.slice())},rows:[],marks:{},sent:{},auto:{on:false,sound:true,skip:[],sk:[]},pend:{},
     sync:{code,key,role:r.role,name:name||(r.role==='mgr'?'المدير':'المتابع'),since:r.now,cfgSig:''}};
-  applyServerCfg(r);applyServerMarks(r.marks);S.sync.cfgSig=cfgSig();save();store.sset('rl-role',r.role);V.date=null;V.p=null;V.tab='now';
+  applyServerCfg(r);applyServerMarks(r.marks);S.sync.cfgSig=cfgSig();if(name)store.set('rl-fname',name);save();store.sset('rl-role',r.role);V.date=null;V.p=null;V.tab='now';
   SYNC_ST={at:hm(),err:''};render();toast(r.role==='mgr'?'انضممت بصلاحية المدير':'انضممت متابعًا')}
 function syncSetupHTML(){
   if(!S.sync)return `<div class="section"><h3>٥. المزامنة بين الأجهزة</h3><div class="card" style="display:grid;gap:10px">
@@ -521,15 +546,16 @@ function monthView(){const W=monthData(V.date),T=W.T;const weeks={};
 function render(){
   const app=$('#app');
   if(needLock()){app.innerHTML=lockView();bindLock();return}
+  if(needName()){app.innerHTML=pickNameView();bindPick();return}
   if(isFol()&&V.tab!=='now')V.tab='now';
   if(!V.date)V.date=defaultDate();
-  if(!V.p)V.p=curPeriod(S.settings.times).idx;
+  if(!V.p)V.p=defaultP();
   ensureAuto();
   app.innerHTML=header()+'<main class="panel'+(V.anim?' enter':'')+'">'+topBars()+({now:nowView,day:dayView,week:weekView,month:monthView,setup:setupView}[V.tab]||nowView)()+'</main>'+
-    `<footer>راصد المبسّط · البيانات محفوظة على هذا الجهاز فقط<br><span class="credit">إعداد وتطوير: عبدالمجيد السيد · 0561955430</span> · جميع الحقوق محفوظة © 2026</footer>`;
+    `<footer>راصد المبسّط · البيانات محفوظة على هذا الجهاز فقط<br><span class="credit">إعداد وتطوير: عبدالمجيد السيد · 0561955430</span> · جميع الحقوق محفوظة © 2026${PWA?' · <a href="about/">ما هو راصد؟</a>':''}</footer>`;
   bind();
 }
-function topBars(){return `${S.demo&&!isFol()?`<div class="demo-bar"><span>تعرض الآن <b>مدرسة تجريبية وهمية</b> للتجربة. ارفع جدول مدرستك من «الإعداد والجدول» لتبدأ.</span><a class="btn" href="#setup">${IC.up} رفع الجدول</a></div>`:''}${updBar()}`}
+function topBars(){return installBar()+`${S.demo&&!isFol()?`<div class="demo-bar"><span>تعرض الآن <b>مدرسة تجريبية وهمية</b> للتجربة. ارفع جدول مدرستك من «الإعداد والجدول» لتبدأ.</span><button class="btn" id="wizB">ابدأ مدرستك في 3 خطوات</button></div>`:''}${updBar()}`}
 function header(){const cp=curPeriod(S.settings.times);const isToday=V.date===today();
   const tab=(id,t)=>`<a href="#${id}" ${V.tab===id?'aria-current="page"':''}>${t}</a>`;
   return `<header class="top"><div class="brand"><div><h1><span class="mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5 9 17 20 6"/></svg></span>راصد المبسّط</h1>
@@ -539,7 +565,8 @@ function header(){const cp=curPeriod(S.settings.times);const isToday=V.date===to
 
 function stripHTML(){const cp=curPeriod(S.settings.times);const isToday=V.date===today();const d=wd(V.date);
   return `<div class="strip" role="group" aria-label="الحصص">${S.settings.times.map((t,i)=>{const p=i+1;const has=S.rows.some(r=>r.d===d&&r.p===p);
-    return `<button class="per num ${isToday&&cp.state==='live'&&cp.idx===p?'live':''} ${has?'':'skip'}" data-p="${p}" aria-pressed="${V.p===p}"><b>${p}</b><span>${t[0]}</span></button>`}).join('')}</div>`}
+    const mine=myPeriods();const notMine=mine.length&&!mine.includes(p);
+    return `<button class="per num ${isToday&&cp.state==='live'&&cp.idx===p?'live':''} ${has&&!notMine?'':'skip'} ${mine.includes(p)?'mine':''}" data-p="${p}" aria-pressed="${V.p===p}"><b>${p}</b><span>${t[0]}</span></button>`}).join('')}</div>`}
 
 function dayBar(title){const d=wd(V.date);
   return `<div class="daybar"><h2>${title}</h2><span class="pill">${d>=0?DAYS[d]:'إجازة'}</span>
@@ -552,10 +579,12 @@ function nowView(){const d=wd(V.date);
   const cp=curPeriod(S.settings.times);const isLive=V.date===today()&&cp.idx===V.p;
   const stateTxt=isLive?({live:'جارية الآن',next:'القادمة',done:'انتهى اليوم الدراسي'}[cp.state]):'';
   let h=dayBar(`الحصة ${V.p}`)+`<p class="muted small num" style="margin:4px 0 0">${tm[0]} – ${tm[1]}${stateTxt?` · <b style="color:var(--ink)">${stateTxt}</b>`:''}</p>`+stripHTML();
+  if(isFol()&&myPeriods().length&&!myPeriods().includes(V.p))return h+`<div class="empty">هذه الحصة ليست من حصصك المسندة. حصصك: ${myPeriods().join('، ')}.</div>`;
   if(!list.length)return h+`<div class="empty">لا حصص في جدول ${DAYS[d]} للحصة ${V.p}.</div>`;
+  const bulk=bulkTargets(list);
   const w=x=>t.total?(x/t.total*100):0;
   h+=`<div class="prog" aria-hidden="true"><i class="ok" style="width:${w(t.ok)}%"></i><i class="late" style="width:${w(t.late)}%"></i><i class="bad" style="width:${w(t.bad)}%"></i></div>
-   <div class="legend num"><span>رُصد <b>${t.total-t.un}</b> من ${t.total}</span><span>حاضر <b>${t.ok}</b></span><span>متأخر <b>${t.late}</b></span><span>غائب <b>${t.bad}</b></span>${t.nl?`<span>بلا رابط <b>${t.nl}</b></span>`:''}</div>${autoBarHTML()}
+   <div class="legend num"><span>رُصد <b>${t.total-t.un}</b> من ${t.total}</span><span>حاضر <b>${t.ok}</b></span><span>متأخر <b>${t.late}</b></span><span>غائب <b>${t.bad}</b></span>${t.nl?`<span>بلا رابط <b>${t.nl}</b></span>`:''}</div>${autoBarHTML()}${bulk.length?`<div class="autobar"><button class="btn wa hot" id="bulkB">${IC.wa} تذكير جماعي (${bulk.length})</button><span>لمن لم يُرصد حضوره أو سُجّل غائبًا/متأخرًا ولم يُذكَّر</span></div>`:''}
    <div class="list">`;
   list.forEach(r=>{const k=mk(V.date,r.p,r.c);const m=S.marks[k];const sent=S.sent[k];const ph=normPhone(r.ph);
     h+=`<div class="row" data-st="${m?m.st:''}"><div class="who"><div class="cls">${esc(r.c)}</div><div class="tch"><button class="tlink" data-teacher="${esc(r.t)}">الأستاذ/ ${esc(r.t)}</button></div></div>
@@ -584,6 +613,7 @@ function dayView(){const d=wd(V.date);
   h+=`<div class="section"><h3>المعلمون</h3><div class="tbl"><table class="num"><thead><tr><th>المعلم</th><th>حصصه</th><th>حاضر</th><th>متأخر</th><th>غائب</th><th>لم يُرصد</th></tr></thead><tbody>
    ${arr.map(o=>`<tr><td><button class="tlink" data-teacher="${esc(o.t)}">الأستاذ/ ${esc(o.t)}</button></td><td class="c">${o.n}</td><td class="c">${o.ok}</td><td class="c" style="color:${o.late?'var(--late)':''}">${o.late}</td><td class="c" style="color:${o.bad?'var(--bad)':''}">${o.bad}</td><td class="c">${o.un}</td></tr>`).join('')}
    </tbody></table></div></div>`;
+  h+=folProgressHTML(V.date);
   h+=msgBlock('رسالة التقرير للمدير',R.text,'rep-day');
   return h}
 
@@ -611,14 +641,20 @@ function setupView(){const s=S.settings;const nT=new Set(S.rows.map(r=>r.t)).siz
    <div class="bar-row" style="margin:0"><button class="btn primary" id="dlTpl">${IC.dl} تنزيل القالب (CSV)</button><button class="btn" id="cpTpl">${IC.copy} نسخ القالب</button></div>
    <label class="drop" id="drop" for="file"><b>${IC.up} اختر ملف الجدول أو اسحبه هنا</b><br><span class="small muted">xlsx · xls · csv</span>
     <input type="file" id="file" accept=".xlsx,.xls,.csv,text/csv" hidden></label>
+   <details><summary class="small" style="cursor:pointer;font-weight:600;color:var(--accent)">أو الصق الجدول مباشرة من Excel أو منصة مدرستي</summary>
+    <textarea class="pastebox" id="pasteT" placeholder="حدّد الجدول مع صف العناوين في Excel، انسخه (Ctrl+C) والصقه هنا (Ctrl+V)" style="margin-top:8px"></textarea>
+    <div style="margin-top:8px"><button class="btn primary" id="pasteB" type="button">قراءة الجدول الملصوق</button></div></details>
    <div class="small num" id="sum">${S.demo?'الجدول الحالي: <b>المدرسة التجريبية</b> · ':''}${S.rows.length} حصة · ${nT} معلم · ${byDay.map((n,i)=>`${DAYS[i]} ${n}`).join(' · ')}</div>
   </div></div>
   <div class="section"><h3>٢. بيانات المدرسة</h3><div class="card" style="display:grid;gap:12px">
    <div class="grid2"><label class="f">اسم المدرسة<input id="s-school" value="${esc(s.school)}"></label>
     <label class="f">رمز دخول المدير<input id="s-pin" inputmode="numeric" value="${esc(s.pin)}" placeholder="اتركه فارغًا لإلغاء القفل"></label>
-    <label class="f">رمز دخول المتابع<input id="s-fpin" inputmode="numeric" value="${esc(s.fpin||'')}" placeholder="اتركه فارغًا لتعطيل دخول المتابع"></label>
-    <label class="f">اسم المدير<input id="s-mgr" value="${esc(s.mgr)}"></label>
+    <label class="f">رمز دخول المتابع<input id="s-fpin" inputmode="numeric" value="${esc(s.fpin||'')}" placeholder="اتركه فارغًا لتعطيل دخول المتابع"></label>    <label class="f">اسم المدير<input id="s-mgr" value="${esc(s.mgr)}"></label>
     <label class="f">جوال المدير<input id="s-mgrPh" inputmode="tel" dir="ltr" value="${esc(s.mgrPh)}" placeholder="05xxxxxxxx"></label></div>
+
+   <div style="display:grid;gap:8px"><div class="small muted">المتابعون: يدخلون برمز المتابع ثم يختار كل منهم اسمه، ويرى حصصه المسندة فقط (بلا تحديد = كل الحصص).</div>
+    <div id="folList" style="display:grid;gap:8px">${S.settings.fols.map(folRowHTML).join('')}</div>
+    <div><button class="btn" id="addFol" type="button">+ إضافة متابع</button></div></div>
    <div><div class="small muted" style="margin-bottom:6px">أوقات الحصص السبع (بداية – نهاية)</div><div class="times num">
     ${s.times.map((t,i)=>`<div><b>${i+1}</b><input type="time" id="t-${i}-0" value="${t[0]}" aria-label="بداية الحصة ${i+1}"><input type="time" id="t-${i}-1" value="${t[1]}" aria-label="نهاية الحصة ${i+1}"></div>`).join('')}</div></div>
    <div><button class="btn primary" id="saveSet">حفظ الإعداد</button></div>
@@ -641,7 +677,7 @@ function lockView(){return `<div class="lock"><span class="mark" style="margin:a
    <button class="btn primary" style="justify-content:center">انضمام</button><p id="jErr" class="small" style="color:var(--bad);margin:0"></p></form>
    <p class="small muted" style="margin:6px 0 0">الانضمام يستبدل بيانات هذا الجهاز ببيانات المدرسة.</p></details>
   ${S.demo?'<p class="small muted">المدرسة التجريبية: المدير <b class="num">1234</b> · المتابع <b class="num">5678</b></p>':''}
-  <button class="btn danger" id="forgot" style="justify-self:center">نسيت الرمز</button><p class="small muted">إعداد وتطوير: عبدالمجيد السيد · 0561955430</p></div>`}
+  <button class="btn danger" id="forgot" style="justify-self:center">نسيت الرمز</button><p class="small muted">إعداد وتطوير: عبدالمجيد السيد · 0561955430${PWA?' · <a href="about/">ما هو راصد؟</a>':''}</p></div>`}
 
 /* ============ الأحداث ============ */
 function bindLock(){$('#pin').focus();
@@ -670,7 +706,11 @@ function bind(){
   document.querySelectorAll('[data-week]').forEach(b=>b.onclick=()=>{V.date=b.dataset.week;location.hash='week'});
   const rn=$('#runNow');if(rn)rn.onclick=()=>{chrome.runtime.sendMessage({cmd:'runNow',date:V.date,p:V.p});toast('بدأ الفحص، وستفتح الإضافة نافذة Teams')};
   document.querySelectorAll('[data-img]').forEach(b=>b.onclick=()=>showImg(b.dataset.img));
-  const lo=$('#logout');if(lo)lo.onclick=()=>{store.sset('rl-role','');V.tab='now';render()};
+  const lo=$('#logout');if(lo)lo.onclick=()=>{if(isFol())store.set('rl-fname','');store.sset('rl-role','');V.tab='now';V.p=null;render()};
+  const wb=$('#wizB');if(wb)wb.onclick=openWizard;
+  const ib=$('#instB');if(ib)ib.onclick=async()=>{if(!DEFER)return;DEFER.prompt();try{await DEFER.userChoice}catch(e){}DEFER=null;render()};
+  const ix=$('#iosX');if(ix)ix.onclick=()=>{store.set('rl-ios','1');render()};
+  const bb=$('#bulkB');if(bb)bb.onclick=openBulk;
   if(V.tab==='setup')bindSetup();
 }
 
@@ -692,7 +732,7 @@ function bindSetup(){
   ['dragenter','dragover'].forEach(e=>drop.addEventListener(e,ev=>{ev.preventDefault();drop.classList.add('over')}));
   ['dragleave','drop'].forEach(e=>drop.addEventListener(e,ev=>{ev.preventDefault();drop.classList.remove('over')}));
   drop.addEventListener('drop',ev=>{const f=ev.dataTransfer.files[0];if(f)readSchedule(f)});
-  $('#saveSet').onclick=()=>{const s=S.settings;s.school=$('#s-school').value.trim()||s.school;s.pin=$('#s-pin').value.trim();s.fpin=$('#s-fpin').value.trim();if(s.fpin&&s.fpin===s.pin){toast('رمز المتابع يجب أن يختلف عن رمز المدير');return}if(S.sync&&!s.pin){toast('لا يمكن حذف رمز المدير والمزامنة مفعّلة');return}
+  $('#saveSet').onclick=()=>{const s=S.settings;s.school=$('#s-school').value.trim()||s.school;s.pin=$('#s-pin').value.trim();s.fpin=$('#s-fpin').value.trim();s.fols=[...document.querySelectorAll('.folrow')].map(r=>({name:r.querySelector('.fname').value.trim(),periods:[...r.querySelectorAll('.pers input:checked')].map(x=>+x.value)})).filter(f=>f.name);if(s.fpin&&s.fpin===s.pin){toast('رمز المتابع يجب أن يختلف عن رمز المدير');return}if(S.sync&&!s.pin){toast('لا يمكن حذف رمز المدير والمزامنة مفعّلة');return}
     s.mgr=$('#s-mgr').value.trim();s.mgrPh=$('#s-mgrPh').value.trim();
     s.times=s.times.map((t,i)=>[$('#t-'+i+'-0').value||t[0],$('#t-'+i+'-1').value||t[1]]);
     store.sset('rl-role','mgr');save();render();toast('حُفظ الإعداد')};
@@ -710,6 +750,9 @@ function bindSetup(){
     if(!link){toast('لا يوجد رابط للاختبار');return}
     TEST={at:hm(),done:false,steps:[{m:'إرسال الطلب للإضافة',at:hm()}]};$('#testOut').innerHTML=testHTML();
     chrome.runtime.sendMessage({cmd:'test',link,teacher:t});toast('بدأ الاختبار، راقب نافذة الفحص')};
+  const pb=$('#pasteB');if(pb)pb.onclick=()=>{const v=$('#pasteT').value;if(!v.trim()){toast('الصق الجدول أولًا');return}readPasted(v)};
+  const af=$('#addFol');if(af)af.onclick=()=>{$('#folList').insertAdjacentHTML('beforeend',folRowHTML());$('#folList').lastElementChild.querySelector('.fname').focus()};
+  const fl=$('#folList');if(fl)fl.addEventListener('click',e=>{const d=e.target.closest('[data-delfol]');if(d)d.closest('.folrow').remove()});
   const so=$('#syncOn');if(so)so.onclick=enableSync;
   const cc=$('#cpCode');if(cc)cc.onclick=()=>copyText(fmtCode(S.sync.code));
   const sn=$('#syncNowB');if(sn)sn.onclick=()=>{SYNC_ST.err='';syncNow()};
@@ -727,26 +770,111 @@ const normAr=s=>String(s||'').trim().replace(/[إأآ]/g,'ا').replace(/ة/g,'ه
 function dayIdx(v){const s=normAr(v);const n=parseInt(s,10);if(n>=1&&n<=5&&/^\d+$/.test(s))return n-1;
   const names=['احد','اثنين','ثلاثاء','اربعاء','خميس'];for(let i=0;i<5;i++)if(s.replace(/^ال/,'').includes(names[i].replace(/ه$/,'')))return i;
   if(s.includes('ثلاث'))return 2;if(s.includes('ربع'))return 3;return -1}
-async function readSchedule(f){try{let aoa;const isCSV=/\.csv$/i.test(f.name)||f.type==='text/csv';
-  if(isCSV){const txt=await f.text();aoa=window.XLSX?XLSX.utils.sheet_to_json(XLSX.read(txt,{type:'string'}).Sheets[XLSX.read(txt,{type:'string'}).SheetNames[0]],{header:1,defval:''}):csvParse(txt)}
-  else{if(!window.XLSX){toast('تعذّر تحميل قارئ Excel، احفظ الملف CSV وأعد الرفع');return}
-    const wb=XLSX.read(await f.arrayBuffer(),{type:'array'});aoa=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{header:1,defval:'',raw:false})}
-  const hi=aoa.findIndex(r=>r.some(c=>normAr(c).includes('معلم'))&&r.some(c=>normAr(c).includes('صف')));
-  if(hi<0){toast('لم أجد صف العناوين (اليوم، الحصة، الصف، المعلم…). استخدم القالب.');return}
+function parseAOA(aoa){
+  const hi=aoa.findIndex(r=>r&&r.some(c=>normAr(c).includes('معلم'))&&r.some(c=>normAr(c).includes('صف')));
+  if(hi<0)throw new Error('لم أجد صف العناوين (اليوم، الحصة، الصف، المعلم…). استخدم القالب أو انسخ الجدول مع صف العناوين.');
   const H=aoa[hi].map(normAr);const col=(...ks)=>H.findIndex(h=>ks.some(k=>h.includes(k)));
   const cD=col('يوم'),cP=col('حصه','حصة'),cC=col('صف','فصل'),cT=col('معلم'),cPh=col('جوال','هاتف','رقم','موبايل'),cL=col('رابط','teams','link');
-  if([cD,cP,cC,cT].some(x=>x<0)){toast('الأعمدة الأساسية ناقصة: اليوم، الحصة، الصف، المعلم');return}
+  if([cD,cP,cC,cT].some(x=>x<0))throw new Error('الأعمدة الأساسية ناقصة: اليوم، الحصة، الصف، المعلم');
   const rows=[];let bad=0;
   aoa.slice(hi+1).forEach(r=>{if(!r||r.every(c=>String(c).trim()===''))return;const d=dayIdx(r[cD]);const p=parseInt(String(r[cP]).replace(/[٠-٩]/g,x=>'٠١٢٣٤٥٦٧٨٩'.indexOf(x)),10);
     const c=String(r[cC]||'').trim(),t=String(r[cT]||'').trim().replace(/^(ال)?(استاذ|أستاذ)\s*[/.:]?\s*|^أ\s*[/.]\s*/,'');
     if(d<0||!(p>=1&&p<=7)||!c||!t){bad++;return}
     let l=cL>=0?String(r[cL]||'').trim():'';if(l&&!/^https?:\/\//i.test(l))l='';
     rows.push({d,p,c,t,ph:cPh>=0?String(r[cPh]||'').trim():'',l})});
-  if(!rows.length){toast('لم تُقرأ أي حصة صالحة من الملف');return}
-  if(S.demo){S.marks={};S.sent={};S.settings.school=S.settings.school.includes('تجريبية')?'اسم مدرستك':S.settings.school;S.settings.mgr='';S.settings.mgrPh='';S.settings.pin=''}
-  S.rows=rows;S.demo=false;save();V.date=null;V.p=null;render();
-  toast(`حُمّل ${rows.length} حصة`+(bad?` · تُجوهل ${bad} سطر غير مكتمل`:''));
- }catch(e){toast('تعذّرت قراءة الملف، تأكد أنه Excel أو CSV')}}
+  if(!rows.length)throw new Error('لم تُقرأ أي حصة صالحة');
+  return{rows,bad}}
+function textToAOA(txt){txt=txt.replace(/^﻿/,'');if(txt.includes('\t'))return txt.split(/\r?\n/).map(l=>l.split('\t'));return csvParse(txt)}
+async function fileToAOA(f){const isCSV=/\.csv$|\.txt$/i.test(f.name)||/text\//.test(f.type);
+  if(isCSV){const txt=await f.text();return window.XLSX?XLSX.utils.sheet_to_json(XLSX.read(txt,{type:'string'}).Sheets[XLSX.read(txt,{type:'string'}).SheetNames[0]],{header:1,defval:''}):textToAOA(txt)}
+  if(!window.XLSX)throw new Error('تعذّر تحميل قارئ Excel، احفظ الملف CSV أو الصق الجدول');
+  const wb=XLSX.read(await f.arrayBuffer(),{type:'array'});return XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{header:1,defval:'',raw:false})}
+function applyRows(res){
+  if(S.demo){S.marks={};S.sent={};S.settings.school=S.settings.school.includes('تجريبية')?'اسم مدرستك':S.settings.school;S.settings.mgr='';S.settings.mgrPh='';S.settings.pin='';S.settings.fpin='';S.settings.fols=[]}
+  S.rows=res.rows;S.demo=false;save();V.date=null;V.p=null;render();
+  toast(`حُمّل ${res.rows.length} حصة`+(res.bad?` · تُجوهل ${res.bad} سطر غير مكتمل`:''))}
+async function readSchedule(f){try{applyRows(parseAOA(await fileToAOA(f)))}catch(e){toast(String(e.message||'تعذّرت قراءة الملف'))}}
+function readPasted(txt){try{applyRows(parseAOA(textToAOA(txt)))}catch(e){toast(String(e.message||e))}}
+
+/* ---- عدة متابعين ---- */
+function folRowHTML(f){f=f||{name:'',periods:[]};return `<div class="folrow"><div class="top-r"><input class="fname" placeholder="اسم المتابع" value="${esc(f.name)}" aria-label="اسم المتابع"><button class="btn danger" type="button" data-delfol>حذف</button></div>
+  <div class="pers" aria-label="الحصص المسندة">${[1,2,3,4,5,6,7].map(p=>`<label><input type="checkbox" value="${p}" ${f.periods&&f.periods.includes(p)?'checked':''}>${p}</label>`).join('')}</div></div>`}
+function folProgressHTML(date){const fols=S.settings.fols||[];if(!fols.length||isFol())return'';const d=wd(date);
+  const rowsD=S.rows.filter(r=>r.d===d&&r.l);
+  const items=fols.map(f=>{const per=f.periods&&f.periods.length?f.periods:[1,2,3,4,5,6,7];const mine=rowsD.filter(r=>per.includes(r.p));
+    const done=mine.filter(r=>{const m=S.marks[mk(date,r.p,r.c)];return m&&m.by===f.name}).length;return{f,n:mine.length,done,pct:mine.length?Math.round(done/mine.length*100):0}});
+  return `<div class="section"><h3>إنجاز المتابعين</h3><div class="tbl"><table class="num"><thead><tr><th>المتابع</th><th>حصصه المسندة</th><th>رصدها</th><th>الإنجاز</th></tr></thead><tbody>
+   ${items.map(x=>`<tr><td>${esc(x.f.name)}</td><td class="c">${x.n}</td><td class="c">${x.done}</td><td><div class="mini"><i class="ok" style="width:${x.pct}%"></i></div> <span class="small">${x.pct}%</span></td></tr>`).join('')}
+   </tbody></table></div></div>`}
+
+/* ---- التذكير الجماعي ---- */
+function bulkTargets(list){return list.filter(r=>{const k=mk(V.date,r.p,r.c);const m=S.marks[k];return normPhone(r.ph)&&!S.sent[k]&&(!m||m.st!=='ok')})}
+function openBulk(){const list=bulkTargets(rowsFor(V.date,V.p));if(!list.length){toast('لا يوجد من يحتاج تذكيرًا');return}
+  const el=document.createElement('div');el.className='sheet';
+  el.innerHTML=`<div role="dialog" aria-label="تذكير جماعي"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><h2 style="font-size:18px">تذكير جماعي · الحصة ${V.p}</h2><button class="btn" data-x>إغلاق</button></div>
+   <p class="small muted" style="margin:0">اضغط «إرسال» لكل معلم، فيفتح واتساب برسالة جاهزة. بعد الإرسال ارجع هنا للمعلم التالي.</p>
+   <div style="display:grid;gap:8px">${list.map(r=>{const k=mk(V.date,r.p,r.c);const m=S.marks[k];return `<div class="bulk-row"><div><b>${esc(r.c)}</b> · الأستاذ/ ${esc(r.t)} <span class="pill ${m?m.st:''}">${m?ST[m.st]:'لم يُرصد'}</span></div>
+     <a class="btn wa hot" data-bulk="${esc(k)}" href="${esc(waUrl(r.ph,remindText(r,V.date)))}" target="_blank" rel="noopener">${IC.wa} إرسال</a></div>`}).join('')}</div></div>`;
+  el.addEventListener('click',e=>{if(e.target===el||e.target.closest('[data-x]')){el.remove();render();return}
+    const a=e.target.closest('[data-bulk]');if(a){const k=a.dataset.bulk;S.sent[k]=hm();markSync(k);save();setTimeout(()=>{a.outerHTML=`<span class="pill ok">✓ أُرسل ${S.sent[k]}</span>`},60)}});
+  document.body.append(el)}
+
+/* ---- معالج البداية ---- */
+let WZ=null;
+function openWizard(){WZ={step:1,school:'',mgr:'',mgrPh:'',rows:null,bad:0,pin:'',fpin:'',fols:'',sync:false,err:''};drawWizard()}
+function drawWizard(){document.querySelectorAll('.sheet.wz').forEach(x=>x.remove());const w=WZ;const el=document.createElement('div');el.className='sheet wz';
+  const steps=`<div class="wiz-steps">${[1,2,3].map(i=>`<i class="${i<=w.step?'on':''}"></i>`).join('')}</div>`;
+  let body='';
+  if(w.step===1)body=`<h2 style="font-size:19px">١. بيانات المدرسة</h2>
+    <label class="f">اسم المدرسة<input id="wSchool" value="${esc(w.school)}"></label>
+    <label class="f">اسم المدير<input id="wMgr" value="${esc(w.mgr)}"></label>
+    <label class="f">جوال المدير (لإرسال التقارير)<input id="wPh" dir="ltr" inputmode="tel" value="${esc(w.mgrPh)}" placeholder="05xxxxxxxx"></label>`;
+  if(w.step===2)body=`<h2 style="font-size:19px">٢. جدول الحصص</h2>
+    <p class="small muted" style="margin:0">الأعمدة: اليوم، الحصة (1–7)، الصف، المعلم، الجوال، رابط Teams (اختياري).</p>
+    <div class="bar-row" style="margin:0"><button class="btn" id="wTpl" type="button">${IC.dl} تنزيل القالب</button><label class="btn primary" for="wFile">${IC.up} اختيار ملف Excel أو CSV</label><input type="file" id="wFile" accept=".xlsx,.xls,.csv" hidden></div>
+    <textarea class="pastebox" id="wPaste" placeholder="أو انسخ الجدول من Excel أو منصة مدرستي (مع صف العناوين) والصقه هنا"></textarea>
+    <div class="small" id="wRows">${w.rows?`✅ قُرئت ${w.rows.length} حصة لـ ${new Set(w.rows.map(r=>r.t)).size} معلم${w.bad?` · تُجوهل ${w.bad} سطر`:''}`:''}</div>`;
+  if(w.step===3)body=`<h2 style="font-size:19px">٣. الرموز والمتابعون</h2>
+    <label class="f">رمز دخول المدير (4 أرقام على الأقل)<input id="wPin" inputmode="numeric" value="${esc(w.pin)}" placeholder="مثل 4826"></label>
+    <label class="f">رمز المتابعين (اختياري)<input id="wFpin" inputmode="numeric" value="${esc(w.fpin)}" placeholder="مثل 7391"></label>
+    <label class="f">أسماء المتابعين (اختياري، تفصل بينها بفاصلة)<input id="wFols" value="${esc(w.fols)}" placeholder="مثل: سعد، خالد"></label>
+    <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="wSync" ${w.sync?'checked':''}> تفعيل المزامنة بين الأجهزة الآن (يحتاج إنترنت)</label>`;
+  el.innerHTML=`<div role="dialog" aria-label="معالج البداية"><div style="display:flex;justify-content:space-between;align-items:center"><b>ابدأ مدرستك</b><button class="btn" data-x>إغلاق</button></div>${steps}${body}
+    <p class="small" id="wErr" style="color:var(--bad);margin:0">${esc(w.err)}</p>
+    <div class="bar-row" style="margin:0;justify-content:space-between">${w.step>1?'<button class="btn" id="wBack">السابق</button>':'<span></span>'}<button class="btn primary" id="wNext">${w.step<3?'التالي':'إنهاء والبدء'}</button></div></div>`;
+  document.body.append(el);
+  el.addEventListener('click',e=>{if(e.target===el||e.target.closest('[data-x]'))el.remove()});
+  const keep=()=>{if(w.step===1){w.school=$('#wSchool').value.trim();w.mgr=$('#wMgr').value.trim();w.mgrPh=$('#wPh').value.trim()}
+    if(w.step===3){w.pin=$('#wPin').value.trim();w.fpin=$('#wFpin').value.trim();w.fols=$('#wFols').value;w.sync=$('#wSync').checked}};
+  if(w.step===2){$('#wTpl').onclick=()=>saveFile('قالب-جدول-راصد.csv',tplCSV(),'text/csv');
+    const got=(res)=>{w.rows=res.rows;w.bad=res.bad;w.err='';drawWizard()},bad=(e)=>{w.err=String(e.message||e);drawWizard()};
+    $('#wFile').onchange=async e=>{const f=e.target.files[0];if(f)try{got(parseAOA(await fileToAOA(f)))}catch(x){bad(x)}};
+    $('#wPaste').addEventListener('paste',()=>setTimeout(()=>{const v=$('#wPaste').value;if(v.trim())try{got(parseAOA(textToAOA(v)))}catch(x){bad(x)}},30))}
+  const back=$('#wBack');if(back)back.onclick=()=>{keep();w.step--;w.err='';drawWizard()};
+  $('#wNext').onclick=async()=>{keep();
+    if(w.step===1&&!w.school){w.err='اكتب اسم المدرسة';return drawWizard()}
+    if(w.step===2&&!w.rows){const v=$('#wPaste').value;if(v.trim()){try{const r=parseAOA(textToAOA(v));w.rows=r.rows;w.bad=r.bad}catch(x){w.err=String(x.message||x);return drawWizard()}}else{w.err='ارفع الجدول أو الصقه أولًا';return drawWizard()}}
+    if(w.step<3){w.step++;w.err='';return drawWizard()}
+    if(w.pin.length<4){w.err='رمز المدير 4 أرقام على الأقل';return drawWizard()}
+    if(w.fpin&&w.fpin===w.pin){w.err='رمز المتابعين يجب أن يختلف عن رمز المدير';return drawWizard()}
+    const fols=w.fols.split(/[،,]/).map(x=>x.trim()).filter(Boolean).map(name=>({name,periods:[]}));
+    S={demo:false,settings:{school:w.school,mgr:w.mgr,mgrPh:w.mgrPh,pin:w.pin,fpin:w.fpin,fols,times:DEF_TIMES.map(x=>x.slice())},rows:w.rows,marks:{},sent:{},auto:{on:false,sound:true,skip:[],sk:[]},pend:{}};
+    save();store.sset('rl-role','mgr');el.remove();V.date=null;V.p=null;V.tab='now';render();toast('تم إعداد المدرسة');
+    if(w.sync)enableSync()}}
+
+/* ---- التثبيت كتطبيق ---- */
+const PWA=('serviceWorker' in navigator)&&location.protocol==='https:'&&!EXT&&/(wasl\.uk|github\.io)$/.test(location.hostname);
+let DEFER=null;
+if(PWA){navigator.serviceWorker.register('sw.js').catch(()=>{});
+  addEventListener('beforeinstallprompt',e=>{e.preventDefault();DEFER=e;if(!needLock())render()});
+  addEventListener('appinstalled',()=>{DEFER=null;toast('ثُبّت راصد على جهازك')})}
+const IOS=/iphone|ipad|ipod/i.test(navigator.userAgent)&&!navigator.standalone;
+function installBar(){if(!PWA)return'';
+  if(DEFER)return `<div class="demo-bar"><span>📲 ثبّت راصد كتطبيق على جهازك ليفتح بضغطة.</span><button class="btn" id="instB">تثبيت</button></div>`;
+  if(IOS&&!store.get('rl-ios'))return `<div class="demo-bar"><span>📲 للتثبيت على الآيفون: زر المشاركة ← «إضافة إلى الشاشة الرئيسية».</span><button class="btn" id="iosX">حسنًا</button></div>`;
+  return''}
+
+
 
 /* ============ تقرير الأسبوع للطباعة ============ */
 function weekHTML(W){const s=S.settings;

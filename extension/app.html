@@ -174,6 +174,20 @@ label.f input,label.f select{background:var(--bg);border:1px solid var(--line);b
 .autobar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:10px;font-size:13px;color:var(--muted)}
 footer{margin-top:40px;font-size:12px;color:var(--muted);text-align:center}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+/* ===== متابعون، معالج، تثبيت ===== */
+.folrow{display:grid;grid-template-columns:minmax(0,1fr);gap:6px;background:var(--surface);border-radius:12px;padding:10px}
+.folrow .pers{display:flex;gap:4px;flex-wrap:wrap}
+.folrow .pers label{display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:32px;border-radius:8px;background:var(--sunk);font-weight:600;cursor:pointer;font-size:13px}
+.folrow .pers input{position:absolute;opacity:0;pointer-events:none}
+.folrow .pers label:has(input:checked){background:var(--accent);color:var(--accent-ink)}
+.folrow .top-r{display:flex;gap:6px;align-items:center}
+.folrow .top-r input{flex:1;min-width:0;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 10px}
+.wiz-steps{display:flex;gap:6px}.wiz-steps i{flex:1;height:4px;border-radius:4px;background:var(--sunk)}.wiz-steps i.on{background:var(--accent)}
+textarea.pastebox{width:100%;min-height:120px;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:10px;font:inherit;font-size:13px;color:var(--ink);direction:rtl}
+.picklist{display:grid;gap:8px}
+.picklist button{justify-content:center;min-height:44px;font-size:16px}
+.bulk-row{display:flex;gap:10px;align-items:center;justify-content:space-between;background:var(--tint);border-radius:12px;padding:10px 12px}
+.per.mine{box-shadow:inset 0 -3px 0 var(--teal)}
 /* ===== تبسيط وسلاسة ===== */
 :where(#app svg){width:18px;height:18px;flex:none;vertical-align:-3px}
 body{background:var(--band) top/100% 190px no-repeat,var(--bg);font-size:15px}
