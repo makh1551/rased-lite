@@ -91,7 +91,7 @@ Deno.serve(async (req) => {
     try {
       const base = (W.url || "https://wa.smart-whats.com").replace(/\/+$/, "");
       const r = await fetch(`${base}/api/messages`, { method: "POST", headers: { "X-API-Key": W.token, "Content-Type": "application/json", Accept: "application/json" },
-        body: JSON.stringify({ phone: digits, message: text, text }) });
+        body: JSON.stringify({ phone: digits, content: text }) });
       const j: any = await r.json().catch(() => ({}));
       if (r.ok && j.success !== false && !j.error) { channel = "whatsapp"; id = String(j.id || j.message_id || j.data?.id || ""); } else addErr("الواتس المباشر: " + (j.message || j.error || r.status));
     } catch (e) { addErr("الواتس المباشر: " + e); }
