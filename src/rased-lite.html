@@ -92,6 +92,7 @@ h1,h2,h3{font-family:var(--font-display);text-wrap:balance;margin:0;line-height:
 .who{min-width:0}
 .cls{font-family:var(--font-display);font-size:17px}
 .tch{font-size:14px;color:var(--muted)}
+.les{font-size:12.5px;color:var(--muted);max-width:34ch;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:2px}
 .acts{display:flex;gap:6px;flex-wrap:wrap;align-items:center;justify-content:flex-end}
 .seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--sunk)}
 .seg button{border:0;background:none;padding:6px 12px;font-weight:600;font-size:14px;color:var(--muted)}
@@ -626,7 +627,7 @@ function nowView(){const d=wd(V.date);
    <div class="legend num"><span>رُصد <b>${t.total-t.un}</b> من ${t.total}</span><span>حاضر <b>${t.ok}</b></span><span>متأخر <b>${t.late}</b></span><span>غائب <b>${t.bad}</b></span>${t.nl?`<span>بلا رابط <b>${t.nl}</b></span>`:''}</div>${autoBarHTML()}${bulk.length?`<div class="autobar"><button class="btn wa hot" id="bulkB">${IC.wa} تذكير جماعي (${bulk.length})</button><span>لمن لم يُرصد حضوره أو سُجّل غائبًا/متأخرًا ولم يُذكَّر</span></div>`:''}
    <div class="list">`;
   list.forEach(r=>{const k=mk(V.date,r.p,r.c);const m=S.marks[k];const sent=S.sent[k];const ph=normPhone(r.ph);
-    h+=`<div class="row" data-st="${m?m.st:''}"><div class="who"><div class="cls">${esc(r.c)}</div><div class="tch"><button class="tlink" data-teacher="${esc(r.t)}">الأستاذ/ ${esc(r.t)}</button></div></div>
+    h+=`<div class="row" data-st="${m?m.st:''}"><div class="who"><div class="cls">${esc(r.c)}</div><div class="tch"><button class="tlink" data-teacher="${esc(r.t)}">الأستاذ/ ${esc(r.t)}</button></div>${r.s?`<div class="les" title="${esc(r.s)}">📘 ${esc(r.s)}</div>`:''}</div>
      <div class="acts">
       ${r.l?`<a class="btn" href="${esc(r.l)}" target="_blank" rel="noopener">${IC.teams} Teams</a>`:`<span class="pill bad">بلا رابط</span>`}
       <div class="seg" role="group" aria-label="حالة المعلم">${['ok','late','bad'].map(v=>`<button data-k="${esc(k)}" data-t="${esc(r.t)}" data-v="${v}" aria-pressed="${m&&m.st===v}">${ST[v]}</button>`).join('')}</div>
@@ -680,6 +681,7 @@ function setupView(){const s=S.settings;const nT=new Set(S.rows.map(r=>r.t)).siz
    <div class="bar-row" style="margin:0"><button class="btn primary" id="dlTpl">${IC.dl} تنزيل القالب (CSV)</button><button class="btn" id="cpTpl">${IC.copy} نسخ القالب</button></div>
    <label class="drop" id="drop" for="file"><b>${IC.up} اختر ملف الجدول أو اسحبه هنا</b><br><span class="small muted">xlsx · xls · csv</span>
     <input type="file" id="file" accept=".xlsx,.xls,.csv,text/csv" hidden></label>
+   <p class="small muted" style="margin:0">يقبل أيضًا ملف «الخطة الأسبوعية» المصدَّر من مدرستي كما هو، ويُحتفظ بجوالات المعلمين وروابط Teams المحفوظة سابقًا.</p>
    <details><summary class="small" style="cursor:pointer;font-weight:600;color:var(--accent)">أو الصق الجدول مباشرة من Excel أو منصة مدرستي</summary>
     <textarea class="pastebox" id="pasteT" placeholder="حدّد الجدول مع صف العناوين في Excel، انسخه (Ctrl+C) والصقه هنا (Ctrl+V)" style="margin-top:8px"></textarea>
     <div style="margin-top:8px"><button class="btn primary" id="pasteB" type="button">قراءة الجدول الملصوق</button></div></details>
@@ -812,17 +814,19 @@ function dayIdx(v){const s=normAr(v);const n=parseInt(s,10);if(n>=1&&n<=5&&/^\d+
   const names=['احد','اثنين','ثلاثاء','اربعاء','خميس'];for(let i=0;i<5;i++)if(s.replace(/^ال/,'').includes(names[i].replace(/ه$/,'')))return i;
   if(s.includes('ثلاث'))return 2;if(s.includes('ربع'))return 3;return -1}
 function parseAOA(aoa){
-  const hi=aoa.findIndex(r=>r&&r.some(c=>normAr(c).includes('معلم'))&&r.some(c=>normAr(c).includes('صف')));
+  const hi=aoa.findIndex(r=>r&&r.some(c=>normAr(c).includes('معلم'))&&r.some(c=>/صف|فصل/.test(normAr(c))));
   if(hi<0)throw new Error('لم أجد صف العناوين (اليوم، الحصة، الصف، المعلم…). استخدم القالب أو انسخ الجدول مع صف العناوين.');
   const H=aoa[hi].map(normAr);const col=(...ks)=>H.findIndex(h=>ks.some(k=>h.includes(k)));
-  const cD=col('يوم'),cP=col('حصه','حصة'),cC=col('صف','فصل'),cT=col('معلم'),cPh=col('جوال','هاتف','رقم','موبايل'),cL=col('رابط','teams','link');
+  const cD=col('يوم'),cP=col('حصه','حصة'),cC=col('صف','فصل'),cT=col('معلم'),cPh=col('جوال','هاتف','رقم','موبايل'),cL=col('رابط','teams','link'),cLs=col('عنوان الدرس','درس'),cSb=col('ماده');
   if([cD,cP,cC,cT].some(x=>x<0))throw new Error('الأعمدة الأساسية ناقصة: اليوم، الحصة، الصف، المعلم');
-  const rows=[];let bad=0;
+  const rows=[];let bad=0;const seen=new Set();
   aoa.slice(hi+1).forEach(r=>{if(!r||r.every(c=>String(c).trim()===''))return;const d=dayIdx(r[cD]);const p=parseInt(String(r[cP]).replace(/[٠-٩]/g,x=>'٠١٢٣٤٥٦٧٨٩'.indexOf(x)),10);
     const c=String(r[cC]||'').trim(),t=String(r[cT]||'').trim().replace(/^(ال)?(استاذ|أستاذ)\s*[/.:]?\s*|^أ\s*[/.]\s*/,'');
     if(d<0||!(p>=1&&p<=7)||!c||!t){bad++;return}
+    const key=d+'|'+p+'|'+c;if(seen.has(key))return;seen.add(key);
+    const les=String((cLs>=0&&r[cLs])||(cSb>=0&&r[cSb])||'').replace(/\s+/g,' ').trim().slice(0,90);
     let l=cL>=0?String(r[cL]||'').trim():'';if(l&&!/^https?:\/\//i.test(l))l='';
-    rows.push({d,p,c,t,ph:cPh>=0?String(r[cPh]||'').trim():'',l})});
+    const o={d,p,c,t,ph:cPh>=0?String(r[cPh]||'').trim():'',l};if(les)o.s=les;rows.push(o)});
   if(!rows.length)throw new Error('لم تُقرأ أي حصة صالحة');
   return{rows,bad}}
 function textToAOA(txt){txt=txt.replace(/^﻿/,'');if(txt.includes('\t'))return txt.split(/\r?\n/).map(l=>l.split('\t'));return csvParse(txt)}
@@ -830,10 +834,15 @@ async function fileToAOA(f){const isCSV=/\.csv$|\.txt$/i.test(f.name)||/text\//.
   if(isCSV){const txt=await f.text();return window.XLSX?XLSX.utils.sheet_to_json(XLSX.read(txt,{type:'string'}).Sheets[XLSX.read(txt,{type:'string'}).SheetNames[0]],{header:1,defval:''}):textToAOA(txt)}
   if(!window.XLSX)throw new Error('تعذّر تحميل قارئ Excel، احفظ الملف CSV أو الصق الجدول');
   const wb=XLSX.read(await f.arrayBuffer(),{type:'array'});return XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{header:1,defval:'',raw:false})}
+/* تحديث الجدول (مثل الخطة الأسبوعية من مدرستي) دون فقد الجوالات والروابط المحفوظة */
+function keepOld(rows){if(S.demo||!S.rows.length)return 0;const nk=s=>normAr(s).replace(/\s/g,'');
+  const ph={},lk={},lk2={};S.rows.forEach(r=>{if(r.ph)ph[nk(r.t)]=r.ph;if(r.l){lk[r.c+'|'+nk(r.t)]=r.l;lk2[r.d+'|'+r.p+'|'+r.c]=r.l}});
+  let n=0;rows.forEach(r=>{const t=nk(r.t);if(!r.ph&&ph[t]){r.ph=ph[t];n++}if(!r.l){const l=lk[r.c+'|'+t]||lk2[r.d+'|'+r.p+'|'+r.c];if(l){r.l=l;n++}}});return n}
 function applyRows(res){
+  const kept=keepOld(res.rows);
   if(S.demo){S.marks={};S.sent={};S.settings.school=S.settings.school.includes('تجريبية')?'اسم مدرستك':S.settings.school;S.settings.mgr='';S.settings.mgrPh='';S.settings.pin='';S.settings.fpin='';S.settings.fols=[]}
   S.rows=res.rows;S.demo=false;save();V.date=null;V.p=null;render();
-  toast(`حُمّل ${res.rows.length} حصة`+(res.bad?` · تُجوهل ${res.bad} سطر غير مكتمل`:''))}
+  toast(`حُمّل ${res.rows.length} حصة`+(kept?` · احتُفظ بالجوالات والروابط السابقة`:'')+(res.bad?` · تُجوهل ${res.bad} سطر غير مكتمل`:''))}
 async function readSchedule(f){try{applyRows(parseAOA(await fileToAOA(f)))}catch(e){toast(String(e.message||'تعذّرت قراءة الملف'))}}
 function readPasted(txt){try{applyRows(parseAOA(textToAOA(txt)))}catch(e){toast(String(e.message||e))}}
 
