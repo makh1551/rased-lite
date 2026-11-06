@@ -207,12 +207,18 @@
   }
   function draw(inner) {
     const sc = detectSchool();
-    box.innerHTML = `<div class="hd"><span class="mk"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0d4f57" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5 9 17 20 6"/></svg></span><b>راصد · سحب جداول الفصول</b><button class="x" id="mpX" title="إغلاق">×</button></div>
+    box.innerHTML = `<div class="hd"><span class="mk"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0d4f57" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5 9 17 20 6"/></svg></span><b>راصد · السحب من مدرستي</b><button class="x" id="mpX" title="إغلاق">×</button></div>
       <div class="bd">${inner || `<div class="mu">${sc ? 'المدرسة محددة ✓' : '⚠️ اختر المدرسة وافتح صفحة «الفصول» أولًا.'} يقرأ راصد جدول كل فصل لهذا الأسبوع (الحصة، المادة، المعلم)، ولا يغيّر شيئًا في مدرستي.</div>
-        <div class="row"><button class="b" id="mpS">فحص عينة (فصل واحد)</button><button class="b p" id="mpA">سحب جدول كل الفصول</button></div>`}</div>`;
-    box.querySelector('#mpX').onclick = () => { box.style.display = 'none'; };
+        <div class="row"><button class="b" id="mpS">فحص عينة (فصل واحد)</button><button class="b p" id="mpA">سحب جدول كل الفصول</button></div>
+        <hr style="border:0;border-top:1px solid #e7eeee;margin:4px 0">
+        <b>📱 أرقام جوالات المعلمين</b>
+        <div class="mu">افتح «الإدارة المدرسية ← المعلمون» (أو أي صفحة فيها قائمة المعلمين)، ثم اضغط الزر. إن كانت القائمة على عدة صفحات فانتقل للتالية واضغط مرة أخرى، فيجمعها راصد معًا.</div>
+        <div class="row"><button class="b p" id="mpPh">سحب الأرقام من هذه الصفحة</button>${PH.size ? `<button class="b" id="mpPhSend">إرسال ${PH.size} رقم إلى راصد</button>` : ''}</div>`}</div>`;
+    box.querySelector('#mpX').onclick = () => { box.style.display = 'none'; chrome.storage.local.remove('mpUntil'); };
     const s = box.querySelector('#mpS'), a = box.querySelector('#mpA');
     if (s) s.onclick = () => run(true); if (a) a.onclick = () => run(false);
+    const ph = box.querySelector('#mpPh'); if (ph) ph.onclick = runPhones;
+    const ps = box.querySelector('#mpPhSend'); if (ps) ps.onclick = sendPhones;
   }
   function prog(kind, a, b) {
     const L = box.querySelector('#mpL'), I = box.querySelector('#mpI'); if (!L) return;
@@ -243,6 +249,92 @@
     box.querySelector('#mpB').onclick = () => draw();
     const sd = box.querySelector('#mpSend'); if (sd) sd.onclick = () => send(false);
   }
+  /* ---------- أرقام المعلمين من صفحة المعلمين (قراءة فقط) ---------- */
+  const PH = new Map();   // phone -> name (يتجمع عبر الصفحات خلال الجلسة)
+  try { JSON.parse(sessionStorage.getItem('rasedPH') || '[]').forEach(x => PH.set(x.ph, x.name)); } catch (e) {}
+  const keepPH = () => { try { sessionStorage.setItem('rasedPH', JSON.stringify([...PH].map(([ph, name]) => ({ ph, name })))); } catch (e) {} };
+  const toAr = s => String(s || '').replace(/[٠-٩]/g, x => '٠١٢٣٤٥٦٧٨٩'.indexOf(x));
+  function phOf(s) { const d = toAr(s).replace(/[\s\-().]/g, ''); const m = d.match(/(?:\+?966|00966|0)?5\d{8}/); return m ? '05' + m[0].slice(-8) : ''; }
+  const JOB = /^(معلم|معلمه|وكيل|مدير|موجه|مرشد|رائد|محضر|اداري|اخصائي|المرحله|الصف|التخصص|المسمي|رقم|السجل|الهويه|البريد|الجوال)/;
+  function bestName(parts) {
+    let best = '';
+    parts.forEach(t => { t = String(t || '').replace(/\s+/g, ' ').trim(); if (!t || /[0-9٠-٩@]/.test(t)) return; const w = t.split(' ');
+      if (w.length < 2 || w.length > 7 || !/^[\u0600-\u06FF\s.]+$/.test(t) || JOB.test(norm(t))) return; if (t.length > best.length) best = t; });
+    return best;
+  }
+  async function expandTable() {
+    let ch = false;
+    document.querySelectorAll('select[name$="_length"], .dataTables_length select, select[aria-controls]').forEach(sel => {
+      const opts = [...sel.options].map(o => +o.value); const mx = opts.includes(-1) ? -1 : Math.max(...opts.filter(n => !isNaN(n)));
+      if (isFinite(mx) && +sel.value !== mx) { sel.value = String(mx); sel.dispatchEvent(new Event('change', { bubbles: true })); ch = true; } });
+    if (ch) await new Promise(r => setTimeout(r, 1800));
+  }
+  function scanPage() {
+    let n = 0;
+    const units = document.querySelectorAll('tbody tr, .dga-defualt-card, .card, li');
+    units.forEach(u => {
+      if (u.closest('#rasedMP') || u.querySelector('tbody tr, .dga-defualt-card')) return;
+      const parts = u.matches('tr') ? [...u.children].map(c => c.textContent) : (u.innerText || u.textContent).split(/\n/);
+      const cands = parts.concat([...u.querySelectorAll('input')].map(i => i.value));
+      let ph = ''; for (const c of cands) { const dg = toAr(c).replace(/\D/g, ''); if (dg.length >= 9 && dg.length <= 14) { ph = phOf(c); if (ph) break; } }
+      if (!ph) return;
+      const name = bestName(parts); if (!name) return;
+      if (!PH.has(ph)) n++; PH.set(ph, name);
+    });
+    return n;
+  }
+  function detailLinks() {
+    const out = new Map();
+    document.querySelectorAll('tbody tr a[href], .dga-defualt-card a[href], .card a[href]').forEach(a => {
+      const h = a.getAttribute('href') || ''; if (!h || h.startsWith('#') || /^javascript:/i.test(h) || /logout|delete|remove|حذف/i.test(h)) return;
+      if (!/teacher|employee|staff|user|member|detail|profile|show|view|edit|info/i.test(h)) return;
+      const u = new URL(h, location.href); if (u.origin !== location.origin) return;
+      const row = a.closest('tr, .dga-defualt-card, .card'); const nm = bestName(row ? (row.matches('tr') ? [...row.children].map(c => c.textContent) : (row.innerText || '').split(/\n/)) : [a.textContent]);
+      if (!out.has(u.href)) out.set(u.href, nm);
+    });
+    return [...out];
+  }
+  function fromDetail(doc, fallbackName) {
+    let ph = '';
+    doc.querySelectorAll('label, th, dt, span, b, strong, td, div').forEach(el => {
+      if (ph || el.children.length > 3) return; const t = norm(el.textContent || ''); if (t.length > 30 || !/جوال|هاتف|موبايل|الجوال/.test(t)) return;
+      const nx = el.nextElementSibling; const inp = el.parentElement && el.parentElement.querySelector('input');
+      ph = phOf((nx && (nx.value || nx.textContent)) || '') || phOf(inp ? inp.value : '') || phOf(el.textContent);
+    });
+    if (!ph) ph = phOf([...doc.querySelectorAll('input')].map(i => i.value).join(' ') + ' ' + (doc.body ? doc.body.textContent : ''));
+    let name = fallbackName || '';
+    if (!name) { const ni = doc.querySelector('input[name*="FullName" i], input[name*="Name" i]'); name = bestName([ni ? ni.value : '', ...[...doc.querySelectorAll('h1,h2,h3,h4,h5')].map(h => h.textContent)]); }
+    return { ph, name };
+  }
+  async function runPhones() {
+    draw(`<div id="mpL" class="mu">قراءة الصفحة…</div><div class="bar"><i id="mpI"></i></div>`);
+    try {
+      await expandTable();
+      let added = scanPage(), viaLinks = 0;
+      if (!added) {
+        const links = detailLinks();
+        let k = 0;
+        await pool(links, 4, async ([u, nm]) => {
+          try { const r = await fetch(u, { credentials: 'include', headers: { Accept: 'text/html' } }); if (r.ok) { const x = fromDetail(new DOMParser().parseFromString(await r.text(), 'text/html'), nm); if (x.ph && x.name) { if (!PH.has(x.ph)) { added++; viaLinks++; } PH.set(x.ph, x.name); } } } catch (e) {}
+          const L = box.querySelector('#mpL'), I = box.querySelector('#mpI'); if (L) { L.textContent = `فتح صفحات المعلمين: ${++k} من ${links.length}`; I.style.width = Math.round(k / links.length * 100) + '%'; }
+        });
+      }
+      keepPH();
+      const list = [...PH].map(([ph, name]) => ({ name, ph }));
+      draw(`<div class="${added ? 'ok' : 'warn'}">${added ? `✓ أُضيف ${added} رقم من هذه الصفحة${viaLinks ? ' (من صفحات المعلمين)' : ''}. المجموع: ${PH.size}.` : 'لم أجد أرقام جوال في هذه الصفحة. افتح قائمة المعلمين أو صفحة بيانات معلم، أو انتقل للصفحة التالية.'}</div>
+        ${list.length ? `<table><tr><th>الاسم</th><th>الجوال</th></tr>${list.slice(-8).map(x => `<tr><td>${esc(x.name)}</td><td dir="ltr">${esc(x.ph.slice(0, 3))}•••${esc(x.ph.slice(-3))}</td></tr>`).join('')}</table>` : ''}
+        <div class="row"><button class="b" id="mpPh">سحب من هذه الصفحة مرة أخرى</button>${PH.size ? `<button class="b p" id="mpPhSend">إرسال ${PH.size} رقم إلى راصد</button>` : ''}<button class="b" id="mpB">رجوع</button></div>`);
+      box.querySelector('#mpB').onclick = () => draw();
+    } catch (e) { draw(`<div class="warn">${esc(e.message || e)}</div><div class="row"><button class="b" id="mpPh">إعادة المحاولة</button></div>`); }
+  }
+  async function sendPhones() {
+    const list = [...PH].map(([ph, name]) => ({ name, ph }));
+    await chrome.storage.local.set({ mphones: { at: Date.now(), list } });
+    PH.clear(); keepPH();
+    draw(`<div class="ok">✓ أُرسل ${list.length} رقم إلى راصد.</div><div class="mu">في راصد تظهر نافذة «مطابقة الأرقام»: راجع المعلم المقابل لكل رقم ثم اضغط «اعتماد».</div><div class="row"><button class="b p" id="mpGo">فتح راصد</button></div>`);
+    box.querySelector('#mpGo').onclick = () => chrome.runtime.sendMessage({ cmd: 'openApp' });
+  }
+
   async function send(auto) {
     const rows = last.rows.filter(r => r.t).map(r => ({ d: r.d, p: r.p, c: r.c, t: r.t, s: r.s, ph: '', l: '' }));
     await chrome.storage.local.set({ mpull: { at: Date.now(), auto: !!auto, school: last.school.name || '', classes: last.classes, skipped: last.rows.length - rows.length, rows } });
@@ -251,10 +343,13 @@
   }
 
   // الطلب من راصد (خلال 30 دقيقة) يفتح اللوحة تلقائيًا
-  chrome.storage.local.get('mreq').then(o => { if (o.mreq && Date.now() - o.mreq < 30 * 60e3) { open(); chrome.storage.local.remove('mreq'); } });
+  // الطلب من راصد يُبقي اللوحة ظاهرة أثناء التنقل في مدرستي لمدة ساعة أو حتى إغلاقها
+  chrome.storage.local.get(['mreq', 'mpUntil']).then(o => {
+    if (o.mreq && Date.now() - o.mreq < 30 * 60e3) { chrome.storage.local.set({ mpUntil: Date.now() + 60 * 60e3 }); chrome.storage.local.remove('mreq'); open(); }
+    else if (o.mpUntil && o.mpUntil > Date.now()) open(); });
   chrome.runtime.onMessage.addListener((m, s, reply) => {
     if (!m) return;
-    if (m.cmd === 'mpOpen') { open(); reply({ ok: 1 }); }
+    if (m.cmd === 'mpOpen') { chrome.storage.local.set({ mpUntil: Date.now() + 60 * 60e3 }); open(); reply({ ok: 1 }); }
     if (m.cmd === 'mpAuto') { (async () => { try { last = await pull({}); await send(true); reply({ ok: 1, n: last.rows.length }); } catch (e) { reply({ ok: 0, err: String(e.message || e) }); } })(); return true; }
   });
 })();

@@ -331,7 +331,7 @@ function onMpull(v){if(!v||!Array.isArray(v.rows)||!v.rows.length||isFol())retur
   if(!v.auto){if(v.school&&(S.demo||/تجريبية|اسم مدرستك/.test(S.settings.school)))S.settings.school=v.school;S.mpullAt=v.at;MP=null;
     applyRows({rows:v.rows.map(r=>Object.assign({},r)),bad:v.skipped||0});return}
   const df=mpDiff(v.rows);if(!df.length){S.mpullAt=v.at;save();return}MP=Object.assign({},v,{diff:df});render()}
-function mpBar(){if(!MP||isFol())return'';return `<div class="alertbar" style="background:var(--accent-soft);color:var(--ink)">🔄 تغيّر الجدول في مدرستي: ${MP.diff.length} تغيير.
+function mpBar(){if(MPH&&!isFol())return `<div class="alertbar" style="background:var(--accent-soft);color:var(--ink)">📱 وصلت ${MPH.list.length} رقم جوال من مدرستي. <button class="btn primary" data-mp="phones">مطابقة واعتماد</button></div>`;if(!MP||isFol())return'';return `<div class="alertbar" style="background:var(--accent-soft);color:var(--ink)">🔄 تغيّر الجدول في مدرستي: ${MP.diff.length} تغيير.
   <div class="bar-row" style="margin-top:8px"><button class="btn primary" data-mp="show">عرض وتطبيق</button><button class="btn" data-mp="skip">تجاهل</button></div></div>`}
 function mpSheet(){const D=MP.diff;const lab={add:'حصة جديدة',chg:'تغيّر المعلم',del:'حُذفت'};
   const d=document.createElement('div');d.className='sheet';d.innerHTML=`<div><h2 style="font-size:18px">تغييرات الجدول من مدرستي</h2>
@@ -340,10 +340,15 @@ function mpSheet(){const D=MP.diff;const lab={add:'حصة جديدة',chg:'تغ�
    <div class="bar-row"><button class="btn primary" data-mp="apply">تطبيق التغييرات</button><button class="btn" data-mp="close">إغلاق</button></div></div>`;document.body.append(d)}
 document.addEventListener('click',e=>{const b=e.target.closest('[data-mp]');if(!b)return;const k=b.dataset.mp;
   if(k==='show')mpSheet();
+  if(k==='phones')mphOpen();
   if(k==='close'){const s=document.querySelector('.sheet');if(s)s.remove()}
   if(k==='skip'){S.mpullAt=MP.at;MP=null;save();render()}
   if(k==='apply'){const s=document.querySelector('.sheet');if(s)s.remove();const v=MP;MP=null;S.mpullAt=v.at;applyRows({rows:v.rows.map(r=>Object.assign({},r)),bad:0})}});
-if(EXT){chrome.storage.local.get('mpull').then(o=>onMpull(o.mpull));chrome.storage.onChanged.addListener((ch,a)=>{if(a==='local'&&ch.mpull)onMpull(ch.mpull.newValue)})}
+let MPH=null;
+function onMphones(v){if(!v||!Array.isArray(v.list)||!v.list.length||isFol())return;if((S.mphAt||0)>=v.at)return;MPH=v;render();
+  if(!document.querySelector('.sheet')&&!needLock())mphOpen()}
+function mphOpen(){if(!MPH)return;const v=MPH;MPH=null;S.mphAt=v.at;save();render();phPreview(v.list.map(x=>({name:x.name,ph:cleanPh(x.ph)})).filter(x=>x.ph),'منصة مدرستي')}
+if(EXT){chrome.storage.local.get(['mpull','mphones']).then(o=>{onMpull(o.mpull);onMphones(o.mphones)});chrome.storage.onChanged.addListener((ch,a)=>{if(a!=='local')return;if(ch.mpull)onMpull(ch.mpull.newValue);if(ch.mphones)onMphones(ch.mphones.newValue)})}
 function updBar(){if(!EXT||!UPD)return'';return `<div class="alertbar" style="background:var(--accent-soft);color:var(--ink)">🔔 تحديث جديد لإضافة راصد ${esc(UPD.version)} (لديك ${esc(UPD.current)})${UPD.notes?': '+esc(UPD.notes):''}
   <div class="bar-row" style="margin-top:8px">${UPD.zip?`<a class="btn primary" href="${esc(UPD.zip)}" target="_blank" rel="noopener">${IC.dl} تنزيل التحديث</a>`:''}<span class="small" style="font-weight:500">فك الضغط داخل مجلد الإضافة نفسه (استبدال الملفات)، ثم اضغط ↻ على الإضافة في صفحة الإضافات. بياناتك لا تتأثر.</span></div></div>`}
 const PLANS={free:'المجانية',trial:'التجربة (14 يومًا)',basic:'الأساسية',pro:'الاحترافية'};
@@ -867,6 +872,9 @@ function setPhone(t,ph){let n=0;S.rows.forEach(r=>{if(r.t===t){r.ph=ph;n++}});re
 function phonesHTML(){if(isFol())return'';const st=phStats();const link=S.sync?`${location.protocol==='https:'&&!/claude/.test(location.host)?location.origin:'https://rased-lite.wasl.uk'}/t/?s=${fmtCode(S.sync.code)}`:'';
   return `<div class="section"><h3>جوالات المعلمين ${st.miss.length?`<span class="pill late">ينقص ${st.miss.length}</span>`:`<span class="pill ok">مكتملة</span>`}</h3><div class="card" style="display:grid;gap:14px">
    <p class="small muted" style="margin:0">لدى المدرسة ${st.T.length} معلم. الجوال يُستخدم للتذكير بواتساب فقط، ولا يظهر في أي تقرير أو صفحة عامة.</p>
+   ${EXT?`<div style="display:grid;gap:8px;background:var(--accent-soft);border-radius:12px;padding:12px"><b>⚡ الأسرع: سحب الأرقام من منصة مدرستي</b>
+    <p class="small muted" style="margin:0">يفتح مدرستي؛ ادخل «الإدارة المدرسية ← المعلمون» واضغط «سحب الأرقام من هذه الصفحة» في لوحة راصد، ثم «إرسال إلى راصد». تظهر هنا للمطابقة والاعتماد.</p>
+    <div><button class="btn primary" id="phMad" type="button">سحب الأرقام من مدرستي</button></div></div>`:`<p class="small muted" style="margin:0">⚡ السحب المباشر للأرقام من منصة مدرستي متاح في إضافة «راصد الآلي».</p>`}
    <div style="display:grid;gap:8px"><b>١. لصق قائمة أرقام</b>
     <p class="small muted" style="margin:0">الصق أسماء وأرقامًا بأي شكل: من Excel، أو كشف، أو قائمة أعضاء مجموعة واتساب. يطابقها راصد مع أسماء الجدول حتى لو اختلفت الصيغة.</p>
     <textarea class="pastebox" id="phPaste" placeholder="خالد السالم 0551234567&#10;سعد محمد العتيبي - 966501234567"></textarea>
@@ -893,6 +901,7 @@ function phPreview(items,src){const T=teachersList();
   d.querySelector('#phClose').onclick=()=>d.remove();
   d.querySelector('#phApply').onclick=()=>{let n=0;d.querySelectorAll('.phsel').forEach(s=>{if(s.value){setPhone(s.value,rows[+s.dataset.i].ph);n++}});d.remove();save();render();toast(`حُفظ ${n} رقم`)}}
 function bindPhones(){
+  const md=$('#phMad');if(md)md.onclick=()=>{chrome.runtime.sendMessage({cmd:'mpOpen'});toast('افتح «الإدارة المدرسية ← المعلمون» في مدرستي')};
   const m=$('#phMatch');if(m)m.onclick=()=>{const it=parsePhoneList($('#phPaste').value);if(!it.length){toast('لم أجد أرقام جوال (تبدأ بـ 05)');return}phPreview(it,'')};
   const om=$('#phOnlyMiss');if(om)om.onchange=()=>{const st=phStats();$('#phBody').innerHTML=phRowsHTML(om.checked?st.miss:st.T)};
   const sv=$('#phSave');if(sv)sv.onclick=()=>{let n=0,bad=0;document.querySelectorAll('.phin').forEach(i=>{const v=i.value.trim();const c=v?cleanPh(v):'';if(v&&!c){bad++;return}if(c!==phoneOf(i.dataset.t)){setPhone(i.dataset.t,c);n++}});save();render();toast(`حُفظ ${n} رقم`+(bad?` · ${bad} رقم غير صحيح`:''))};
