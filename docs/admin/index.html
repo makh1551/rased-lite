@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>إدارة اشتراكات راصد</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;600;700&display=swap">
+<style>
+/* لوحة إدارة بسيطة: أكواد التفعيل والمدارس المشتركة */
+:root{--bg:#f2f5f5;--surface:#fff;--tint:#f1f8f7;--ink:#10272b;--muted:#5f7376;--line:#e2e9e9;--accent:#0d4f57;--ok:#15803d;--bad:#b42318;--late:#a65508}
+@media (prefers-color-scheme:dark){:root{--bg:#0c1517;--surface:#142124;--tint:#132c2f;--ink:#e4efee;--muted:#9db1b0;--line:#24363a;--accent:#4cc3c0;--ok:#5fd394;--bad:#ff8f84;--late:#f2b45a;color-scheme:dark}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans Arabic",Tahoma,sans-serif;font-size:15px}
+.w{max-width:980px;margin:0 auto;padding:20px max(16px,env(safe-area-inset-left,0px))}
+h1{font-size:22px;margin:0 0 14px}h2{font-size:17px;margin:0 0 10px}
+.card{background:var(--surface);border-radius:16px;padding:16px;margin-bottom:14px;box-shadow:0 1px 2px rgba(0,0,0,.05)}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:end}
+label{display:grid;gap:4px;font-size:13px;color:var(--muted)}
+input,select{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 10px;min-width:0}
+button{font:inherit;font-weight:600;border:0;border-radius:10px;padding:9px 16px;background:var(--accent);color:#fff;cursor:pointer}
+@media (prefers-color-scheme:dark){button{color:#06231c}}
+button.o{background:transparent;border:1px solid var(--accent);color:var(--accent)}
+.tbl{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:13px}th,td{padding:7px 10px;text-align:start;border-bottom:1px solid var(--line);white-space:nowrap}
+th{color:var(--muted);font-weight:600}code{font-size:13px;direction:ltr;display:inline-block}
+.pill{display:inline-block;border-radius:99px;padding:1px 9px;font-size:12px;font-weight:600;background:var(--tint)}
+.ok{color:var(--ok)}.bad{color:var(--bad)}.late{color:var(--late)}
+#msg{min-height:1.4em;font-size:13px}
+pre{background:var(--tint);border-radius:10px;padding:10px;direction:ltr;text-align:left;white-space:pre-wrap;margin:8px 0 0}
+</style></head><body><div class="w">
+<h1>إدارة اشتراكات راصد المبسّط</h1>
+<div class="card"><div class="row"><label style="flex:1">كلمة مرور الإدارة<input id="pass" type="password" autocomplete="current-password"></label><button id="load">دخول وتحديث</button></div><div id="msg"></div></div>
+<div class="card" id="gen" hidden><h2>إنشاء أكواد تفعيل</h2>
+  <div class="row"><label>الباقة<select id="plan"><option value="pro">الاحترافية</option><option value="basic">الأساسية</option></select></label>
+  <label>العدد<input id="count" type="number" min="1" max="50" value="1" style="width:80px"></label>
+  <label>المدة بالأيام<input id="days" type="number" min="1" value="150" style="width:100px"></label>
+  <label style="flex:1">ملاحظة (اسم المدرسة أو المشتري)<input id="note"></label><button id="mk">إنشاء</button></div>
+  <pre id="newCodes" hidden></pre><button class="o" id="cp" hidden>نسخ الأكواد</button></div>
+<div class="card" id="lic" hidden><h2>الأكواد</h2><div class="tbl" id="licT"></div></div>
+<div class="card" id="sch" hidden><h2>المدارس</h2><div class="tbl" id="schT"></div></div>
+<p style="color:var(--muted);font-size:12px;text-align:center">راصد المبسّط · إعداد وتطوير: عبدالمجيد السيد</p>
+</div>
+<script>
+const SB='https://knrpjgppxdhkdyxcwroe.supabase.co/rest/v1/rpc/',K='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtucnBqZ3BweGRoa2R5eGN3cm9lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE5OTk4MzMsImV4cCI6MjEwNzU3NTgzM30.T_M5u9G1Ix9nMGCt2Ysm1bmiDzpBppOPsHdJTYVH6Qc';
+const $=s=>document.querySelector(s),esc=t=>String(t??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const P={pro:'الاحترافية',basic:'الأساسية',trial:'تجربة',free:'مجانية'};
+async function rpc(f,a){const r=await fetch(SB+f,{method:'POST',headers:{apikey:K,Authorization:'Bearer '+K,'Content-Type':'application/json'},body:JSON.stringify(a)});const j=await r.json();if(!r.ok)throw new Error(j.message||r.status);if(j.err)throw new Error(j.err==='admin'?'كلمة المرور غير صحيحة':j.err);return j}
+const msg=(t,c)=>{$('#msg').innerHTML=`<span class="${c||''}">${esc(t)}</span>`};
+const today=new Date().toISOString().slice(0,10);
+async function load(){msg('⏳ …');try{const r=await rpc('lite_admin_list',{p_pass:$('#pass').value});msg('');['#gen','#lic','#sch'].forEach(x=>$(x).hidden=false);
+  $('#licT').innerHTML=`<table><tr><th>الكود</th><th>الباقة</th><th>المدة</th><th>ملاحظة</th><th>الحالة</th></tr>${r.licenses.map(l=>`<tr><td><code>${esc(l.code)}</code></td><td>${P[l.plan]}</td><td>${l.days} يوم</td><td>${esc(l.note)}</td><td>${l.used_by?`<span class="pill ok">مستخدم · ${esc(l.used_by)} · ${esc((l.used_at||'').slice(0,10))}</span>`:'<span class="pill">متاح</span>'}</td></tr>`).join('')}</table>`;
+  $('#schT').innerHTML=`<table><tr><th>رمز المدرسة</th><th>الاسم</th><th>الباقة</th><th>حتى</th><th>الرصد</th><th>أُنشئت</th></tr>${r.schools.map(s=>{const exp=s.plan_until<today;return `<tr><td><code>${esc(s.code.slice(0,4)+'-'+s.code.slice(4))}</code></td><td>${esc(s.name)}</td><td>${P[s.plan]||s.plan}</td><td class="${exp?'bad':''}">${esc(s.plan_until)}${exp?' (منتهية)':''}</td><td>${s.marks}</td><td>${esc((s.created_at||'').slice(0,10))}</td></tr>`}).join('')}</table>`;
+}catch(e){msg(e.message,'bad')}}
+$('#load').onclick=load;$('#pass').addEventListener('keydown',e=>{if(e.key==='Enter')load()});
+$('#mk').onclick=async()=>{try{const r=await rpc('lite_admin_create',{p_pass:$('#pass').value,p_plan:$('#plan').value,p_count:+$('#count').value,p_days:+$('#days').value,p_note:$('#note').value});
+  $('#newCodes').hidden=false;$('#cp').hidden=false;$('#newCodes').textContent=r.codes.join('\n');load()}catch(e){msg(e.message,'bad')}};
+$('#cp').onclick=async()=>{try{await navigator.clipboard.writeText($('#newCodes').textContent);msg('نُسخت الأكواد','ok')}catch(e){msg('انسخها يدويًا')}};
+</script></body></html>

@@ -81,7 +81,12 @@ S.auto.wa=Object.assign({remind:false,report:false,max:40},S.auto.wa||{});
 if(EXT)chrome.storage.local.get('upd').then(o=>{UPD=o.upd||null;if(UPD)render()});
 function updBar(){if(!EXT||!UPD)return'';return `<div class="alertbar" style="background:var(--accent-soft);color:var(--ink)">🔔 تحديث جديد لإضافة راصد ${esc(UPD.version)} (لديك ${esc(UPD.current)})${UPD.notes?': '+esc(UPD.notes):''}
   <div class="bar-row" style="margin-top:8px">${UPD.zip?`<a class="btn primary" href="${esc(UPD.zip)}" target="_blank" rel="noopener">${IC.dl} تنزيل التحديث</a>`:''}<span class="small" style="font-weight:500">فك الضغط داخل مجلد الإضافة نفسه (استبدال الملفات)، ثم اضغط ↻ على الإضافة في صفحة الإضافات. بياناتك لا تتأثر.</span></div></div>`}
-function pushCfg(){if(!EXT)return;const c={rows:S.rows,times:S.settings.times,school:S.settings.school,mgr:S.settings.mgr,mgrPh:S.settings.mgrPh,auto:S.auto};const j=JSON.stringify(c);if(j===lastCfg)return;lastCfg=j;chrome.storage.local.set({cfg:c})}
+const PLANS={free:'المجانية',trial:'التجربة (14 يومًا)',basic:'الأساسية',pro:'الاحترافية'};
+function curPlan(){if(!S.sync)return'free';const p=S.sync.plan||'trial',u=S.sync.until||'';if(u&&u<today())return'free';return p}
+const proOK=()=>['pro','trial'].includes(curPlan());
+const daysLeft=()=>{const u=S.sync&&S.sync.until;if(!u)return null;return Math.round((pd(u)-pd(today()))/864e5)};
+function pushCfg(){if(!EXT)return;const c={rows:S.rows,times:S.settings.times,school:S.settings.school,mgr:S.settings.mgr,mgrPh:S.settings.mgrPh,
+  auto:Object.assign({},S.auto,{on:!!(S.auto.on&&proOK()),wa:proOK()?S.auto.wa:{remind:false,report:false,max:0}})};const j=JSON.stringify(c);if(j===lastCfg)return;lastCfg=j;chrome.storage.local.set({cfg:c})}
 function save(){store.set(KEY,JSON.stringify(S));pushCfg();if(EXT&&!isFolSafe()&&wd(today())>=0){try{chrome.storage.local.set({['dayrep:'+today()]:dayReport(today()).text})}catch(e){}}}
 function isFolSafe(){try{return store.sget('rl-role')==='fol'}catch(e){return false}}
 /* ---- الأدوار: المدير والمتابع ---- */
@@ -104,7 +109,7 @@ function roleBar(){if(!(S.settings.pin||S.settings.fpin||S.sync)||!role())return
   return `<div style="display:flex;gap:6px;align-items:center"><span class="pill">${isFol()?'👤 '+esc(byName()):'المدير'}</span><button class="btn ghost" id="logout">خروج</button></div>`}
 /* ---- المزامنة بين الأجهزة (Supabase) ---- */
 const SB_URL='https://knrpjgppxdhkdyxcwroe.supabase.co',SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtucnBqZ3BweGRoa2R5eGN3cm9lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE5OTk4MzMsImV4cCI6MjEwNzU3NTgzM30.T_M5u9G1Ix9nMGCt2Ysm1bmiDzpBppOPsHdJTYVH6Qc';
-const ERRS={bad:'رمز الدخول غير صحيح',none:'رمز المدرسة غير موجود',locked:'محاولات خاطئة كثيرة، حاول بعد ساعة',too_many:'تغييرات كثيرة دفعة واحدة',too_big:'الجدول كبير جدًا'};
+const ERRS={plan:'لا يوجد اشتراك ساري لهذه المدرسة. فعّل الاشتراك من «الإعداد ← الاشتراك»',license:'كود التفعيل غير صحيح',used:'كود التفعيل مستخدم من قبل',mgr_only:'التفعيل من حساب المدير فقط',bad:'رمز الدخول غير صحيح',none:'رمز المدرسة غير موجود',locked:'محاولات خاطئة كثيرة، حاول بعد ساعة',too_many:'تغييرات كثيرة دفعة واحدة',too_big:'الجدول كبير جدًا'};
 const fmtCode=c=>c?c.slice(0,4)+'-'+c.slice(4):'';
 async function rpc(fn,args){let r;try{r=await fetch(`${SB_URL}/rest/v1/rpc/${fn}`,{method:'POST',headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY,'Content-Type':'application/json'},body:JSON.stringify(args)})}
   catch(e){throw new Error('تعذّر الاتصال بالإنترنت. المزامنة تعمل من موقع راصد أو من الإضافة.')}
@@ -131,22 +136,44 @@ async function syncNow(){if(!S.sync||syncBusy||needLock())return;syncBusy=true;l
   const r=await rpc('lite_pull',{p_code:S.sync.code,p_key:S.sync.key,p_since:S.sync.since||null});
   if(r.cfg&&(S.sync.role==='fol'||cfgSig()===S.sync.cfgSig)){applyServerCfg(r);if(S.sync.role==='mgr')S.sync.cfgSig=cfgSig();ch=true}
   if(applyServerMarks(r.marks))ch=true;
+  if(r.plan){S.sync.plan=r.plan;S.sync.until=r.plan_until||''}
   S.sync.since=r.now;SYNC_ST={at:hm(),err:''};store.set(KEY,JSON.stringify(S));
-}catch(e){SYNC_ST.err=String(e.message||e)}finally{syncBusy=false;const el=$('#syncSt');if(el)el.innerHTML=syncStHTML();
+}catch(e){SYNC_ST.err=String(e.message||e);if(SYNC_ST.err===ERRS.plan&&S.sync){S.sync.plan='free';store.set(KEY,JSON.stringify(S))}}finally{syncBusy=false;const el=$('#syncSt');if(el)el.innerHTML=syncStHTML();
   if(ch&&V.tab!=='setup'&&!document.querySelector('.lb,.sheet'))render()}}
 setInterval(syncNow,10000);
 async function enableSync(){if(!S.settings.pin){toast('ضع رمز دخول المدير أولًا');return}
   const b=$('#syncOn');if(b)b.disabled=true;
   try{const code=await rpc('lite_create',{p_name:S.settings.school,p_mgr_key:S.settings.pin,p_fol_key:S.settings.fpin||null,p_cfg:cfgObj(),p_rows:S.rows});
-    S.sync={code,key:S.settings.pin,role:'mgr',name:'المدير',since:null,cfgSig:cfgSig()};S.pend={};
+    S.sync={code,key:S.settings.pin,role:'mgr',name:'المدير',since:null,cfgSig:cfgSig(),plan:'trial',until:addD(today(),14)};S.pend={};
     Object.keys(S.marks).concat(Object.keys(S.sent)).forEach(k=>S.pend[k]=1);save();render();toast('فُعّلت المزامنة');syncNow()}
   catch(e){toast(String(e.message||e));if(b)b.disabled=false}}
 async function joinSchool(code,key,name){code=code.toUpperCase().replace(/[^A-Z0-9]/g,'');if(code.length!==8)throw new Error('رمز المدرسة 8 أحرف، مثل ABCD-2345');if(!key)throw new Error('اكتب رمز الدخول');
   const r=await rpc('lite_pull',{p_code:code,p_key:key,p_since:null});
   S={demo:false,settings:{school:'',mgr:'',mgrPh:'',pin:r.role==='mgr'?key:'',fpin:'',times:DEF_TIMES.map(x=>x.slice())},rows:[],marks:{},sent:{},auto:{on:false,sound:true,skip:[],sk:[]},pend:{},
-    sync:{code,key,role:r.role,name:name||(r.role==='mgr'?'المدير':'المتابع'),since:r.now,cfgSig:''}};
+    sync:{code,key,role:r.role,name:name||(r.role==='mgr'?'المدير':'المتابع'),since:r.now,cfgSig:'',plan:r.plan||'free',until:r.plan_until||''}};
   applyServerCfg(r);applyServerMarks(r.marks);S.sync.cfgSig=cfgSig();if(name)store.set('rl-fname',name);save();store.sset('rl-role',r.role);V.date=null;V.p=null;V.tab='now';
   SYNC_ST={at:hm(),err:''};render();toast(r.role==='mgr'?'انضممت بصلاحية المدير':'انضممت متابعًا')}
+function planSetupHTML(){const p=curPlan(),dl=daysLeft();
+  const contact=waUrl('0561955430',`السلام عليكم، أرغب في الاشتراك في راصد المبسّط\nالمدرسة: ${S.settings.school}${S.sync?`\nرمز المدرسة: ${fmtCode(S.sync.code)}`:''}`);
+  return `<div class="section"><h3>٦. الاشتراك</h3><div class="card" style="display:grid;gap:12px">
+   <div>الباقة الحالية: <b>${PLANS[p]}</b>${S.sync&&p!=='free'&&dl!=null?` <span class="pill ${dl<=7?'late':'ok'}">${dl>=0?`متبقٍ ${dl} يوم`:'منتهية'}</span>`:''}</div>
+   <div class="tbl"><table><thead><tr><th>الباقة</th><th>السعر (لكل فصل دراسي)</th><th>تشمل</th></tr></thead><tbody>
+    <tr><td>المجانية</td><td class="num">0</td><td class="small">جهاز واحد: الرصد والتذكير اليدوي والتقارير</td></tr>
+    <tr><td>الأساسية</td><td class="num">149 ر.س</td><td class="small">+ متابعون على أجهزتهم ومزامنة لحظية</td></tr>
+    <tr><td>الاحترافية</td><td class="num">349 ر.س</td><td class="small">+ الفحص الآلي ولقطات الشاشة والإرسال الآلي ودعم واتساب</td></tr>
+   </tbody></table></div>
+   <p class="small muted" style="margin:0">خصم 25% لخمس مدارس فأكثر. تفعيل المزامنة يمنح تجربة مجانية للباقة الاحترافية 14 يومًا.</p>
+   <div class="bar-row" style="margin:0"><a class="btn wa" href="${esc(contact)}" target="_blank" rel="noopener">${IC.wa} طلب اشتراك</a></div>
+   <label class="f" style="max-width:320px">كود التفعيل<input id="licIn" dir="ltr" autocomplete="off" placeholder="RSD-XXXX-XXXX"></label>
+   <div class="bar-row" style="margin:0"><button class="btn primary" id="licB" type="button">تفعيل</button><span class="small" id="licOut"></span></div></div></div>`}
+async function activateLicense(){const v=$('#licIn').value.trim().toUpperCase();if(!v){toast('اكتب كود التفعيل');return}
+  const out=$('#licOut'),b=$('#licB');b.disabled=true;out.textContent='⏳ جارٍ التفعيل…';
+  try{if(!S.sync){if(!S.settings.pin){throw new Error('ضع رمز دخول المدير في «بيانات المدرسة» واحفظ أولًا')}await enableSync();if(!S.sync)throw new Error('تعذّر تفعيل المزامنة')}
+    const r=await rpc('lite_activate',{p_code:S.sync.code,p_key:S.sync.key,p_license:v});S.sync.plan=r.plan;S.sync.until=r.plan_until;save();render();toast(`فُعّلت الباقة ${PLANS[r.plan]} حتى ${r.plan_until}`)}
+  catch(e){out.innerHTML=`<span style="color:var(--bad)">${esc(String(e.message||e))}</span>`;b.disabled=false}}
+function planBar(){if(isFol()||!S.sync)return'';const p=curPlan(),dl=daysLeft();
+  if(p==='free')return `<div class="alertbar">⚠️ انتهى اشتراك المزامنة لهذه المدرسة، فتوقفت مزامنة المتابعين. <a href="#setup">فعّل الاشتراك</a></div>`;
+  if(dl!=null&&dl<=7)return `<div class="demo-bar"><span>⏳ ${p==='trial'?'التجربة المجانية':'الاشتراك'} ينتهي بعد ${dl} يوم.</span><a class="btn" href="#setup">الاشتراك</a></div>`;return''}
 function syncSetupHTML(){
   if(!S.sync)return `<div class="section"><h3>٥. المزامنة بين الأجهزة</h3><div class="card" style="display:grid;gap:10px">
    <p class="small muted" style="margin:0">تجعل رصد المتابعين على أجهزتهم يظهر عند المدير خلال ثوانٍ، ويصلهم الجدول وتعديلاته تلقائيًا. تحتاج اتصالًا بالإنترنت، والبيانات محمية برمز المدرسة والرموز السرية.</p>
@@ -209,6 +236,8 @@ function testHTML(){if(!TEST)return'<p class="small muted" style="margin:0">لم
   <ol class="steps small">${(TEST.steps||[]).map(x=>`<li>${x.ok===false?'❌':x.ok?'✅':'•'} ${esc(x.m)} <span class="muted num">${esc(x.at)}</span></li>`).join('')}</ol>
   ${TEST.shot?`<img src="${TEST.shot}" alt="لقطة الاختبار" style="border-radius:8px;border:1px solid var(--line);max-width:min(100%,460px)">`:''}`}
 function autoSetupHTML(){
+  if(EXT&&!proOK())return `<div class="section"><h3>٤. الفحص الآلي</h3><div class="card" style="display:grid;gap:8px"><b>🔒 متاح في الباقة الاحترافية</b>
+   <p class="small muted" style="margin:0">الفحص الآلي ولقطات الشاشة والإرسال الآلي عبر واتساب ضمن الباقة الاحترافية. فعّل المزامنة لتحصل على تجربة مجانية 14 يومًا، أو فعّل اشتراكك من قسم «الاشتراك».</p></div></div>`;
   if(!EXT)return `<div class="section"><h3>٤. الفحص الآلي</h3><div class="card small muted">الدخول الآلي على الحصص ولقطات الشاشة يعملان عند فتح راصد من إضافة «راصد الآلي» على Chrome أو Edge، في جهاز مسجّل في Teams بالحساب المدعو لاجتماعات المعلمين.</div></div>`;
   return `<div class="section"><h3>٤. الفحص الآلي</h3><div class="card" style="display:grid;gap:10px">
    <label style="display:flex;gap:8px;align-items:center;font-weight:600"><input type="checkbox" id="autoOn" ${S.auto.on?'checked':''}> تشغيل الفحص الآلي في أوقات الحصص</label>
@@ -330,7 +359,7 @@ function render(){
     `<footer>راصد المبسّط · البيانات محفوظة على هذا الجهاز فقط<br><span class="credit">إعداد وتطوير: عبدالمجيد السيد · 0561955430</span> · جميع الحقوق محفوظة © 2026${PWA?' · <a href="about/">ما هو راصد؟</a>':''}</footer>`;
   bind();
 }
-function topBars(){return installBar()+`${S.demo&&!isFol()?`<div class="demo-bar"><span>تعرض الآن <b>مدرسة تجريبية وهمية</b> للتجربة. ارفع جدول مدرستك من «الإعداد والجدول» لتبدأ.</span><button class="btn" id="wizB">ابدأ مدرستك في 3 خطوات</button></div>`:''}${updBar()}`}
+function topBars(){return installBar()+planBar()+`${S.demo&&!isFol()?`<div class="demo-bar"><span>تعرض الآن <b>مدرسة تجريبية وهمية</b> للتجربة. ارفع جدول مدرستك من «الإعداد والجدول» لتبدأ.</span><button class="btn" id="wizB">ابدأ مدرستك في 3 خطوات</button></div>`:''}${updBar()}`}
 function header(){const cp=curPeriod(S.settings.times);const isToday=V.date===today();
   const tab=(id,t)=>`<a href="#${id}" ${V.tab===id?'aria-current="page"':''}>${t}</a>`;
   return `<header class="top"><div class="brand"><div><h1><span class="mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5 9 17 20 6"/></svg></span>راصد المبسّط</h1>
@@ -439,7 +468,7 @@ function setupView(){const s=S.settings;const nT=new Set(S.rows.map(r=>r.t)).siz
    <div class="bar-row" style="margin:0"><button class="btn" id="exp">${IC.dl} تصدير نسخة (JSON)</button><button class="btn" id="expCp">${IC.copy} نسخ النسخة</button>
     <label class="btn" for="imp">${IC.up} استيراد نسخة</label><input type="file" id="imp" accept=".json,application/json" hidden></div>
    <div class="bar-row" style="margin:0"><button class="btn danger" id="clrMarks">مسح الرصد فقط</button><button class="btn danger" id="reset">مسح كل شيء والعودة للمدرسة التجريبية</button></div>
-  </div></div>${autoSetupHTML()}${syncSetupHTML()}`}
+  </div></div>${autoSetupHTML()}${syncSetupHTML()}${planSetupHTML()}`}
 
 function lockView(){return `<div class="lock"><span class="mark" style="margin:auto;width:48px;height:48px;border-radius:12px" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="width:26px;height:26px"><path d="M4 12.5 9 17 20 6"/></svg></span>
   <h1 style="font-size:24px">راصد المبسّط</h1><div class="muted">${esc(S.settings.school)}</div><div class="pill" style="justify-self:center">دخول المدير أو المتابع</div>
@@ -521,6 +550,7 @@ function bindSetup(){
     list.forEach(x=>{const p=parseInt(x.replace(/\D/g,''),10);const d=dayIdx(x.replace(/\d/g,''));if(d>=0&&p>=1&&p<=7)sk.push(d+'-'+p)});
     S.auto={on:$('#autoOn').checked,sound:$('#autoSound').checked,skip:list,sk,wa:{remind:$('#waRemind').checked,report:$('#waReport').checked,max:Math.max(1,Math.min(200,+$('#waMax').value||40))}};save();render();toast(S.auto.on?'الفحص الآلي مفعّل':'الفحص الآلي متوقف')};
   const wt=$('#waTest');if(wt)wt.onclick=()=>{if(!S.settings.mgrPh){toast('أضف جوال المدير في بيانات المدرسة');return}WATEST=null;$('#waTestOut').textContent='⏳ جارٍ الإرسال… راقب نافذة الفحص';chrome.runtime.sendMessage({cmd:'waTest'})};
+  const lb=$('#licB');if(lb)lb.onclick=activateLicense;
   const rt=$('#runTest');if(rt)rt.onclick=()=>{let link=$('#testLink').value.trim(),t=$('#testT').value.trim();
     if(!link){const d=wd(today());const r=S.rows.find(x=>x.l&&x.d===d)||S.rows.find(x=>x.l);if(r){link=r.l;t=t||r.t}}
     if(!link){toast('لا يوجد رابط للاختبار');return}
