@@ -27,7 +27,7 @@ function plan(cfg, date) {
 /* ---------- الجدولة ---------- */
 async function schedule() {
   const all = await chrome.alarms.getAll();
-  await Promise.all(all.filter(a => /^(chk|pre|warep)\|/.test(a.name)).map(a => chrome.alarms.clear(a.name)));
+  await Promise.all(all.filter(a => /^(chk|pre|prem|warep)\|/.test(a.name)).map(a => chrome.alarms.clear(a.name)));
   chrome.alarms.create('tick', { periodInMinutes: 30 });
   chrome.alarms.create('watch', { periodInMinutes: 5 });
   chrome.alarms.create('upd', { periodInMinutes: 360 });
@@ -40,6 +40,7 @@ async function schedule() {
       if (!P.linked.length) continue;
       OFF.forEach((o, i) => { const w = P.start + o * 60e3; if (w > now) chrome.alarms.create(`chk|${date}|${P.p}|${i + 1}`, { when: w }); });
       const w = P.start - PRE_MIN * 60e3; if (w > now) chrome.alarms.create(`pre|${date}|${P.p}`, { when: w });
+      const wr = P.start - 5 * 60e3; if (cfg.auto.wa && cfg.auto.wa.pre && (cfg.watchT || []).length && wr > now) chrome.alarms.create(`prem|${date}|${P.p}`, { when: wr });
     }
   }
   if (cfg && cfg.auto && cfg.auto.wa && cfg.auto.wa.report && cfg.mgrPh) {
@@ -59,6 +60,7 @@ chrome.alarms.onAlarm.addListener(a => {
   const [kind, date, p, n] = a.name.split('|');
   if (kind === 'chk') enqueue({ date, p: +p, n: +n });
   if (kind === 'pre') enqueue({ pre: true, date, p: +p });
+  if (kind === 'prem') preRemind(date, +p);
   if (kind === 'warep') enqueue({ wa: true, kind: 'rep', key: 'rep|' + date, date, name: 'المدير' });
 });
 chrome.action.onClicked.addListener(() => openApp());
@@ -170,6 +172,14 @@ async function runCheck({ date, p, n, force }) {
     }
     if (nn === 1 && !out.present && !out.err && r.ph && cfg.auto.wa && cfg.auto.wa.remind)
       await runWA({ wa: true, kind: 'rem', key: 'rem|' + k, k, date, to: r.ph, name: r.t, text: remindText(cfg, r, p) });
+    if (nn === 2 && !out.present && !out.err) {
+      const f = (cfg.fols || []).find(x => x.ph && (x.periods || []).includes(p));
+      const to = f ? f.ph : cfg.mgrPh, who = f ? f.name : 'المدير';
+      notify(`esc|${k}`, `راصد · متابعة الحصة ${p} · ${r.c}`, `الأستاذ/ ${r.t} لم يدخل الحصة حتى ${out.at}`);
+      if (to && cfg.auto.wa && cfg.auto.wa.esc)
+        await runWA({ wa: true, kind: 'esc', key: 'esc|' + k, k: '', date, to, name: who,
+          text: `تنبيه متابعة – ${cfg.school || ''}\nالأستاذ/ ${r.t} لم يدخل الحصة (${p}) للصف ${r.c} حتى الساعة ${out.at}.` });
+    }
   }
 }
 
@@ -273,7 +283,7 @@ async function runWA(j) {
     const r = ph ? await waSendNow(ph, `✅ اختبار الإرسال الآلي من راصد\n${cfg.school || ''}`) : { ok: false, err: 'أضف جوال المدير في بيانات المدرسة' };
     await chrome.storage.local.set({ watest: { at: at(), ok: !!r.ok, err: r.err || '' } }); return;
   }
-  if (!(j.kind === 'rem' ? wa.remind : wa.report)) return;
+  if (!({ rem: wa.remind, rep: wa.report, esc: wa.esc, pre: wa.pre })[j.kind]) return;
   const lk = 'walog:' + j.date; const log = (await chrome.storage.local.get(lk))[lk] || {};
   if (log[j.key] && log[j.key].ok) return;
   if (Object.values(log).filter(x => x.ok).length >= (wa.max || 40)) {
@@ -405,4 +415,13 @@ async function madrasatiWeekly() {
   }
   if (o.mweekAsk !== today) { await chrome.storage.local.set({ mweekAsk: today });
     notify('mweek', 'راصد · تحديث الجدول الأسبوعي', 'افتح منصة مدرستي وسجّل الدخول، وسيُحدَّث جدول راصد تلقائيًا خلال ساعة.'); }
+}
+
+/* ---------- تذكير قبل الحصة لمن تكرر تأخره هذا الأسبوع ---------- */
+async function preRemind(date, p) {
+  const cfg = await getCfg(); if (!cfg || !cfg.auto || !cfg.auto.on || !cfg.auto.wa || !cfg.auto.wa.pre) return;
+  const d = wdOf(date); if (d < 0) return; const W = new Set(cfg.watchT || []); const tm = (cfg.times[p - 1] || [''])[0];
+  for (const r of cfg.rows.filter(x => x.d === d && x.p === p && x.ph && W.has(x.t)))
+    enqueue({ wa: true, kind: 'pre', key: 'pre|' + mk(date, p, r.c), k: '', date, to: r.ph, name: r.t,
+      text: `الأستاذ/ ${r.t}\nالسلام عليكم ورحمة الله وبركاته\nتذكير بحصتك (${p}) للصف ${r.c} الساعة ${tm}.` + (r.l ? `\nرابط الحصة: ${r.l}` : '') + `\nشاكرين تعاونكم\n${cfg.school || ''}` });
 }

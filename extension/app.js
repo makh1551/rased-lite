@@ -115,7 +115,10 @@ function curPlan(){if(!S.sync)return'free';const p=S.sync.plan||'trial',u=S.sync
 const proOK=()=>['pro','trial'].includes(curPlan());
 const daysLeft=()=>{const u=S.sync&&S.sync.until;if(!u)return null;return Math.round((pd(u)-pd(today()))/864e5)};
 function pushCfg(){if(!EXT)return;const c={rows:S.rows,times:S.settings.times,school:S.settings.school,mgr:S.settings.mgr,mgrPh:S.settings.mgrPh,
-  auto:Object.assign({},S.auto,{on:!!(S.auto.on&&proOK()),wa:proOK()?S.auto.wa:{remind:false,report:false,max:0}})};const j=JSON.stringify(c);if(j===lastCfg)return;lastCfg=j;chrome.storage.local.set({cfg:c})}
+  fols:(S.settings.fols||[]).map(f=>({name:f.name,ph:f.ph||'',periods:f.periods||[]})),watchT:weekRepeat(),auto:Object.assign({},S.auto,{on:!!(S.auto.on&&proOK()),wa:proOK()?S.auto.wa:{remind:false,report:false,esc:false,pre:false,max:0}})};const j=JSON.stringify(c);if(j===lastCfg)return;lastCfg=j;chrome.storage.local.set({cfg:c})}
+function weekRepeat(){try{let a=today();const st=addD(a,-Math.max(0,wd(a)));const cnt={};for(let i=0;i<5;i++){const ds=addD(st,i);if(ds>a)break;
+  for(const k in S.marks){if(!k.startsWith(ds+'|'))continue;const m=S.marks[k];if(m.st==='late'||m.st==='bad'){const t=teacherOf(k,m);if(t)cnt[t]=(cnt[t]||0)+1}}}
+  return Object.keys(cnt).filter(t=>cnt[t]>=2)}catch(e){return[]}}
 function save(){store.set(KEY,JSON.stringify(S));pushCfg();if(EXT&&!isFolSafe()&&wd(today())>=0){try{chrome.storage.local.set({['dayrep:'+today()]:dayReport(today()).text})}catch(e){}}}
 function isFolSafe(){try{return store.sget('rl-role')==='fol'}catch(e){return false}}
 /* ---- الأدوار: المدير والمتابع ---- */
@@ -277,6 +280,8 @@ function autoSetupHTML(){
    <div style="display:grid;gap:8px;background:var(--surface);border-radius:12px;padding:12px"><b>📤 الإرسال الآلي عبر واتساب ويب</b>
     <p class="small muted" style="margin:0">ترسل الإضافة الرسائل من رقم واتساب المسجّل في واتساب ويب على هذا المتصفح (يُفضّل رقم المدرسة). افتح web.whatsapp.com مرة وسجّل الدخول بمسح الرمز.</p>
     <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="waRemind" ${S.auto.wa.remind?'checked':''}> تذكير المعلم تلقائيًا إذا لم يُوجد في الفحص الأول (مرة واحدة لكل حصة)</label>
+    <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="waEsc" ${S.auto.wa.esc?'checked':''}> إن بقي غير موجود في الفحص الثاني: تنبيه المتابع المسند للحصة (أو المدير) بدل تكرار التذكير للمعلم</label>
+    <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="waPre" ${S.auto.wa.pre?'checked':''}> تذكير قبل الحصة بخمس دقائق لمن تأخّر أو غاب مرتين فأكثر هذا الأسبوع فقط</label>
     <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="waReport" ${S.auto.wa.report?'checked':''}> إرسال تقرير اليوم للمدير بعد آخر حصة بـ20 دقيقة</label>
     <label class="f" style="max-width:220px">الحد الأعلى للرسائل يوميًا<input id="waMax" type="number" min="1" max="200" value="${S.auto.wa.max||40}"></label>
     <p class="small" style="margin:0;color:var(--late)">تنبيه: الإرسال الآلي الكثيف قد يعرّض الرقم لتقييد من واتساب، فأبقِ الحد منخفضًا.</p>
@@ -342,6 +347,8 @@ function dayReport(date){const d=wd(date);const all=S.rows.filter(r=>r.d===d);co
   if(late.length){lines.push('','⏱ التأخر:');late.forEach(r=>lines.push(`• الأستاذ/ ${r.t} – الحصة ${r.p} – ${r.c}`))}
   if(typeof AUTO!=='undefined'&&AUTO._date===date){const low=all.filter(r=>isLow(AUTO[mk(date,r.p,r.c)])).sort((a,b)=>a.p-b.p);
     if(low.length){lines.push('','👥 حضور طلاب ضعيف (أقل من '+LOWN+'):');low.forEach(r=>lines.push(`• الأستاذ/ ${r.t} – الحصة ${r.p} – ${r.c}`))}}
+  const rem=all.filter(r=>S.sent[mk(date,r.p,r.c)]);if(rem.length){const ok=rem.filter(r=>['ok','late'].includes(S.marks[mk(date,r.p,r.c)]?.st)),no=rem.filter(r=>S.marks[mk(date,r.p,r.c)]?.st==='bad');
+    lines.push('',`📩 التذكيرات: ${rem.length} · استجاب ${ok.length}`+(no.length?` · لم يستجب ${no.length}`:''));no.sort((a,b)=>a.p-b.p).forEach(r=>lines.push(`• لم يستجب: الأستاذ/ ${r.t} – الحصة ${r.p} – ${r.c}`))}
   if(!bad.length&&!late.length&&marked)lines.push('','حضور كامل في كل الحصص المرصودة.');
   return{t,pct,marked,bad,late,text:lines.join('\n')}}
 
@@ -481,6 +488,7 @@ function setupView(){const s=S.settings;const nT=new Set(S.rows.map(r=>r.t)).siz
     <div style="margin-top:8px"><button class="btn primary" id="pasteB" type="button">قراءة الجدول الملصوق</button></div></details>
    <div class="small num" id="sum">${S.demo?'الجدول الحالي: <b>المدرسة التجريبية</b> · ':''}${S.rows.length} حصة · ${nT} معلم · ${byDay.map((n,i)=>`${DAYS[i]} ${n}`).join(' · ')}</div>
   </div></div>
+  ${phonesHTML()}
   <div class="section"><h3>٢. بيانات المدرسة</h3><div class="card" style="display:grid;gap:12px">
    <div class="grid2"><label class="f">اسم المدرسة<input id="s-school" value="${esc(s.school)}"></label>
     <label class="f">رمز دخول المدير<input id="s-pin" inputmode="numeric" value="${esc(s.pin)}" placeholder="اتركه فارغًا لإلغاء القفل"></label>
@@ -561,6 +569,7 @@ function bindSetup(){
     const tg=()=>{const c=sec.classList.toggle('closed');h.setAttribute('aria-expanded',!c);c?OPENSEC.delete(i):OPENSEC.add(i)};
     h.onclick=tg;h.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();tg()}}});
   $('#dlTpl').onclick=()=>saveFile('قالب-جدول-راصد.csv',tplCSV(),'text/csv');
+  bindPhones();
   const mg=$('#mpGo');if(mg)mg.onclick=()=>{chrome.runtime.sendMessage({cmd:'mpOpen'});toast('افتح مدرستي واتبع اللوحة الظاهرة أسفل الصفحة')};
   const mw=$('#mpWeek');if(mw)mw.onchange=()=>{S.auto.mweekly=mw.checked;save();toast(mw.checked?'فُعّل التحديث الأسبوعي':'أُوقف التحديث الأسبوعي')};
   $('#cpTpl').onclick=()=>copyText(TPL_HEAD.join('\t')+'\nالأحد\t1\tالأول أ\tاسم المعلم\t05xxxxxxxx\t');
@@ -569,7 +578,7 @@ function bindSetup(){
   ['dragenter','dragover'].forEach(e=>drop.addEventListener(e,ev=>{ev.preventDefault();drop.classList.add('over')}));
   ['dragleave','drop'].forEach(e=>drop.addEventListener(e,ev=>{ev.preventDefault();drop.classList.remove('over')}));
   drop.addEventListener('drop',ev=>{const f=ev.dataTransfer.files[0];if(f)readSchedule(f)});
-  $('#saveSet').onclick=()=>{const s=S.settings;s.school=$('#s-school').value.trim()||s.school;s.pin=$('#s-pin').value.trim();s.fpin=$('#s-fpin').value.trim();s.fols=[...document.querySelectorAll('.folrow')].map(r=>({name:r.querySelector('.fname').value.trim(),periods:[...r.querySelectorAll('.pers input:checked')].map(x=>+x.value)})).filter(f=>f.name);if(s.fpin&&s.fpin===s.pin){toast('رمز المتابع يجب أن يختلف عن رمز المدير');return}if(S.sync&&!s.pin){toast('لا يمكن حذف رمز المدير والمزامنة مفعّلة');return}
+  $('#saveSet').onclick=()=>{const s=S.settings;s.school=$('#s-school').value.trim()||s.school;s.pin=$('#s-pin').value.trim();s.fpin=$('#s-fpin').value.trim();s.fols=[...document.querySelectorAll('.folrow')].map(r=>({name:r.querySelector('.fname').value.trim(),ph:cleanPh((r.querySelector('.fph')||{}).value||''),periods:[...r.querySelectorAll('.pers input:checked')].map(x=>+x.value)})).filter(f=>f.name);if(s.fpin&&s.fpin===s.pin){toast('رمز المتابع يجب أن يختلف عن رمز المدير');return}if(S.sync&&!s.pin){toast('لا يمكن حذف رمز المدير والمزامنة مفعّلة');return}
     s.mgr=$('#s-mgr').value.trim();s.mgrPh=$('#s-mgrPh').value.trim();
     s.times=s.times.map((t,i)=>[$('#t-'+i+'-0').value||t[0],$('#t-'+i+'-1').value||t[1]]);
     store.sset('rl-role','mgr');save();render();toast('حُفظ الإعداد')};
@@ -581,7 +590,7 @@ function bindSetup(){
     store.sset('rl-role','mgr');save();V.date=null;V.p=null;render();toast('استُوردت النسخة')}catch(_){toast('الملف ليس نسخة راصد صالحة')}};
   const sa=$('#saveAuto');if(sa)sa.onclick=()=>{const raw=$('#autoSkip').value;const list=raw.split(/[،,]/).map(x=>x.trim()).filter(Boolean);const sk=[];
     list.forEach(x=>{const p=parseInt(x.replace(/\D/g,''),10);const d=dayIdx(x.replace(/\d/g,''));if(d>=0&&p>=1&&p<=7)sk.push(d+'-'+p)});
-    S.auto={on:$('#autoOn').checked,sound:$('#autoSound').checked,skip:list,sk,wa:{remind:$('#waRemind').checked,report:$('#waReport').checked,max:Math.max(1,Math.min(200,+$('#waMax').value||40))}};save();render();toast(S.auto.on?'الفحص الآلي مفعّل':'الفحص الآلي متوقف')};
+    S.auto=Object.assign(S.auto,{on:$('#autoOn').checked,sound:$('#autoSound').checked,skip:list,sk,wa:Object.assign({},S.auto.wa,{remind:$('#waRemind').checked,esc:$('#waEsc').checked,pre:$('#waPre').checked,report:$('#waReport').checked,max:Math.max(1,Math.min(200,+$('#waMax').value||40))})});save();render();toast(S.auto.on?'الفحص الآلي مفعّل':'الفحص الآلي متوقف')};
   const wt=$('#waTest');if(wt)wt.onclick=()=>{if(!S.settings.mgrPh){toast('أضف جوال المدير في بيانات المدرسة');return}WATEST=null;$('#waTestOut').textContent='⏳ جارٍ الإرسال… راقب نافذة الفحص';chrome.runtime.sendMessage({cmd:'waTest'})};
   const lb=$('#licB');if(lb)lb.onclick=activateLicense;
   const rt=$('#runTest');if(rt)rt.onclick=()=>{let link=$('#testLink').value.trim(),t=$('#testT').value.trim();
@@ -598,6 +607,63 @@ function bindSetup(){
   twoStep($('#syncOff'),'اضغط مرة أخرى لإيقاف المزامنة هنا',()=>{S.sync=null;S.pend={};save();render();toast('أُوقفت المزامنة في هذا الجهاز')});
   twoStep($('#clrMarks'),'اضغط مرة أخرى لمسح الرصد',()=>{Object.keys(S.marks).concat(Object.keys(S.sent)).forEach(markSync);S.marks={};S.sent={};save();render();toast('مُسح الرصد')});
   twoStep($('#reset'),'اضغط مرة أخرى لمسح كل شيء',()=>{S=demoState();S.auto={on:false,sound:true,skip:[],sk:[],wa:{remind:false,report:false,max:40}};save();store.sset('rl-role','mgr');V.date=null;V.p=null;render();toast('عادت المدرسة التجريبية')});
+}
+
+/* ============ جوالات المعلمين: لصق ومطابقة، رابط تسجيل ذاتي، جدول تعبئة ============ */
+const PH_RE=/(?:\+?966|00966|0)?5\d{8}/;
+function cleanPh(s){const d=String(s||'').replace(/[٠-٩]/g,x=>'٠١٢٣٤٥٦٧٨٩'.indexOf(x)).replace(/[\s\-().]/g,'');const m=d.match(PH_RE);if(!m)return'';return '05'+m[0].slice(-8)}
+function nameToks(s){return normAr(String(s||'').replace(/(ال)?(استاذ|أستاذ|الأستاذ|معلم|المعلم)\s*[/.:]?/g,' ').replace(/[^؀-ۿ\s]/g,' '))
+  .replace(/(^|\s)عبد\s+/g,'$1عبد').replace(/(^|\s)ابو\s+/g,'$1ابو').split(' ').filter(w=>w.length>1&&!['بن','ابن','بنت','ال'].includes(w))}
+function teachersList(){return [...new Set(S.rows.map(r=>r.t))].sort((a,b)=>a.localeCompare(b,'ar'))}
+function matchTeacher(name,list){const q=nameToks(name);if(!q.length)return null;let best=null,bs=0,second=0;
+  for(const t of list){const w=nameToks(t);if(!w.length)continue;let s=0;if(w[0]===q[0])s+=2;else continue;
+    const last=q[q.length-1];if(q.length>1&&w[w.length-1]===last)s+=2;q.slice(1).forEach(x=>{if(w.includes(x))s+=1});
+    if(q.length>1&&q.every(x=>w.includes(x)))s+=1;
+    if(s>bs){second=bs;bs=s;best=t}else if(s>second)second=s}
+  return bs>=(q.length>1?4:2)&&bs>second?best:null}
+function parsePhoneList(txt){const out=[];let pend='';
+  String(txt||'').split(/\r?\n/).forEach(line=>{const ph=cleanPh(line);const nm=line.replace(/[0-9٠-٩+\-().]/g,' ').replace(/[,\t;|:،]/g,' ').replace(/\s+/g,' ').trim();
+    if(ph){const n=/[؀-ۿ]{2,}/.test(nm)?nm:pend;if(n)out.push({name:n,ph});pend=''}else if(/[؀-ۿ]{2,}/.test(nm))pend=nm});
+  return out}
+function phStats(){const T=teachersList();const has=new Set(S.rows.filter(r=>cleanPh(r.ph)).map(r=>r.t));return{T,miss:T.filter(t=>!has.has(t))}}
+function phoneOf(t){const r=S.rows.find(x=>x.t===t&&x.ph);return r?r.ph:''}
+function setPhone(t,ph){let n=0;S.rows.forEach(r=>{if(r.t===t){r.ph=ph;n++}});return n}
+function phonesHTML(){if(isFol())return'';const st=phStats();const link=S.sync?`${location.protocol==='https:'&&!/claude/.test(location.host)?location.origin:'https://rased-lite.wasl.uk'}/t/?s=${fmtCode(S.sync.code)}`:'';
+  return `<div class="section"><h3>جوالات المعلمين ${st.miss.length?`<span class="pill late">ينقص ${st.miss.length}</span>`:`<span class="pill ok">مكتملة</span>`}</h3><div class="card" style="display:grid;gap:14px">
+   <p class="small muted" style="margin:0">لدى المدرسة ${st.T.length} معلم. الجوال يُستخدم للتذكير بواتساب فقط، ولا يظهر في أي تقرير أو صفحة عامة.</p>
+   <div style="display:grid;gap:8px"><b>١. لصق قائمة أرقام</b>
+    <p class="small muted" style="margin:0">الصق أسماء وأرقامًا بأي شكل: من Excel، أو كشف، أو قائمة أعضاء مجموعة واتساب. يطابقها راصد مع أسماء الجدول حتى لو اختلفت الصيغة.</p>
+    <textarea class="pastebox" id="phPaste" placeholder="خالد السالم 0551234567&#10;سعد محمد العتيبي - 966501234567"></textarea>
+    <div><button class="btn primary" id="phMatch" type="button">مطابقة</button></div></div>
+   <div style="display:grid;gap:8px"><b>٢. رابط يسجّل فيه المعلم رقمه بنفسه</b>
+    ${S.sync?`<div class="bar-row" style="margin:0"><code dir="ltr" style="background:var(--sunk);padding:6px 10px;border-radius:8px;font-size:13px">${esc(link)}</code><button class="btn" id="phCpLink" type="button">${IC.copy} نسخ رسالة للمعلمين</button><button class="btn primary" id="phPull" type="button">جلب ما سجّله المعلمون</button></div>
+     <p class="small muted" style="margin:0">يكتب المعلم اسمه ورقمه فقط، ولا تعرض الصفحة أي رقم. ثم اضغط «جلب ما سجّله المعلمون» لمطابقته واعتماده.</p>`
+    :`<p class="small muted" style="margin:0">يتطلب تفعيل «المزامنة بين الأجهزة» أولًا (القسم ٥).</p>`}</div>
+   <div style="display:grid;gap:8px"><b>٣. تعبئة يدوية</b>
+    <label style="display:flex;gap:8px;align-items:center" class="small"><input type="checkbox" id="phOnlyMiss" ${st.miss.length?'checked':''}> إظهار من ينقصه رقم فقط</label>
+    <div class="tbl" style="max-height:360px;overflow:auto"><table><thead><tr><th>المعلم</th><th>الجوال</th></tr></thead><tbody id="phBody">${phRowsHTML(st.miss.length?st.miss:st.T)}</tbody></table></div>
+    <div><button class="btn primary" id="phSave" type="button">حفظ الأرقام</button></div></div>
+  </div></div>`}
+function phRowsHTML(list){return list.map(t=>`<tr><td>${esc(t)}</td><td><input class="phin" data-t="${esc(t)}" dir="ltr" inputmode="tel" value="${esc(phoneOf(t))}" placeholder="05xxxxxxxx" style="width:150px;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:5px 8px"></td></tr>`).join('')||'<tr><td colspan="2" class="muted">لا يوجد</td></tr>'}
+function phPreview(items,src){const T=teachersList();
+  const rows=items.map(x=>({...x,m:matchTeacher(x.name,T)}));
+  const d=document.createElement('div');d.className='sheet';
+  d.innerHTML=`<div><h2 style="font-size:18px">مطابقة الأرقام ${src?'('+esc(src)+')':''}</h2>
+   <p class="small muted" style="margin:0">طابق راصد ${rows.filter(r=>r.m).length} من ${rows.length}. راجع المعلم المقابل لكل رقم، وغيّره أو اختر «تجاهل».</p>
+   <div class="tbl"><table><thead><tr><th>الاسم كما ورد</th><th>الجوال</th><th>معلم الجدول</th></tr></thead><tbody>${rows.map((r,i)=>`<tr><td>${esc(r.name)}</td><td dir="ltr" class="num">${esc(r.ph)}</td>
+    <td><select data-i="${i}" class="phsel" style="max-width:260px;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:4px"><option value="">— تجاهل —</option>${T.map(t=>`<option ${t===r.m?'selected':''}>${esc(t)}</option>`).join('')}</select>${phoneOf(r.m)&&phoneOf(r.m)!==r.ph?' <span class="pill late">سيستبدل رقمًا سابقًا</span>':''}</td></tr>`).join('')}</tbody></table></div>
+   <div class="bar-row"><button class="btn primary" id="phApply">اعتماد</button><button class="btn" id="phClose">إغلاق</button></div></div>`;
+  document.body.append(d);
+  d.querySelector('#phClose').onclick=()=>d.remove();
+  d.querySelector('#phApply').onclick=()=>{let n=0;d.querySelectorAll('.phsel').forEach(s=>{if(s.value){setPhone(s.value,rows[+s.dataset.i].ph);n++}});d.remove();save();render();toast(`حُفظ ${n} رقم`)}}
+function bindPhones(){
+  const m=$('#phMatch');if(m)m.onclick=()=>{const it=parsePhoneList($('#phPaste').value);if(!it.length){toast('لم أجد أرقام جوال (تبدأ بـ 05)');return}phPreview(it,'')};
+  const om=$('#phOnlyMiss');if(om)om.onchange=()=>{const st=phStats();$('#phBody').innerHTML=phRowsHTML(om.checked?st.miss:st.T)};
+  const sv=$('#phSave');if(sv)sv.onclick=()=>{let n=0,bad=0;document.querySelectorAll('.phin').forEach(i=>{const v=i.value.trim();const c=v?cleanPh(v):'';if(v&&!c){bad++;return}if(c!==phoneOf(i.dataset.t)){setPhone(i.dataset.t,c);n++}});save();render();toast(`حُفظ ${n} رقم`+(bad?` · ${bad} رقم غير صحيح`:''))};
+  const cl=$('#phCpLink');if(cl)cl.onclick=()=>{const link=document.querySelector('#phCpLink').parentElement.querySelector('code').textContent;
+    copyText(`السلام عليكم ورحمة الله وبركاته\nنأمل من الزملاء المعلمين تسجيل رقم الجوال في راصد لاستقبال تذكيرات الحصص الافتراضية:\n${link}\nشاكرين تعاونكم\n${S.settings.school}`)};
+  const pl=$('#phPull');if(pl)pl.onclick=async()=>{pl.disabled=true;try{const r=await rpc('lite_phone_list',{p_code:S.sync.code,p_key:S.sync.key});const it=(r.list||[]).map(x=>({name:x.name,ph:cleanPh(x.phone)})).filter(x=>x.ph);
+    if(!it.length)toast('لم يسجّل أي معلم بعد');else phPreview(it,'تسجيل المعلمين')}catch(e){toast(String(e.message||e))}pl.disabled=false};
 }
 
 /* ============ قراءة الجدول ============ */
@@ -643,7 +709,7 @@ async function readSchedule(f){try{applyRows(parseAOA(await fileToAOA(f)))}catch
 function readPasted(txt){try{applyRows(parseAOA(textToAOA(txt)))}catch(e){toast(String(e.message||e))}}
 
 /* ---- عدة متابعين ---- */
-function folRowHTML(f){f=f||{name:'',periods:[]};return `<div class="folrow"><div class="top-r"><input class="fname" placeholder="اسم المتابع" value="${esc(f.name)}" aria-label="اسم المتابع"><button class="btn danger" type="button" data-delfol>حذف</button></div>
+function folRowHTML(f){f=f||{name:'',periods:[]};return `<div class="folrow"><div class="top-r"><input class="fname" placeholder="اسم المتابع" value="${esc(f.name)}" aria-label="اسم المتابع"><input class="fph" placeholder="جواله (للتنبيه)" dir="ltr" inputmode="tel" value="${esc(f.ph||'')}" aria-label="جوال المتابع" style="max-width:150px"><button class="btn danger" type="button" data-delfol>حذف</button></div>
   <div class="pers" aria-label="الحصص المسندة">${[1,2,3,4,5,6,7].map(p=>`<label><input type="checkbox" value="${p}" ${f.periods&&f.periods.includes(p)?'checked':''}>${p}</label>`).join('')}</div></div>`}
 function folProgressHTML(date){const fols=S.settings.fols||[];if(!fols.length||isFol())return'';const d=wd(date);
   const rowsD=S.rows.filter(r=>r.d===d&&r.l);
