@@ -583,7 +583,7 @@ function tally(list,date){const o={ok:0,late:0,bad:0,un:0,nl:0,total:list.length
 /* ---- الإرسال عبر واتساب الرسمي (API) من الخادم ---- */
 const FN_URL=SB_URL+'/functions/v1/rased-send';
 const apiOn=()=>!!(S.auto.wa&&S.auto.wa.via==='api'&&S.sync&&proOK());
-const SEND_ERR={plan:'الإرسال الرسمي ضمن الباقة الاحترافية',phone:'رقم الجوال غير صحيح',quota:'بلغت المدرسة الحد اليومي للرسائل',not_configured:'خدمة الإرسال لم تُفعَّل بعد على الخادم',send:'تعذّر الإرسال',bad:'رمز الدخول غير صحيح',none:'رمز المدرسة غير موجود'};
+const SEND_ERR={plan:'الإرسال من الخادم ضمن الباقة الاحترافية',phone:'رقم الجوال غير صحيح',quota:'بلغت المدرسة الحد اليومي للرسائل',not_configured:'لم يُضبط مزوّد إرسال للمدرسة (الإعداد ← طريقة إرسال الرسائل)',send:'تعذّر الإرسال',bad:'رمز الدخول غير صحيح',none:'رمز المدرسة غير موجود'};
 async function apiSend(kind,to,vars,text,dkey){if(!S.sync)throw new Error('فعّل المزامنة أولًا');let r;
   try{r=await fetch(FN_URL,{method:'POST',headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY,'Content-Type':'application/json'},body:JSON.stringify({code:S.sync.code,key:S.sync.key,kind,to,vars,text,dkey})})}catch(e){throw new Error('تعذّر الاتصال بخدمة الإرسال')}
   const j=await r.json().catch(()=>({}));if(!r.ok||j.err)throw new Error((SEND_ERR[j.err]||j.err||('خطأ '+r.status))+(j.detail?` (${j.detail})`:''));return j}
@@ -592,13 +592,38 @@ async function apiRemind(k,btn){const[d,p,c]=k.split('|');const r=S.rows.find(x=
   if(btn)btn.disabled=true;try{const j=await apiSend('rem',r.ph,remVars(r),remindText(r,d),'rem|'+k);S.sent[k]=hm()+(j.channel==='sms'?'✉️':'📨');markSync(k);save();toast(j.dup?'أُرسل سابقًا':'أُرسل التذكير'+(j.channel==='sms'?' برسالة نصية':''));return true}
   catch(e){toast(String(e.message||e));if(btn)btn.disabled=false;return false}}
 document.addEventListener('click',e=>{const b=e.target.closest('[data-api]');if(!b)return;e.preventDefault();apiRemind(b.dataset.api,b).then(ok=>{if(ok&&!document.querySelector('.sheet'))render()})});
-function sendSetupHTML(){if(isFol())return'';const via=(S.auto.wa&&S.auto.wa.via)||'web';
-  return `<div class="section"><h3>٧. طريقة إرسال الرسائل</h3><div class="card" style="display:grid;gap:10px">
-   <label style="display:flex;gap:8px;align-items:flex-start"><input type="radio" name="via" value="web" ${via!=='api'?'checked':''}><span><b>واتساب العادي</b><br><span class="small muted">زر «تذكير» يفتح واتساب برسالة جاهزة وتضغط إرسال بنفسك، والإرسال الآلي عبر واتساب ويب في الإضافة. مجاني.</span></span></label>
-   <label style="display:flex;gap:8px;align-items:flex-start"><input type="radio" name="via" value="api" ${via==='api'?'checked':''} ${S.sync&&proOK()?'':'disabled'}><span><b>واتساب الرسمي (API) مع رسالة نصية احتياطية</b><br><span class="small muted">يُرسل من الخادم مباشرة برقم المدرسة الموثّق: ضغطة واحدة دون فتح واتساب، ولا يحتاج جهازًا مفتوحًا للإرسال الآلي، ولا خطر حظر للرقم. ضمن الباقة الاحترافية.</span>${S.sync&&proOK()?'':`<br><span class="small" style="color:var(--late)">يتطلب تفعيل المزامنة والباقة الاحترافية.</span>`}</span></label>
-   ${via==='api'?`<div class="bar-row" style="margin:0"><button class="btn" id="apiTest" type="button">رسالة اختبار لجوال المدير</button><span class="small" id="apiOut"></span></div>`:''}
+let SENDCFG=null,SENDCFG_LOAD=false;
+function loadSendCfg(){if(SENDCFG_LOAD||!S.sync||S.sync.role!=='mgr')return;SENDCFG_LOAD=true;rpc('lite_send_cfg_get',{p_code:S.sync.code,p_key:S.sync.key}).then(r=>{SENDCFG=r;if(V.tab==='setup')render()}).catch(()=>{SENDCFG={err:1}})}
+function sendSetupHTML(){if(isFol())return'';const via=(S.auto.wa&&S.auto.wa.via)||'web';const can=!!(S.sync&&proOK());
+  if(via==='api'&&can)loadSendCfg();const W=(SENDCFG&&SENDCFG.wa)||{},M=(SENDCFG&&SENDCFG.sms)||{};
+  const opt=(v,t,cur)=>`<option value="${v}" ${cur===v?'selected':''}>${t}</option>`;
+  const inp=(id,ph,val,ltr=true)=>`<input id="${id}" ${ltr?'dir="ltr"':''} placeholder="${ph}" value="${esc(val||'')}" autocomplete="off" style="background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:7px 10px;min-width:0;width:100%">`;
+  return `<div class="section"><h3>٧. طريقة إرسال الرسائل</h3><div class="card" style="display:grid;gap:12px">
+   <label style="display:flex;gap:8px;align-items:flex-start"><input type="radio" name="via" value="web" ${via!=='api'?'checked':''}><span><b>واتساب من الجهاز</b> <span class="pill ok">مجاني</span><br><span class="small muted">زر «تذكير» يفتح واتساب برسالة جاهزة، والإرسال الآلي عبر واتساب ويب في إضافة راصد (يبقى الجهاز مفتوحًا أثناء الدوام).</span></span></label>
+   <label style="display:flex;gap:8px;align-items:flex-start"><input type="radio" name="via" value="api" ${via==='api'?'checked':''} ${can?'':'disabled'}><span><b>الإرسال من الخادم</b><br><span class="small muted">ضغطة واحدة دون فتح واتساب، ولا يحتاج جهازًا مفتوحًا للإرسال الآلي. تربط المدرسة مزوّدها مرة واحدة: واتساب برمز QR، و/أو رسائل نصية سعودية احتياطية.</span>${can?'':`<br><span class="small" style="color:var(--late)">يتطلب تفعيل المزامنة والباقة الاحترافية.</span>`}</span></label>
+   ${via==='api'&&can?`<div style="display:grid;gap:12px;background:var(--surface);border-radius:12px;padding:12px">
+    <div style="display:grid;gap:8px"><b>واتساب برقم المدرسة (بوابة QR)</b>
+     <p class="small muted" style="margin:0">أنشئ حسابًا في UltraMsg أو Green-API، وامسح رمز QR من واتساب رقم المدرسة، ثم انسخ رقم الخدمة (Instance) والرمز (Token) هنا. خدمة غير رسمية: أبقِ الرسائل معتدلة.</p>
+     <select id="waProv" style="max-width:240px;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:7px">${opt('','بدون',W.provider||'')}${opt('ultramsg','UltraMsg',W.provider)}${opt('greenapi','Green-API',W.provider)}</select>
+     <div class="grid2">${inp('waInst','Instance ID',W.instance)}${inp('waTok','Token',W.token)}</div>
+     <div id="waUrlW" ${W.provider==='greenapi'?'':'hidden'}>${inp('waUrl','apiUrl (من لوحة Green-API، اختياري)',W.url)}</div></div>
+    <div style="display:grid;gap:8px"><b>رسائل نصية (SMS) سعودية</b>
+     <p class="small muted" style="margin:0">تُستخدم إن لم يُضبط واتساب أو فشل الإرسال إليه. يلزم اسم مرسل معتمد من المزوّد.</p>
+     <select id="smsProv" style="max-width:240px;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:7px">${opt('','بدون',M.provider||'')}${opt('taqnyat','تقنيات Taqnyat',M.provider)}${opt('msegat','مسجات Msegat',M.provider)}${opt('unifonic','يونيفونك Unifonic',M.provider)}</select>
+     <div class="grid2">${inp('smsTok',M.provider==='unifonic'?'AppSid':M.provider==='msegat'?'API Key':'Bearer Token',M.token)}${inp('smsSender','اسم المرسل المعتمد',M.sender)}</div>
+     <div id="smsUserW" ${M.provider==='msegat'?'':'hidden'}>${inp('smsUser','اسم المستخدم في مسجات',M.user)}</div></div>
+    <p class="small muted" style="margin:0">🔒 الرموز تُحفظ على الخادم ولا تُعرض بعد الحفظ (تظهر مخفية ••••).</p>
+    <div class="bar-row" style="margin:0"><button class="btn" id="apiTest" type="button">رسالة اختبار لجوال المدير</button><span class="small" id="apiOut"></span></div></div>`:''}
    <div><button class="btn primary" id="viaSave" type="button">حفظ</button></div></div></div>`}
-function bindSend(){const vs=$('#viaSave');if(vs)vs.onclick=()=>{const v=(document.querySelector('input[name=via]:checked')||{}).value||'web';S.auto.wa=Object.assign({},S.auto.wa,{via:v});save();render();toast(v==='api'?'سيُرسل عبر واتساب الرسمي':'سيُرسل عبر واتساب العادي')};
+function bindSend(){
+  const wp=$('#waProv');if(wp)wp.onchange=()=>{$('#waUrlW').hidden=wp.value!=='greenapi'};
+  const sp=$('#smsProv');if(sp)sp.onchange=()=>{$('#smsUserW').hidden=sp.value!=='msegat';$('#smsTok').placeholder=sp.value==='unifonic'?'AppSid':sp.value==='msegat'?'API Key':'Bearer Token'};
+  document.querySelectorAll('input[name=via]').forEach(r=>r.onchange=()=>{S.auto.wa=Object.assign({},S.auto.wa,{via:r.value});save();render()});
+  const vs=$('#viaSave');if(vs)vs.onclick=async()=>{const v=(document.querySelector('input[name=via]:checked')||{}).value||'web';S.auto.wa=Object.assign({},S.auto.wa,{via:v});save();
+    if(v==='api'&&$('#waProv')){const val=id=>($('#'+id)||{}).value||'';const wa={provider:val('waProv'),instance:val('waInst'),token:val('waTok'),url:val('waUrl')};const sms={provider:val('smsProv'),token:val('smsTok'),sender:val('smsSender'),user:val('smsUser')};
+      if(!wa.provider&&!sms.provider){toast('اختر مزوّد واتساب أو رسائل نصية');return}
+      vs.disabled=true;try{SENDCFG=await rpc('lite_send_cfg_set',{p_code:S.sync.code,p_key:S.sync.key,p_wa:wa,p_sms:sms});toast('حُفظت إعدادات الإرسال')}catch(e){toast(String(e.message||e))}vs.disabled=false}
+    else toast(v==='api'?'سيُرسل من الخادم':'سيُرسل من واتساب الجهاز');render()};
   const t=$('#apiTest');if(t)t.onclick=async()=>{const o=$('#apiOut');if(!S.settings.mgrPh){o.textContent='أضف جوال المدير في بيانات المدرسة';return}t.disabled=true;o.textContent='⏳ …';
     try{const j=await apiSend('test',S.settings.mgrPh,{school:S.settings.school},'✅ اختبار الإرسال من راصد\n'+S.settings.school,'');o.innerHTML=`<span style="color:var(--ok)">✅ أُرسلت (${j.channel==='sms'?'رسالة نصية':'واتساب'})</span>`;
       const st=await rpc('lite_send_stats',{p_code:S.sync.code,p_key:S.sync.key}).catch(()=>null);if(st)o.innerHTML+=` · اليوم ${st.today} · هذا الشهر ${st.month}`}
