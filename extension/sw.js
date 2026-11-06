@@ -77,7 +77,7 @@ async function prune() {
 }
 
 /* ---------- التحديثات من GitHub ---------- */
-const UPD_URL = 'https://makh1551.github.io/rased-lite/version.json';
+const UPD_URL = 'https://rased-lite.wasl.uk/version.json';
 const newer = (a, b) => { const x = a.split('.').map(Number), y = b.split('.').map(Number); for (let i = 0; i < 3; i++) { if ((x[i] || 0) !== (y[i] || 0)) return (x[i] || 0) > (y[i] || 0); } return false; };
 async function checkUpdate() {
   try {

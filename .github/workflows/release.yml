@@ -48,7 +48,7 @@ jobs:
           V="${{ steps.v.outputs.version }}"
           mkdir -p _site && cp -r docs/* _site/ && cp rased-auto.zip _site/
           jq -n --arg v "$V" --arg n "$(head -1 release-notes.txt)" \
-            --arg z "https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/rased-auto.zip" \
+            --arg z "https://rased-lite.wasl.uk/rased-auto.zip" \
             '{version:$v, notes:$n, zip:$z}' > _site/version.json
       - uses: actions/upload-pages-artifact@v3
         with: { path: _site }

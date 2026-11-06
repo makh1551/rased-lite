@@ -3,10 +3,10 @@
 **راصد المبسّط**: صفحة واحدة لرصد حضور المعلمين في حصص Teams، مع تذكير واتساب وتقارير اليوم والأسبوع والشهر.
 **راصد الآلي**: إضافة Chrome/Edge تدخل الحصص تلقائيًا في مواعيدها، وتتحقق من وجود المعلم، وتلتقط لقطة شاشة مختومة بالوقت.
 
-- الصفحة على الإنترنت: https://makh1551.github.io/rased-lite/
-- تنزيل الإضافة (آخر إصدار): https://makh1551.github.io/rased-lite/rased-auto.zip
-- قالب الجدول: https://makh1551.github.io/rased-lite/rased-template.csv
-- سياسة الخصوصية: https://makh1551.github.io/rased-lite/privacy.html
+- الصفحة على الإنترنت: https://rased-lite.wasl.uk/
+- تنزيل الإضافة (آخر إصدار): https://rased-lite.wasl.uk/rased-auto.zip
+- قالب الجدول: https://rased-lite.wasl.uk/rased-template.csv
+- سياسة الخصوصية: https://rased-lite.wasl.uk/privacy.html
 
 ## تثبيت الإضافة
 1. نزّل `rased-auto.zip` وفك ضغطه في مجلد ثابت.
