@@ -125,11 +125,11 @@ function curPlan(){if(!S.sync)return'free';const p=S.sync.plan||'trial',u=S.sync
 const proOK=()=>['pro','trial'].includes(curPlan());
 const daysLeft=()=>{const u=S.sync&&S.sync.until;if(!u)return null;return Math.round((pd(u)-pd(today()))/864e5)};
 function pushCfg(){if(!EXT)return;const c={rows:S.rows,times:S.settings.times,school:S.settings.school,mgr:S.settings.mgr,mgrPh:S.settings.mgrPh,
-  fols:(S.settings.fols||[]).map(f=>({name:f.name,ph:f.ph||'',periods:f.periods||[]})),watchT:weekRepeat(),auto:Object.assign({},S.auto,{on:!!(S.auto.on&&proOK()),wa:proOK()?S.auto.wa:{remind:false,report:false,esc:false,pre:false,max:0}})};const j=JSON.stringify(c);if(j===lastCfg)return;lastCfg=j;chrome.storage.local.set({cfg:c})}
+  fols:(S.settings.fols||[]).map(f=>({name:f.name,ph:f.ph||'',periods:f.periods||[]})),api:S.sync?{code:S.sync.code,key:S.sync.key}:null,watchT:weekRepeat(),auto:Object.assign({},S.auto,{on:!!(S.auto.on&&proOK()),wa:proOK()?S.auto.wa:{remind:false,report:false,esc:false,pre:false,max:0}})};const j=JSON.stringify(c);if(j===lastCfg)return;lastCfg=j;chrome.storage.local.set({cfg:c})}
 function weekRepeat(){try{let a=today();const st=addD(a,-Math.max(0,wd(a)));const cnt={};for(let i=0;i<5;i++){const ds=addD(st,i);if(ds>a)break;
   for(const k in S.marks){if(!k.startsWith(ds+'|'))continue;const m=S.marks[k];if(m.st==='late'||m.st==='bad'){const t=teacherOf(k,m);if(t)cnt[t]=(cnt[t]||0)+1}}}
   return Object.keys(cnt).filter(t=>cnt[t]>=2)}catch(e){return[]}}
-function save(){store.set(KEY,JSON.stringify(S));pushCfg();if(EXT&&!isFolSafe()&&wd(today())>=0){try{chrome.storage.local.set({['dayrep:'+today()]:dayReport(today()).text})}catch(e){}}}
+function save(){store.set(KEY,JSON.stringify(S));pushCfg();if(EXT&&!isFolSafe()&&wd(today())>=0){try{const R=dayReport(today());chrome.storage.local.set({['dayrep:'+today()]:R.text,['dayrepv:'+today()]:{school:S.settings.school,date:today(),ok:R.t.ok,late:R.t.late,bad:R.t.bad,pct:R.pct}})}catch(e){}}}
 function isFolSafe(){try{return store.sget('rl-role')==='fol'}catch(e){return false}}
 /* ---- الأدوار: المدير والمتابع ---- */
 const role=()=>store.sget('rl-role')||'';
@@ -343,6 +343,29 @@ function tally(list,date){const o={ok:0,late:0,bad:0,un:0,nl:0,total:list.length
   list.forEach(r=>{if(!r.l){o.nl++}const m=S.marks[mk(date,r.p,r.c)];if(m)o[m.st]++;else o.un++});return o}
 
 /* ============ نصوص الرسائل ============ */
+/* ---- الإرسال عبر واتساب الرسمي (API) من الخادم ---- */
+const FN_URL=SB_URL+'/functions/v1/rased-send';
+const apiOn=()=>!!(S.auto.wa&&S.auto.wa.via==='api'&&S.sync&&proOK());
+const SEND_ERR={plan:'الإرسال الرسمي ضمن الباقة الاحترافية',phone:'رقم الجوال غير صحيح',quota:'بلغت المدرسة الحد اليومي للرسائل',not_configured:'خدمة الإرسال لم تُفعَّل بعد على الخادم',send:'تعذّر الإرسال',bad:'رمز الدخول غير صحيح',none:'رمز المدرسة غير موجود'};
+async function apiSend(kind,to,vars,text,dkey){if(!S.sync)throw new Error('فعّل المزامنة أولًا');let r;
+  try{r=await fetch(FN_URL,{method:'POST',headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY,'Content-Type':'application/json'},body:JSON.stringify({code:S.sync.code,key:S.sync.key,kind,to,vars,text,dkey})})}catch(e){throw new Error('تعذّر الاتصال بخدمة الإرسال')}
+  const j=await r.json().catch(()=>({}));if(!r.ok||j.err)throw new Error((SEND_ERR[j.err]||j.err||('خطأ '+r.status))+(j.detail?` (${j.detail})`:''));return j}
+const remVars=(r)=>({name:r.t,period:String(r.p),class:r.c,time:S.settings.times[r.p-1][0],school:S.settings.school});
+async function apiRemind(k,btn){const[d,p,c]=k.split('|');const r=S.rows.find(x=>x.d===wd(d)&&x.p===+p&&x.c===c);if(!r)return;
+  if(btn)btn.disabled=true;try{const j=await apiSend('rem',r.ph,remVars(r),remindText(r,d),'rem|'+k);S.sent[k]=hm()+(j.channel==='sms'?'✉️':'📨');markSync(k);save();toast(j.dup?'أُرسل سابقًا':'أُرسل التذكير'+(j.channel==='sms'?' برسالة نصية':''));return true}
+  catch(e){toast(String(e.message||e));if(btn)btn.disabled=false;return false}}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-api]');if(!b)return;e.preventDefault();apiRemind(b.dataset.api,b).then(ok=>{if(ok&&!document.querySelector('.sheet'))render()})});
+function sendSetupHTML(){if(isFol())return'';const via=(S.auto.wa&&S.auto.wa.via)||'web';
+  return `<div class="section"><h3>٧. طريقة إرسال الرسائل</h3><div class="card" style="display:grid;gap:10px">
+   <label style="display:flex;gap:8px;align-items:flex-start"><input type="radio" name="via" value="web" ${via!=='api'?'checked':''}><span><b>واتساب العادي</b><br><span class="small muted">زر «تذكير» يفتح واتساب برسالة جاهزة وتضغط إرسال بنفسك، والإرسال الآلي عبر واتساب ويب في الإضافة. مجاني.</span></span></label>
+   <label style="display:flex;gap:8px;align-items:flex-start"><input type="radio" name="via" value="api" ${via==='api'?'checked':''} ${S.sync&&proOK()?'':'disabled'}><span><b>واتساب الرسمي (API) مع رسالة نصية احتياطية</b><br><span class="small muted">يُرسل من الخادم مباشرة برقم المدرسة الموثّق: ضغطة واحدة دون فتح واتساب، ولا يحتاج جهازًا مفتوحًا للإرسال الآلي، ولا خطر حظر للرقم. ضمن الباقة الاحترافية.</span>${S.sync&&proOK()?'':`<br><span class="small" style="color:var(--late)">يتطلب تفعيل المزامنة والباقة الاحترافية.</span>`}</span></label>
+   ${via==='api'?`<div class="bar-row" style="margin:0"><button class="btn" id="apiTest" type="button">رسالة اختبار لجوال المدير</button><span class="small" id="apiOut"></span></div>`:''}
+   <div><button class="btn primary" id="viaSave" type="button">حفظ</button></div></div></div>`}
+function bindSend(){const vs=$('#viaSave');if(vs)vs.onclick=()=>{const v=(document.querySelector('input[name=via]:checked')||{}).value||'web';S.auto.wa=Object.assign({},S.auto.wa,{via:v});save();render();toast(v==='api'?'سيُرسل عبر واتساب الرسمي':'سيُرسل عبر واتساب العادي')};
+  const t=$('#apiTest');if(t)t.onclick=async()=>{const o=$('#apiOut');if(!S.settings.mgrPh){o.textContent='أضف جوال المدير في بيانات المدرسة';return}t.disabled=true;o.textContent='⏳ …';
+    try{const j=await apiSend('test',S.settings.mgrPh,{school:S.settings.school},'✅ اختبار الإرسال من راصد\n'+S.settings.school,'');o.innerHTML=`<span style="color:var(--ok)">✅ أُرسلت (${j.channel==='sms'?'رسالة نصية':'واتساب'})</span>`;
+      const st=await rpc('lite_send_stats',{p_code:S.sync.code,p_key:S.sync.key}).catch(()=>null);if(st)o.innerHTML+=` · اليوم ${st.today} · هذا الشهر ${st.month}`}
+    catch(e){o.innerHTML=`<span style="color:var(--bad)">${esc(e.message)}</span>`}t.disabled=false}}
 function remindText(r,date){const tm=S.settings.times[r.p-1][0];
   return `الأستاذ/ ${r.t}\nالسلام عليكم ورحمة الله وبركاته\nحصتك (${r.p}) للصف ${r.c} بدأت الساعة ${tm}، نأمل الدخول إلى الحصة الافتراضية الآن.`+
    (r.l?`\nرابط الحصة: ${r.l}`:'')+`\nشاكرين تعاونكم\n${S.settings.school}`}
@@ -441,7 +464,7 @@ function nowView(){const d=wd(V.date);
      <div class="acts">
       ${r.l?`<a class="btn" href="${esc(r.l)}" target="_blank" rel="noopener">${IC.teams} Teams</a>`:`<span class="pill bad">بلا رابط</span>`}
       <div class="seg" role="group" aria-label="حالة المعلم">${['ok','late','bad'].map(v=>`<button data-k="${esc(k)}" data-t="${esc(r.t)}" data-v="${v}" aria-pressed="${m&&m.st===v}">${ST[v]}</button>`).join('')}</div>
-      ${ph?`<a class="btn wa ${hotWA(k,m,sent)?'hot':''}" data-sent="${esc(k)}" href="${esc(waUrl(r.ph,remindText(r,V.date)))}" target="_blank" rel="noopener">${IC.wa} تذكير</a>`:`<span class="pill">لا جوال</span>`}
+      ${ph?(apiOn()?`<button class="btn wa ${hotWA(k,m,sent)?'hot':''}" data-api="${esc(k)}" type="button">${IC.wa} ${sent?'إعادة التذكير':'إرسال تذكير'}</button>`:`<a class="btn wa ${hotWA(k,m,sent)?'hot':''}" data-sent="${esc(k)}" href="${esc(waUrl(r.ph,remindText(r,V.date)))}" target="_blank" rel="noopener">${IC.wa} تذكير</a>`):`<span class="pill">لا جوال</span>`}
      </div>
      ${noteHTML(k,m,sent,r)}
     </div>`});
@@ -517,7 +540,7 @@ function setupView(){const s=S.settings;const nT=new Set(S.rows.map(r=>r.t)).siz
    <div class="bar-row" style="margin:0"><button class="btn" id="exp">${IC.dl} تصدير نسخة (JSON)</button><button class="btn" id="expCp">${IC.copy} نسخ النسخة</button>
     <label class="btn" for="imp">${IC.up} استيراد نسخة</label><input type="file" id="imp" accept=".json,application/json" hidden></div>
    <div class="bar-row" style="margin:0"><button class="btn danger" id="clrMarks">مسح الرصد فقط</button><button class="btn danger" id="reset">مسح كل شيء والعودة للمدرسة التجريبية</button></div>
-  </div></div>${autoSetupHTML()}${syncSetupHTML()}${planSetupHTML()}`}
+  </div></div>${autoSetupHTML()}${syncSetupHTML()}${planSetupHTML()}${sendSetupHTML()}`}
 
 function lockView(){return `<div class="lock"><span class="mark" style="margin:auto;width:48px;height:48px;border-radius:12px" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="width:26px;height:26px"><path d="M4 12.5 9 17 20 6"/></svg></span>
   <h1 style="font-size:24px">راصد المبسّط</h1><div class="muted">${esc(S.settings.school)}</div><div class="pill" style="justify-self:center">دخول المدير أو المتابع</div>
@@ -579,7 +602,7 @@ function bindSetup(){
     const tg=()=>{const c=sec.classList.toggle('closed');h.setAttribute('aria-expanded',!c);c?OPENSEC.delete(i):OPENSEC.add(i)};
     h.onclick=tg;h.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();tg()}}});
   $('#dlTpl').onclick=()=>saveFile('قالب-جدول-راصد.csv',tplCSV(),'text/csv');
-  bindPhones();
+  bindPhones();bindSend();
   const mg=$('#mpGo');if(mg)mg.onclick=()=>{chrome.runtime.sendMessage({cmd:'mpOpen'});toast('افتح مدرستي واتبع اللوحة الظاهرة أسفل الصفحة')};
   const mw=$('#mpWeek');if(mw)mw.onchange=()=>{S.auto.mweekly=mw.checked;save();toast(mw.checked?'فُعّل التحديث الأسبوعي':'أُوقف التحديث الأسبوعي')};
   $('#cpTpl').onclick=()=>copyText(TPL_HEAD.join('\t')+'\nالأحد\t1\tالأول أ\tاسم المعلم\t05xxxxxxxx\t');
@@ -740,10 +763,13 @@ function bulkTargets(list){return list.filter(r=>{const k=mk(V.date,r.p,r.c);con
 function openBulk(){const list=bulkTargets(rowsFor(V.date,V.p));if(!list.length){toast('لا يوجد من يحتاج تذكيرًا');return}
   const el=document.createElement('div');el.className='sheet';
   el.innerHTML=`<div role="dialog" aria-label="تذكير جماعي"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><h2 style="font-size:18px">تذكير جماعي · الحصة ${V.p}</h2><button class="btn" data-x>إغلاق</button></div>
-   <p class="small muted" style="margin:0">اضغط «إرسال» لكل معلم، فيفتح واتساب برسالة جاهزة. بعد الإرسال ارجع هنا للمعلم التالي.</p>
+   <p class="small muted" style="margin:0">${apiOn()?'يُرسل التذكير مباشرة عبر واتساب الرسمي دون فتح واتساب.':'اضغط «إرسال» لكل معلم، فيفتح واتساب برسالة جاهزة. بعد الإرسال ارجع هنا للمعلم التالي.'}</p>
    <div style="display:grid;gap:8px">${list.map(r=>{const k=mk(V.date,r.p,r.c);const m=S.marks[k];return `<div class="bulk-row"><div><b>${esc(r.c)}</b> · الأستاذ/ ${esc(r.t)} <span class="pill ${m?m.st:''}">${m?ST[m.st]:'لم يُرصد'}</span></div>
-     <a class="btn wa hot" data-bulk="${esc(k)}" href="${esc(waUrl(r.ph,remindText(r,V.date)))}" target="_blank" rel="noopener">${IC.wa} إرسال</a></div>`}).join('')}</div></div>`;
+     ${apiOn()?`<button class="btn wa hot" data-apib="${esc(k)}" type="button">${IC.wa} إرسال</button>`:`<a class="btn wa hot" data-bulk="${esc(k)}" href="${esc(waUrl(r.ph,remindText(r,V.date)))}" target="_blank" rel="noopener">${IC.wa} إرسال</a>`}</div>`}).join('')}</div>
+   ${apiOn()?`<div><button class="btn primary" data-apiall type="button">إرسال للجميع الآن (${list.length})</button></div>`:''}</div>`;
   el.addEventListener('click',e=>{if(e.target===el||e.target.closest('[data-x]')){el.remove();render();return}
+    const ab=e.target.closest('[data-apib]');if(ab){apiRemind(ab.dataset.apib,ab).then(ok=>{if(ok)ab.outerHTML=`<span class="pill ok">✓ أُرسل ${S.sent[ab.dataset.apib]}</span>`});return}
+    const aa=e.target.closest('[data-apiall]');if(aa){aa.disabled=true;(async()=>{for(const b of [...el.querySelectorAll('[data-apib]')]){const k=b.dataset.apib;if(await apiRemind(k,b))b.outerHTML=`<span class="pill ok">✓ أُرسل ${S.sent[k]}</span>`}aa.textContent='اكتمل الإرسال'})();return}
     const a=e.target.closest('[data-bulk]');if(a){const k=a.dataset.bulk;S.sent[k]=hm();markSync(k);save();setTimeout(()=>{a.outerHTML=`<span class="pill ok">✓ أُرسل ${S.sent[k]}</span>`},60)}});
   document.body.append(el)}
 

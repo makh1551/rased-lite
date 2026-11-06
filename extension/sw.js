@@ -171,13 +171,13 @@ async function runCheck({ date, p, n, force }) {
       notify(`${k}|${nn}`, `راصد · الحصة ${p} · ${r.c}`, `الأستاذ/ ${r.t}: ${what} (${out.at})${out.err ? ' – ' + out.err : ''}`);
     }
     if (nn === 1 && !out.present && !out.err && r.ph && cfg.auto.wa && cfg.auto.wa.remind)
-      await runWA({ wa: true, kind: 'rem', key: 'rem|' + k, k, date, to: r.ph, name: r.t, text: remindText(cfg, r, p) });
+      await runWA({ wa: true, kind: 'rem', key: 'rem|' + k, k, date, to: r.ph, name: r.t, text: remindText(cfg, r, p), vars: { name: r.t, period: String(p), class: r.c, time: (cfg.times[p - 1] || [''])[0], school: cfg.school || '' } });
     if (nn === 2 && !out.present && !out.err) {
       const f = (cfg.fols || []).find(x => x.ph && (x.periods || []).includes(p));
       const to = f ? f.ph : cfg.mgrPh, who = f ? f.name : 'المدير';
       notify(`esc|${k}`, `راصد · متابعة الحصة ${p} · ${r.c}`, `الأستاذ/ ${r.t} لم يدخل الحصة حتى ${out.at}`);
       if (to && cfg.auto.wa && cfg.auto.wa.esc)
-        await runWA({ wa: true, kind: 'esc', key: 'esc|' + k, k: '', date, to, name: who,
+        await runWA({ wa: true, kind: 'esc', key: 'esc|' + k, k: '', date, to, name: who, vars: { name: r.t, period: String(p), class: r.c, time: out.at, school: cfg.school || '' },
           text: `تنبيه متابعة – ${cfg.school || ''}\nالأستاذ/ ${r.t} لم يدخل الحصة (${p}) للصف ${r.c} حتى الساعة ${out.at}.` });
     }
   }
@@ -275,12 +275,25 @@ async function waSendNow(phone, text) {
   if (!await ping(id, 40000)) return { ok: false, err: 'واتساب ويب لم يفتح' };
   try { return await sendMsg(id, { cmd: 'waSend' }, 80000); } catch (e) { return { ok: false, err: String(e && e.message || e) }; }
 }
+/* ---------- الإرسال عبر واتساب الرسمي (خادم راصد) ---------- */
+const FN = 'https://knrpjgppxdhkdyxcwroe.supabase.co/functions/v1/rased-send';
+const ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtucnBqZ3BweGRoa2R5eGN3cm9lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE5OTk4MzMsImV4cCI6MjEwNzU3NTgzM30.T_M5u9G1Ix9nMGCt2Ysm1bmiDzpBppOPsHdJTYVH6Qc';
+async function apiSendSW(cfg, kind, to, vars, text, dkey) {
+  try {
+    const r = await fetch(FN, { method: 'POST', headers: { apikey: ANON, Authorization: 'Bearer ' + ANON, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code: cfg.api.code, key: cfg.api.key, kind, to, vars, text, dkey }) });
+    const j = await r.json().catch(() => ({}));
+    return j.ok ? { ok: true, ch: j.channel } : { ok: false, err: (j.err || ('HTTP ' + r.status)) + (j.detail ? ' ' + j.detail : '') };
+  } catch (e) { return { ok: false, err: 'تعذّر الاتصال بخدمة الإرسال' }; }
+}
+const apiMode = cfg => !!(cfg.api && cfg.auto && cfg.auto.wa && cfg.auto.wa.via === 'api');
 async function runWA(j) {
   const cfg = await getCfg(); if (!cfg) return; const wa = (cfg.auto && cfg.auto.wa) || {};
   const at = () => hm(new Date());
   if (j.waTest) {
     const ph = normPhone(cfg.mgrPh);
-    const r = ph ? await waSendNow(ph, `✅ اختبار الإرسال الآلي من راصد\n${cfg.school || ''}`) : { ok: false, err: 'أضف جوال المدير في بيانات المدرسة' };
+    const r = !ph ? { ok: false, err: 'أضف جوال المدير في بيانات المدرسة' } : apiMode(cfg) ? await apiSendSW(cfg, 'test', ph, { school: cfg.school || '' }, `✅ اختبار الإرسال الآلي من راصد\n${cfg.school || ''}`, '')
+      : await waSendNow(ph, `✅ اختبار الإرسال الآلي من راصد\n${cfg.school || ''}`);
     await chrome.storage.local.set({ watest: { at: at(), ok: !!r.ok, err: r.err || '' } }); return;
   }
   if (!({ rem: wa.remind, rep: wa.report, esc: wa.esc, pre: wa.pre })[j.kind]) return;
@@ -290,15 +303,16 @@ async function runWA(j) {
     log[j.key] = { ok: false, err: 'بلغ الحد اليومي للرسائل', at: at(), kind: j.kind, name: j.name, k: j.k || '' };
     await chrome.storage.local.set({ [lk]: log }); return;
   }
-  let to = j.to, text = j.text;
-  if (j.kind === 'rep') { to = cfg.mgrPh; text = (await chrome.storage.local.get('dayrep:' + j.date))['dayrep:' + j.date] || await fallbackReport(cfg, j.date); }
+  let to = j.to, text = j.text, vars = j.vars || {};
+  if (j.kind === 'rep') { to = cfg.mgrPh; text = (await chrome.storage.local.get('dayrep:' + j.date))['dayrep:' + j.date] || await fallbackReport(cfg, j.date);
+    vars = (await chrome.storage.local.get('dayrepv:' + j.date))['dayrepv:' + j.date] || { school: cfg.school || '', date: j.date, ok: '-', late: '-', bad: '-', pct: '-' }; }
   const ph = normPhone(to); if (!ph || !text) return;
-  const r = await waSendNow(ph, text);
+  const r = apiMode(cfg) ? await apiSendSW(cfg, j.kind, ph, vars, text, j.key + '|' + j.date) : await waSendNow(ph, text);
   const log2 = (await chrome.storage.local.get(lk))[lk] || {};
   log2[j.key] = { ok: !!r.ok, err: r.err || '', at: at(), kind: j.kind, name: j.name, k: j.k || '' };
   await chrome.storage.local.set({ [lk]: log2 });
   if (!r.ok) notify('wa|' + j.key, 'راصد · تعذّر الإرسال الآلي', `${j.name || ''}: ${r.err}`);
-  await sleep(6000);
+  await sleep(apiMode(cfg) ? 400 : 6000);
 }
 
 async function ensureWin() {
@@ -422,6 +436,6 @@ async function preRemind(date, p) {
   const cfg = await getCfg(); if (!cfg || !cfg.auto || !cfg.auto.on || !cfg.auto.wa || !cfg.auto.wa.pre) return;
   const d = wdOf(date); if (d < 0) return; const W = new Set(cfg.watchT || []); const tm = (cfg.times[p - 1] || [''])[0];
   for (const r of cfg.rows.filter(x => x.d === d && x.p === p && x.ph && W.has(x.t)))
-    enqueue({ wa: true, kind: 'pre', key: 'pre|' + mk(date, p, r.c), k: '', date, to: r.ph, name: r.t,
+    enqueue({ wa: true, kind: 'pre', key: 'pre|' + mk(date, p, r.c), k: '', date, to: r.ph, name: r.t, vars: { name: r.t, period: String(p), class: r.c, time: tm, school: cfg.school || '' },
       text: `الأستاذ/ ${r.t}\nالسلام عليكم ورحمة الله وبركاته\nتذكير بحصتك (${p}) للصف ${r.c} الساعة ${tm}.` + (r.l ? `\nرابط الحصة: ${r.l}` : '') + `\nشاكرين تعاونكم\n${cfg.school || ''}` });
 }
