@@ -311,12 +311,14 @@ S.auto=Object.assign({on:false,sound:true,skip:[],sk:[]},S.auto||{});
 const LOWN=5;   // أقل من 5 مشاركين = حضور طلاب ضعيف
 /* ---- جسر إضافة «راصد الآلي» (يعمل فقط داخل الإضافة) ---- */
 const EXT=!!(window.chrome&&chrome.runtime&&chrome.runtime.id&&chrome.storage&&chrome.storage.local);
-let AUTO={_date:null},PRE={},HB=null,TEST=null,UPD=null,lastCfg='';
+let AUTO={_date:null},PRE={},HB=null,TEST=null,UPD=null,WALOG={},WATEST=null,lastCfg='';
+S.auto.wa=Object.assign({remind:false,report:false,max:40},S.auto.wa||{});
 if(EXT)chrome.storage.local.get('upd').then(o=>{UPD=o.upd||null;if(UPD)render()});
 function updBar(){if(!EXT||!UPD)return'';return `<div class="alertbar" style="background:var(--accent-soft);color:var(--ink)">🔔 تحديث جديد لإضافة راصد ${esc(UPD.version)} (لديك ${esc(UPD.current)})${UPD.notes?': '+esc(UPD.notes):''}
   <div class="bar-row" style="margin-top:8px">${UPD.zip?`<a class="btn primary" href="${esc(UPD.zip)}" target="_blank" rel="noopener">${IC.dl} تنزيل التحديث</a>`:''}<span class="small" style="font-weight:500">فك الضغط داخل مجلد الإضافة نفسه (استبدال الملفات)، ثم اضغط ↻ على الإضافة في صفحة الإضافات. بياناتك لا تتأثر.</span></div></div>`}
-function pushCfg(){if(!EXT)return;const c={rows:S.rows,times:S.settings.times,school:S.settings.school,auto:S.auto};const j=JSON.stringify(c);if(j===lastCfg)return;lastCfg=j;chrome.storage.local.set({cfg:c})}
-function save(){store.set(KEY,JSON.stringify(S));pushCfg()}
+function pushCfg(){if(!EXT)return;const c={rows:S.rows,times:S.settings.times,school:S.settings.school,mgr:S.settings.mgr,mgrPh:S.settings.mgrPh,auto:S.auto};const j=JSON.stringify(c);if(j===lastCfg)return;lastCfg=j;chrome.storage.local.set({cfg:c})}
+function save(){store.set(KEY,JSON.stringify(S));pushCfg();if(EXT&&!isFolSafe()&&wd(today())>=0){try{chrome.storage.local.set({['dayrep:'+today()]:dayReport(today()).text})}catch(e){}}}
+function isFolSafe(){try{return store.sget('rl-role')==='fol'}catch(e){return false}}
 /* ---- الأدوار: المدير والمتابع ---- */
 const role=()=>store.sget('rl-role')||'';
 function needLock(){return !!(S.settings.pin||S.settings.fpin||(S.sync&&S.sync.key))&&!role()}
@@ -394,7 +396,7 @@ function teacherOf(k,m){if(m&&m.t)return m.t;const[d,p,c]=k.split('|');const r=S
 function mergeAuto(){let ch=false;for(const[k,r]of Object.entries(AUTO)){if(k[0]==='_'||!r||!r.final||r.st==='unk')continue;const m=S.marks[k];
   if((!m||m.src==='auto')&&(!m||m.st!==r.st)){S.marks[k]={st:r.st,at:r.at,src:'auto',t:r.t||teacherOf(k),by:'🤖 آلي'};markSync(k);ch=true}}if(ch)store.set(KEY,JSON.stringify(S))}
 function ensureAuto(){if(!EXT||AUTO._date===V.date)return;const d=V.date;AUTO={_date:d};PRE={};
-  chrome.storage.local.get(['res:'+d,'pre:'+d,'hb','test:last']).then(o=>{if(V.date!==d)return;AUTO=Object.assign({_date:d},o['res:'+d]||{});PRE=o['pre:'+d]||{};HB=o.hb||null;TEST=o['test:last']||null;mergeAuto();render()})}
+  chrome.storage.local.get(['res:'+d,'pre:'+d,'hb','test:last','walog:'+d,'watest']).then(o=>{if(V.date!==d)return;AUTO=Object.assign({_date:d},o['res:'+d]||{});PRE=o['pre:'+d]||{};HB=o.hb||null;TEST=o['test:last']||null;WALOG=o['walog:'+d]||{};WATEST=o.watest||null;mergeWA();mergeAuto();render()})}
 function beep(){try{const A=new(window.AudioContext||window.webkitAudioContext)();[880,660,880].forEach((f,i)=>{const o=A.createOscillator(),g=A.createGain();o.frequency.value=f;o.connect(g);g.connect(A.destination);
   const t=A.currentTime+i*.28;g.gain.setValueAtTime(.18,t);g.gain.exponentialRampToValueAtTime(.001,t+.25);o.start(t);o.stop(t+.26)})}catch(e){}}
 if(EXT)chrome.storage.onChanged.addListener((ch,a)=>{if(a!=='local')return;let re=false;
@@ -404,6 +406,8 @@ if(EXT)chrome.storage.onChanged.addListener((ch,a)=>{if(a!=='local')return;let r
   const k='res:'+V.date;if(ch[k]){AUTO=Object.assign({_date:V.date},ch[k].newValue||{});mergeAuto();re=true}
   if(ch['pre:'+V.date]){PRE=ch['pre:'+V.date].newValue||{};re=true}
   if(ch.hb){HB=ch.hb.newValue;re=true}
+  if(ch['walog:'+V.date]){WALOG=ch['walog:'+V.date].newValue||{};mergeWA();re=true}
+  if(ch.watest){WATEST=ch.watest.newValue;const o=$('#waTestOut');if(o)o.innerHTML=waTestHTML()}
   if(ch.upd){UPD=ch.upd.newValue||null;re=true}
   if(ch['test:last']){TEST=ch['test:last'].newValue;const o=$('#testOut');if(o)o.innerHTML=testHTML()}
   if(re&&V.tab!=='setup'&&!document.querySelector('.lb,.sheet'))render()});
@@ -426,13 +430,15 @@ function noteHTML(k,m,sent,r){const a=AUTO[k],pr=PRE[k];const P=[];
     if(!isFol())P.push(`<button class="shot" data-edit="${esc(k)}">✎ ${r.l?'تعديل الرابط':'إضافة رابط'}</button>`)}
   if(sent)P.push(`<span class="sent">✓ أُرسل التذكير ${sent}</span>`);
   return P.length?`<div class="note num">${P.join('')}</div>`:''}
+function mergeWA(){let ch=false;for(const v of Object.values(WALOG||{})){if(v&&v.ok&&v.k&&!S.sent[v.k]){S.sent[v.k]=v.at+'🤖';markSync(v.k);ch=true}}if(ch)store.set(KEY,JSON.stringify(S))}
+function waTestHTML(){return WATEST?(WATEST.ok?`✅ أُرسلت رسالة الاختبار لجوال المدير ${WATEST.at}`:`<span style="color:var(--bad)">❌ ${esc(WATEST.err||'تعذّر الإرسال')} (${WATEST.at})</span>`):''}
 function hotWA(k,m,sent){if(sent)return false;if(m&&m.st!=='ok')return true;const a=AUTO[k];return !!(a&&!a.final)}
 function missedPeriods(){if(!EXT||!S.auto.on||V.date!==today())return[];const d=wd(V.date);if(d<0)return[];const now=mins(hm());const sk=new Set(S.auto.sk||[]);const out=[];
   for(let p=1;p<=7;p++){if(sk.has(d+'-'+p))continue;const L=S.rows.filter(r=>r.d===d&&r.p===p&&r.l);if(!L.length)continue;
     if(now<mins(S.settings.times[p-1][0])+9)continue;if(!L.some(r=>AUTO[mk(V.date,p,r.c)]))out.push(p)}return out}
 function autoBarHTML(){if(!EXT)return'';const miss=missedPeriods();
   return (miss.length?`<div class="alertbar">⚠️ لم تُفحص آليًا في موعدها: ${miss.map(p=>'الحصة '+p).join('، ')}. تأكد أن الجهاز يعمل وأن Teams مسجّل الدخول، ثم اضغط «افحص هذه الحصة الآن».</div>`:'')+
-  `<div class="autobar">🤖 الفحص الآلي: ${S.auto.on?'<b style="color:var(--ok)">مفعّل</b>':'<b>متوقف</b> – فعّله من «الإعداد والجدول»'}${HB?` · آخر فحص ${HB.at}${HB.err?` <span style="color:var(--bad)">(${esc(HB.err)})</span>`:''}`:''}<button class="btn" id="runNow">افحص هذه الحصة الآن</button></div>`}
+  `<div class="autobar">🤖 الفحص الآلي: ${S.auto.on?'<b style="color:var(--ok)">مفعّل</b>':'<b>متوقف</b> – فعّله من «الإعداد والجدول»'}${(()=>{const v=Object.values(WALOG||{});const ok=v.filter(x=>x.ok).length,bad=v.filter(x=>!x.ok).length;return ok||bad?` · 📤 أُرسل آليًا ${ok}${bad?` <span style="color:var(--bad)">· تعذّر ${bad}</span>`:''}`:''})()}${HB?` · آخر فحص ${HB.at}${HB.err?` <span style="color:var(--bad)">(${esc(HB.err)})</span>`:''}`:''}<button class="btn" id="runNow">افحص هذه الحصة الآن</button></div>`}
 function testHTML(){if(!TEST)return'<p class="small muted" style="margin:0">لم يُجرَ اختبار بعد.</p>';
   return `<div class="small"><b>${TEST.done?(TEST.ok?'✅ نجح الاختبار':'❌ لم ينجح الاختبار'):'⏳ جارٍ الاختبار…'}</b> <span class="muted num">${esc(TEST.at||'')}</span></div>
   <ol class="steps small">${(TEST.steps||[]).map(x=>`<li>${x.ok===false?'❌':x.ok?'✅':'•'} ${esc(x.m)} <span class="muted num">${esc(x.at)}</span></li>`).join('')}</ol>
@@ -445,6 +451,13 @@ function autoSetupHTML(){
    <p class="small muted" style="margin:0">قبل كل حصة بعشر دقائق تُفحص روابطها. بعد بدايتها بـ3 دقائق يُفحص كل اجتماع، ثم بعد 7 ثم 18 لمن لم يُوجد. لا يُسجَّل «غائب» إلا بعد الفحص الأخير، ومن يدخل بعد الأول يُسجَّل «متأخر». لكل فحص لقطة شاشة كاملة مختومة بالوقت للتوثيق، تُحفظ ملفًا في مجلد «التنزيلات/راصد/التاريخ/الحصة» على هذا الجهاز.</p>
    <p class="small muted" style="margin:0">يبقى الجهاز مستيقظًا تلقائيًا من قبل الحصة الأولى إلى بعد الأخيرة. وإن فاتت حصة (الجهاز نائم أو المتصفح مغلق) يظهر تنبيه ويبدأ فحص تعويضي ما دامت الحصة قائمة. لا تغلق نافذة الفحص ولا تصغّرها.</p>
    <label class="f" style="max-width:340px">حصص لا تُفحص<input id="autoSkip" value="${esc((S.auto.skip||[]).join('، '))}" placeholder="مثال: خميس 7، أحد 1"></label>
+   <div style="display:grid;gap:8px;background:var(--surface);border-radius:12px;padding:12px"><b>📤 الإرسال الآلي عبر واتساب ويب</b>
+    <p class="small muted" style="margin:0">ترسل الإضافة الرسائل من رقم واتساب المسجّل في واتساب ويب على هذا المتصفح (يُفضّل رقم المدرسة). افتح web.whatsapp.com مرة وسجّل الدخول بمسح الرمز.</p>
+    <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="waRemind" ${S.auto.wa.remind?'checked':''}> تذكير المعلم تلقائيًا إذا لم يُوجد في الفحص الأول (مرة واحدة لكل حصة)</label>
+    <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="waReport" ${S.auto.wa.report?'checked':''}> إرسال تقرير اليوم للمدير بعد آخر حصة بـ20 دقيقة</label>
+    <label class="f" style="max-width:220px">الحد الأعلى للرسائل يوميًا<input id="waMax" type="number" min="1" max="200" value="${S.auto.wa.max||40}"></label>
+    <p class="small" style="margin:0;color:var(--late)">تنبيه: الإرسال الآلي الكثيف قد يعرّض الرقم لتقييد من واتساب، فأبقِ الحد منخفضًا.</p>
+    <div class="bar-row" style="margin:0"><button class="btn" id="waTest" type="button">إرسال رسالة اختبار للمدير</button><span class="small" id="waTestOut">${waTestHTML()}</span></div></div>
    <div><button class="btn primary" id="saveAuto">حفظ</button></div></div>
    <div class="card" style="display:grid;gap:10px;margin-top:10px"><b>اختبار الإعداد</b>
    <p class="small muted" style="margin:0">يفتح اجتماعًا واحدًا الآن ويعرض نتيجة كل خطوة ولقطة الشاشة. اتركه فارغًا لاختبار أول رابط في الجدول. نفّذه في أول يوم على أي جهاز جديد.</p>
@@ -683,7 +696,7 @@ function bindLock(){$('#pin').focus();
   $('#lockF').addEventListener('submit',e=>{e.preventDefault();const v=$('#pin').value.trim();let r='';
     if(S.settings.pin&&v===S.settings.pin)r='mgr';else if(S.settings.fpin&&v===S.settings.fpin)r='fol';else if(S.sync&&v===S.sync.key)r=S.sync.role;
     if(r){store.sset('rl-role',r);if(r==='fol')V.tab='now';render();syncNow()}else{$('#lockErr').textContent='الرمز غير صحيح، حاول مرة أخرى.';$('#pin').select()}});
-  twoStep($('#forgot'),'اضغط مرة أخرى لمسح كل البيانات',()=>{S=demoState();S.auto={on:false,sound:true,skip:[],sk:[]};save();store.sset('rl-role','');render();toast('مُسحت البيانات وعادت المدرسة التجريبية')})}
+  twoStep($('#forgot'),'اضغط مرة أخرى لمسح كل البيانات',()=>{S=demoState();S.auto={on:false,sound:true,skip:[],sk:[],wa:{remind:false,report:false,max:40}};save();store.sset('rl-role','');render();toast('مُسحت البيانات وعادت المدرسة التجريبية')})}
 
 function twoStep(btn,msg,fn){if(!btn)return;const orig=btn.innerHTML;btn.addEventListener('click',()=>{if(btn.dataset.arm){fn();return}
   btn.dataset.arm=1;btn.textContent=msg;setTimeout(()=>{if(btn.isConnected){delete btn.dataset.arm;btn.innerHTML=orig}},4000)})}
@@ -741,7 +754,8 @@ function bindSetup(){
     store.sset('rl-role','mgr');save();V.date=null;V.p=null;render();toast('استُوردت النسخة')}catch(_){toast('الملف ليس نسخة راصد صالحة')}};
   const sa=$('#saveAuto');if(sa)sa.onclick=()=>{const raw=$('#autoSkip').value;const list=raw.split(/[،,]/).map(x=>x.trim()).filter(Boolean);const sk=[];
     list.forEach(x=>{const p=parseInt(x.replace(/\D/g,''),10);const d=dayIdx(x.replace(/\d/g,''));if(d>=0&&p>=1&&p<=7)sk.push(d+'-'+p)});
-    S.auto={on:$('#autoOn').checked,sound:$('#autoSound').checked,skip:list,sk};save();render();toast(S.auto.on?'الفحص الآلي مفعّل':'الفحص الآلي متوقف')};
+    S.auto={on:$('#autoOn').checked,sound:$('#autoSound').checked,skip:list,sk,wa:{remind:$('#waRemind').checked,report:$('#waReport').checked,max:Math.max(1,Math.min(200,+$('#waMax').value||40))}};save();render();toast(S.auto.on?'الفحص الآلي مفعّل':'الفحص الآلي متوقف')};
+  const wt=$('#waTest');if(wt)wt.onclick=()=>{if(!S.settings.mgrPh){toast('أضف جوال المدير في بيانات المدرسة');return}WATEST=null;$('#waTestOut').textContent='⏳ جارٍ الإرسال… راقب نافذة الفحص';chrome.runtime.sendMessage({cmd:'waTest'})};
   const rt=$('#runTest');if(rt)rt.onclick=()=>{let link=$('#testLink').value.trim(),t=$('#testT').value.trim();
     if(!link){const d=wd(today());const r=S.rows.find(x=>x.l&&x.d===d)||S.rows.find(x=>x.l);if(r){link=r.l;t=t||r.t}}
     if(!link){toast('لا يوجد رابط للاختبار');return}
@@ -755,7 +769,7 @@ function bindSetup(){
   const sn=$('#syncNowB');if(sn)sn.onclick=()=>{SYNC_ST.err='';syncNow()};
   twoStep($('#syncOff'),'اضغط مرة أخرى لإيقاف المزامنة هنا',()=>{S.sync=null;S.pend={};save();render();toast('أُوقفت المزامنة في هذا الجهاز')});
   twoStep($('#clrMarks'),'اضغط مرة أخرى لمسح الرصد',()=>{Object.keys(S.marks).concat(Object.keys(S.sent)).forEach(markSync);S.marks={};S.sent={};save();render();toast('مُسح الرصد')});
-  twoStep($('#reset'),'اضغط مرة أخرى لمسح كل شيء',()=>{S=demoState();S.auto={on:false,sound:true,skip:[],sk:[]};save();store.sset('rl-role','mgr');V.date=null;V.p=null;render();toast('عادت المدرسة التجريبية')});
+  twoStep($('#reset'),'اضغط مرة أخرى لمسح كل شيء',()=>{S=demoState();S.auto={on:false,sound:true,skip:[],sk:[],wa:{remind:false,report:false,max:40}};save();store.sset('rl-role','mgr');V.date=null;V.p=null;render();toast('عادت المدرسة التجريبية')});
 }
 
 /* ============ قراءة الجدول ============ */

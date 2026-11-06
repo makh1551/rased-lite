@@ -27,7 +27,7 @@ function plan(cfg, date) {
 /* ---------- الجدولة ---------- */
 async function schedule() {
   const all = await chrome.alarms.getAll();
-  await Promise.all(all.filter(a => /^(chk|pre)\|/.test(a.name)).map(a => chrome.alarms.clear(a.name)));
+  await Promise.all(all.filter(a => /^(chk|pre|warep)\|/.test(a.name)).map(a => chrome.alarms.clear(a.name)));
   chrome.alarms.create('tick', { periodInMinutes: 30 });
   chrome.alarms.create('watch', { periodInMinutes: 5 });
   chrome.alarms.create('upd', { periodInMinutes: 360 });
@@ -41,6 +41,10 @@ async function schedule() {
       const w = P.start - PRE_MIN * 60e3; if (w > now) chrome.alarms.create(`pre|${date}|${P.p}`, { when: w });
     }
   }
+  if (cfg && cfg.auto && cfg.auto.wa && cfg.auto.wa.report && cfg.mgrPh) {
+    const date = ymd(new Date()); const P = plan(cfg, date);
+    if (P.length) { const w = P[P.length - 1].end + 20 * 60e3; if (w > Date.now()) chrome.alarms.create(`warep|${date}`, { when: w }); }
+  }
   watch();
 }
 chrome.runtime.onInstalled.addListener(() => { schedule(); openApp(); checkUpdate(); });
@@ -53,6 +57,7 @@ chrome.alarms.onAlarm.addListener(a => {
   const [kind, date, p, n] = a.name.split('|');
   if (kind === 'chk') enqueue({ date, p: +p, n: +n });
   if (kind === 'pre') enqueue({ pre: true, date, p: +p });
+  if (kind === 'warep') enqueue({ wa: true, kind: 'rep', key: 'rep|' + date, date, name: 'المدير' });
 });
 chrome.action.onClicked.addListener(() => openApp());
 chrome.notifications.onClicked.addListener(() => openApp());
@@ -60,6 +65,7 @@ chrome.runtime.onMessage.addListener((m, s, send) => {
   if (!m) return;
   if (m.cmd === 'runNow') { enqueue({ date: m.date, p: +m.p, force: true }); send({ ok: 1 }); }
   if (m.cmd === 'test') { enqueue({ test: true, link: m.link, teacher: m.teacher }); send({ ok: 1 }); }
+  if (m.cmd === 'waTest') { enqueue({ wa: true, waTest: true, kind: 'test', key: 'test', date: ymd(new Date()), name: 'المدير' }); send({ ok: 1 }); }
 });
 
 async function openApp() {
@@ -72,7 +78,7 @@ async function prune() {
   if (!chrome.storage.local.getKeys) return;
   const keys = await chrome.storage.local.getKeys();
   const lim = ymd(new Date(Date.now() - 45 * 864e5));
-  const old = keys.filter(k => /^(res|img|pre):/.test(k) && k.slice(4, 14) < lim);
+  const old = keys.filter(k => (/^(res|img|pre):/.test(k) && k.slice(4, 14) < lim) || (/^(walog|dayrep):/.test(k) && k.split(':')[1].slice(0, 10) < lim));
   if (old.length) chrome.storage.local.remove(old);
 }
 
@@ -119,9 +125,9 @@ async function watch() {
 /* ---------- الطابور ---------- */
 let chain = Promise.resolve(), busy = 0, ka = null; const queued = new Set();
 function enqueue(job) {
-  const qk = job.test ? 'test' : `${job.date}|${job.p}${job.pre ? '|pre' : ''}`;
+  const qk = job.wa ? 'wa|' + job.key : job.test ? 'test' : `${job.date}|${job.p}${job.pre ? '|pre' : ''}`;
   busy++; queued.add(qk); keepAlive();
-  chain = chain.then(() => job.test ? runTest(job) : job.pre ? runPre(job) : runCheck(job))
+  chain = chain.then(() => job.wa ? runWA(job) : job.test ? runTest(job) : job.pre ? runPre(job) : runCheck(job))
     .catch(e => console.warn('راصد', e)).finally(() => { busy--; queued.delete(qk); });
 }
 function keepAlive() {
@@ -158,6 +164,8 @@ async function runCheck({ date, p, n, force }) {
       const what = x.final ? (x.st === 'bad' ? 'غائب بعد الفحص الأخير' : 'تعذّر التحقق') : (out.err ? 'تعذّر الفحص' : 'غير موجود');
       notify(`${k}|${nn}`, `راصد · الحصة ${p} · ${r.c}`, `الأستاذ/ ${r.t}: ${what} (${out.at})${out.err ? ' – ' + out.err : ''}`);
     }
+    if (nn === 1 && !out.present && !out.err && r.ph && cfg.auto.wa && cfg.auto.wa.remind)
+      await runWA({ wa: true, kind: 'rem', key: 'rem|' + k, k, date, to: r.ph, name: r.t, text: remindText(cfg, r, p) });
   }
 }
 
@@ -230,6 +238,55 @@ function waitLoad(tabId, ms) {
     chrome.tabs.onUpdated.addListener(l);
   });
 }
+/* ---------- الإرسال الآلي عبر واتساب ويب ---------- */
+function normPhone(p) { let d = String(p || '').replace(/\D/g, ''); if (!d) return ''; if (d.startsWith('00')) d = d.slice(2);
+  if (d.startsWith('05') && d.length === 10) d = '966' + d.slice(1); else if (d.startsWith('5') && d.length === 9) d = '966' + d; return d; }
+function remindText(cfg, r, p) { const tm = (cfg.times[p - 1] || [''])[0];
+  return `الأستاذ/ ${r.t}\nالسلام عليكم ورحمة الله وبركاته\nحصتك (${p}) للصف ${r.c} بدأت الساعة ${tm}، نأمل الدخول إلى الحصة الافتراضية الآن.` + (r.l ? `\nرابط الحصة: ${r.l}` : '') + `\nشاكرين تعاونكم\n${cfg.school || ''}`; }
+async function fallbackReport(cfg, date) { const res = (await chrome.storage.local.get('res:' + date))['res:' + date] || {};
+  const v = Object.values(res).filter(x => x && x.final); const c = s => v.filter(x => x.st === s).length;
+  return `📋 تقرير الفحص الآلي – ${cfg.school || ''}\n${date}\n✅ حاضر: ${c('ok')} · ⏱ متأخر: ${c('late')} · ❌ غائب: ${c('bad')}` +
+    (c('bad') ? '\n\n❌ الغياب:\n' + Object.entries(res).filter(([k, x]) => x && x.st === 'bad').map(([k, x]) => `• الأستاذ/ ${x.t} – الحصة ${k.split('|')[1]} – ${k.split('|')[2]}`).join('\n') : ''); }
+async function ping(tabId, ms) { const end = Date.now() + ms; while (Date.now() < end) { try { const r = await chrome.tabs.sendMessage(tabId, { cmd: 'ping' }); if (r && r.ok) return true; } catch (e) { } await sleep(1000); } return false; }
+async function waTabId() {
+  const { waTab } = await chrome.storage.session.get('waTab');
+  if (waTab) { try { await chrome.tabs.get(waTab); return waTab; } catch (e) { } }
+  const win = await ensureWin(); const t = await chrome.tabs.create({ windowId: win, url: 'about:blank', active: false });
+  await chrome.storage.session.set({ waTab: t.id }); return t.id;
+}
+async function waSendNow(phone, text) {
+  const id = await waTabId();
+  await chrome.tabs.update(id, { url: `https://web.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(text)}` });
+  await waitLoad(id, 45000);
+  if (!await ping(id, 40000)) return { ok: false, err: 'واتساب ويب لم يفتح' };
+  try { return await sendMsg(id, { cmd: 'waSend' }, 80000); } catch (e) { return { ok: false, err: String(e && e.message || e) }; }
+}
+async function runWA(j) {
+  const cfg = await getCfg(); if (!cfg) return; const wa = (cfg.auto && cfg.auto.wa) || {};
+  const at = () => hm(new Date());
+  if (j.waTest) {
+    const ph = normPhone(cfg.mgrPh);
+    const r = ph ? await waSendNow(ph, `✅ اختبار الإرسال الآلي من راصد\n${cfg.school || ''}`) : { ok: false, err: 'أضف جوال المدير في بيانات المدرسة' };
+    await chrome.storage.local.set({ watest: { at: at(), ok: !!r.ok, err: r.err || '' } }); return;
+  }
+  if (!(j.kind === 'rem' ? wa.remind : wa.report)) return;
+  const lk = 'walog:' + j.date; const log = (await chrome.storage.local.get(lk))[lk] || {};
+  if (log[j.key] && log[j.key].ok) return;
+  if (Object.values(log).filter(x => x.ok).length >= (wa.max || 40)) {
+    log[j.key] = { ok: false, err: 'بلغ الحد اليومي للرسائل', at: at(), kind: j.kind, name: j.name, k: j.k || '' };
+    await chrome.storage.local.set({ [lk]: log }); return;
+  }
+  let to = j.to, text = j.text;
+  if (j.kind === 'rep') { to = cfg.mgrPh; text = (await chrome.storage.local.get('dayrep:' + j.date))['dayrep:' + j.date] || await fallbackReport(cfg, j.date); }
+  const ph = normPhone(to); if (!ph || !text) return;
+  const r = await waSendNow(ph, text);
+  const log2 = (await chrome.storage.local.get(lk))[lk] || {};
+  log2[j.key] = { ok: !!r.ok, err: r.err || '', at: at(), kind: j.kind, name: j.name, k: j.k || '' };
+  await chrome.storage.local.set({ [lk]: log2 });
+  if (!r.ok) notify('wa|' + j.key, 'راصد · تعذّر الإرسال الآلي', `${j.name || ''}: ${r.err}`);
+  await sleep(6000);
+}
+
 async function ensureWin() {
   const { winId } = await chrome.storage.session.get('winId');
   if (winId) { try { const w = await chrome.windows.get(winId); if (w.state === 'minimized') await chrome.windows.update(winId, { state: 'normal' }); return winId; } catch (e) { } }
