@@ -331,7 +331,7 @@
     const list = [...PH].map(([ph, name]) => ({ name, ph }));
     await chrome.storage.local.set({ mphones: { at: Date.now(), list } });
     PH.clear(); keepPH();
-    draw(`<div class="ok">✓ أُرسل ${list.length} رقم إلى راصد.</div><div class="mu">في راصد تظهر نافذة «مطابقة الأرقام»: راجع المعلم المقابل لكل رقم ثم اضغط «اعتماد».</div><div class="row"><button class="b p" id="mpGo">فتح راصد</button></div>`);
+    draw(`<div class="ok">✓ أُرسل ${list.length} رقم إلى راصد.</div><div class="mu">يعتمدها راصد تلقائيًا لكل معلم تطابق اسمه، ويعرض عليك فقط ما لم يتطابق.</div><div class="row"><button class="b p" id="mpGo">فتح راصد</button></div>`);
     box.querySelector('#mpGo').onclick = () => chrome.runtime.sendMessage({ cmd: 'openApp' });
   }
 

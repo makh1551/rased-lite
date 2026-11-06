@@ -345,9 +345,14 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-mp]');if(!
   if(k==='skip'){S.mpullAt=MP.at;MP=null;save();render()}
   if(k==='apply'){const s=document.querySelector('.sheet');if(s)s.remove();const v=MP;MP=null;S.mpullAt=v.at;applyRows({rows:v.rows.map(r=>Object.assign({},r)),bad:0})}});
 let MPH=null;
-function onMphones(v){if(!v||!Array.isArray(v.list)||!v.list.length||isFol())return;if((S.mphAt||0)>=v.at)return;MPH=v;render();
+function onMphones(v){if(!v||!Array.isArray(v.list)||!v.list.length||isFol())return;if((S.mphAt||0)>=v.at)return;MPH=v;
   if(!document.querySelector('.sheet')&&!needLock())mphOpen()}
-function mphOpen(){if(!MPH)return;const v=MPH;MPH=null;S.mphAt=v.at;save();render();phPreview(v.list.map(x=>({name:x.name,ph:cleanPh(x.ph)})).filter(x=>x.ph),'منصة مدرستي')}
+function mphOpen(){if(!MPH)return;const v=MPH;MPH=null;S.mphAt=v.at;
+  const T=teachersList(),items=v.list.map(x=>({name:x.name,ph:cleanPh(x.ph)})).filter(x=>x.ph);const rest=[];let n=0;
+  items.forEach(x=>{const m=matchTeacher(x.name,T);if(m){if(phoneOf(m)!==x.ph){setPhone(m,x.ph);n++}}else rest.push(x)});
+  save();render();const miss=phStats().miss.length;
+  toast(`اعتُمد ${n} رقم تلقائيًا`+(miss?` · ينقص ${miss}`:' · اكتملت الجوالات'));
+  if(rest.length){const useful=rest.filter(x=>!T.some(t=>phoneOf(t)===x.ph));if(useful.length&&miss)phPreview(useful,'لم تتطابق تلقائيًا')}}
 if(EXT){chrome.storage.local.get(['mpull','mphones']).then(o=>{onMpull(o.mpull);onMphones(o.mphones)});chrome.storage.onChanged.addListener((ch,a)=>{if(a!=='local')return;if(ch.mpull)onMpull(ch.mpull.newValue);if(ch.mphones)onMphones(ch.mphones.newValue)})}
 function updBar(){if(!EXT||!UPD)return'';return `<div class="alertbar" style="background:var(--accent-soft);color:var(--ink)">🔔 تحديث جديد لإضافة راصد ${esc(UPD.version)} (لديك ${esc(UPD.current)})${UPD.notes?': '+esc(UPD.notes):''}
   <div class="bar-row" style="margin-top:8px">${UPD.zip?`<a class="btn primary" href="${esc(UPD.zip)}" target="_blank" rel="noopener">${IC.dl} تنزيل التحديث</a>`:''}<span class="small" style="font-weight:500">فك الضغط داخل مجلد الإضافة نفسه (استبدال الملفات)، ثم اضغط ↻ على الإضافة في صفحة الإضافات. بياناتك لا تتأثر.</span></div></div>`}
@@ -873,8 +878,9 @@ function phonesHTML(){if(isFol())return'';const st=phStats();const link=S.sync?`
   return `<div class="section"><h3>جوالات المعلمين ${st.miss.length?`<span class="pill late">ينقص ${st.miss.length}</span>`:`<span class="pill ok">مكتملة</span>`}</h3><div class="card" style="display:grid;gap:14px">
    <p class="small muted" style="margin:0">لدى المدرسة ${st.T.length} معلم. الجوال يُستخدم للتذكير بواتساب فقط، ولا يظهر في أي تقرير أو صفحة عامة.</p>
    ${EXT?`<div style="display:grid;gap:8px;background:var(--accent-soft);border-radius:12px;padding:12px"><b>⚡ الأسرع: سحب الأرقام من منصة مدرستي</b>
-    <p class="small muted" style="margin:0">يفتح مدرستي؛ ادخل «الإدارة المدرسية ← المعلمون» واضغط «سحب الأرقام من هذه الصفحة» في لوحة راصد، ثم «إرسال إلى راصد». تظهر هنا للمطابقة والاعتماد.</p>
+    <p class="small muted" style="margin:0">يفتح مدرستي؛ ادخل «الإدارة المدرسية ← المعلمون» واضغط «سحب الأرقام من هذه الصفحة» في لوحة راصد، ثم «إرسال إلى راصد». تُعتمد الأرقام تلقائيًا لكل معلم تطابق اسمه، ولا يُعرض عليك إلا ما لم يتطابق.</p>
     <div><button class="btn primary" id="phMad" type="button">سحب الأرقام من مدرستي</button></div></div>`:`<p class="small muted" style="margin:0">⚡ السحب المباشر للأرقام من منصة مدرستي متاح في إضافة «راصد الآلي».</p>`}
+   ${EXT?`<details><summary class="small" style="cursor:pointer;font-weight:600;color:var(--accent)">طرق أخرى (عند الحاجة فقط)${st.miss.length?` · ينقص ${st.miss.length} رقم`:''}</summary><div style="display:grid;gap:14px;margin-top:10px">`:''}
    <div style="display:grid;gap:8px"><b>١. لصق قائمة أرقام</b>
     <p class="small muted" style="margin:0">الصق أسماء وأرقامًا بأي شكل: من Excel، أو كشف، أو قائمة أعضاء مجموعة واتساب. يطابقها راصد مع أسماء الجدول حتى لو اختلفت الصيغة.</p>
     <textarea class="pastebox" id="phPaste" placeholder="خالد السالم 0551234567&#10;سعد محمد العتيبي - 966501234567"></textarea>
@@ -887,6 +893,7 @@ function phonesHTML(){if(isFol())return'';const st=phStats();const link=S.sync?`
     <label style="display:flex;gap:8px;align-items:center" class="small"><input type="checkbox" id="phOnlyMiss" ${st.miss.length?'checked':''}> إظهار من ينقصه رقم فقط</label>
     <div class="tbl" style="max-height:360px;overflow:auto"><table><thead><tr><th>المعلم</th><th>الجوال</th></tr></thead><tbody id="phBody">${phRowsHTML(st.miss.length?st.miss:st.T)}</tbody></table></div>
     <div><button class="btn primary" id="phSave" type="button">حفظ الأرقام</button></div></div>
+   ${EXT?'</div></details>':''}
   </div></div>`}
 function phRowsHTML(list){return list.map(t=>`<tr><td>${esc(t)}</td><td><input class="phin" data-t="${esc(t)}" dir="ltr" inputmode="tel" value="${esc(phoneOf(t))}" placeholder="05xxxxxxxx" style="width:150px;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:5px 8px"></td></tr>`).join('')||'<tr><td colspan="2" class="muted">لا يوجد</td></tr>'}
 function phPreview(items,src){const T=teachersList();
