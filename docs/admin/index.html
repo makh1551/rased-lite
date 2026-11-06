@@ -26,6 +26,13 @@ pre{background:var(--tint);border-radius:10px;padding:10px;direction:ltr;text-al
 </style></head><body><div class="w">
 <h1>إدارة اشتراكات راصد المبسّط</h1>
 <div class="card"><div class="row"><label style="flex:1">كلمة مرور الإدارة<input id="pass" type="password" autocomplete="current-password"></label><button id="load">دخول وتحديث</button></div><div id="msg"></div></div>
+<div class="card" id="ord" hidden><h2>طلبات الاشتراك</h2><p style="color:var(--muted);font-size:13px;margin:0 0 8px">«تأكيد الدفع» ينشئ كودًا ويفعّل باقة المدرسة فورًا، ويفتح رسالة واتساب جاهزة للعميل.</p><div class="tbl" id="ordT"></div></div>
+<div class="card" id="prc" hidden><h2>الأسعار والإعدادات</h2>
+  <div class="row"><label>الأساسية<input id="p_basic" type="number" style="width:90px"></label><label>الاحترافية<input id="p_pro" type="number" style="width:90px"></label><label>العملة<input id="p_currency" style="width:70px"></label>
+  <label>خصم المدارس %<input id="p_multi_discount" type="number" style="width:80px"></label><label>من عدد مدارس<input id="p_multi_min" type="number" style="width:80px"></label>
+  <label>أيام التجربة<input id="p_trial_days" type="number" style="width:80px"></label><label>مدة الاشتراك (يوم)<input id="p_license_days" type="number" style="width:90px"></label></div>
+  <div class="row" style="margin-top:8px"><label style="flex:1">رابط دفع الأساسية (اختياري)<input id="p_pay_basic" dir="ltr"></label><label style="flex:1">رابط دفع الاحترافية (اختياري)<input id="p_pay_pro" dir="ltr"></label></div>
+  <div class="row" style="margin-top:8px"><label style="flex:1">بيانات التحويل البنكي (تظهر للعميل)<input id="p_bank"></label><label>واتساب استقبال الطلبات<input id="p_contact" dir="ltr" style="width:150px"></label><button id="savePrc">حفظ</button></div></div>
 <div class="card" id="gen" hidden><h2>إنشاء أكواد تفعيل</h2>
   <div class="row"><label>الباقة<select id="plan"><option value="pro">الاحترافية</option><option value="basic">الأساسية</option></select></label>
   <label>العدد<input id="count" type="number" min="1" max="50" value="1" style="width:80px"></label>
@@ -39,15 +46,28 @@ pre{background:var(--tint);border-radius:10px;padding:10px;direction:ltr;text-al
 <script>
 const SB='https://knrpjgppxdhkdyxcwroe.supabase.co/rest/v1/rpc/',K='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtucnBqZ3BweGRoa2R5eGN3cm9lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE5OTk4MzMsImV4cCI6MjEwNzU3NTgzM30.T_M5u9G1Ix9nMGCt2Ysm1bmiDzpBppOPsHdJTYVH6Qc';
 const $=s=>document.querySelector(s),esc=t=>String(t??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const P={pro:'الاحترافية',basic:'الأساسية',trial:'تجربة',free:'مجانية'};
+const P2={pro:'الاحترافية',basic:'الأساسية',trial:'تجربة',free:'مجانية'};
 async function rpc(f,a){const r=await fetch(SB+f,{method:'POST',headers:{apikey:K,Authorization:'Bearer '+K,'Content-Type':'application/json'},body:JSON.stringify(a)});const j=await r.json();if(!r.ok)throw new Error(j.message||r.status);if(j.err)throw new Error(j.err==='admin'?'كلمة المرور غير صحيحة':j.err);return j}
 const msg=(t,c)=>{$('#msg').innerHTML=`<span class="${c||''}">${esc(t)}</span>`};
 const today=new Date().toISOString().slice(0,10);
-async function load(){msg('⏳ …');try{const r=await rpc('lite_admin_list',{p_pass:$('#pass').value});msg('');['#gen','#lic','#sch'].forEach(x=>$(x).hidden=false);
-  $('#licT').innerHTML=`<table><tr><th>الكود</th><th>الباقة</th><th>المدة</th><th>ملاحظة</th><th>الحالة</th></tr>${r.licenses.map(l=>`<tr><td><code>${esc(l.code)}</code></td><td>${P[l.plan]}</td><td>${l.days} يوم</td><td>${esc(l.note)}</td><td>${l.used_by?`<span class="pill ok">مستخدم · ${esc(l.used_by)} · ${esc((l.used_at||'').slice(0,10))}</span>`:'<span class="pill">متاح</span>'}</td></tr>`).join('')}</table>`;
-  $('#schT').innerHTML=`<table><tr><th>رمز المدرسة</th><th>الاسم</th><th>الباقة</th><th>حتى</th><th>الرصد</th><th>أُنشئت</th></tr>${r.schools.map(s=>{const exp=s.plan_until<today;return `<tr><td><code>${esc(s.code.slice(0,4)+'-'+s.code.slice(4))}</code></td><td>${esc(s.name)}</td><td>${P[s.plan]||s.plan}</td><td class="${exp?'bad':''}">${esc(s.plan_until)}${exp?' (منتهية)':''}</td><td>${s.marks}</td><td>${esc((s.created_at||'').slice(0,10))}</td></tr>`}).join('')}</table>`;
+const PK=['basic','pro','currency','multi_discount','multi_min','trial_days','license_days','pay_basic','pay_pro','bank','contact'];
+const wa=(ph,t)=>'https://wa.me/'+String(ph||'').replace(/\D/g,'').replace(/^05/,'9665')+'?text='+encodeURIComponent(t);
+async function load(){msg('⏳ …');try{const r=await rpc('lite_admin_list',{p_pass:$('#pass').value});msg('');['#gen','#lic','#sch','#ord','#prc'].forEach(x=>$(x).hidden=false);
+  const P=r.prices||{};PK.forEach(k=>{const el=$('#p_'+k);if(el)el.value=P[k]??''});
+  const O=r.orders||[];$('#ordT').innerHTML=O.length?`<table><tr><th>#</th><th>المدرسة</th><th>الباقة</th><th>المبلغ</th><th>التواصل</th><th>الحالة</th><th></th></tr>${O.map(o=>`<tr><td>${o.id}</td><td>${esc(o.school)}<br><code>${esc(o.code||'')}</code></td><td>${P[o.plan]?esc({pro:'الاحترافية',basic:'الأساسية'}[o.plan]):esc(o.plan)}</td><td>${o.amount}</td><td>${esc(o.contact)}<br><code>${esc(o.phone)}</code></td>
+    <td>${o.status==='paid'?`<span class="pill ok">مدفوع · ${esc(o.license||'')}</span>`:o.status==='cancelled'?'<span class="pill">ملغى</span>':'<span class="pill late">بانتظار الدفع</span>'}</td>
+    <td>${o.status==='pending'?`<button data-paid="${o.id}">تأكيد الدفع</button> <button class="o" data-cancel="${o.id}">إلغاء</button>`:''}</td></tr>`).join('')}</table>`:'<p style="color:var(--muted)">لا طلبات بعد.</p>';
+  $('#licT').innerHTML=`<table><tr><th>الكود</th><th>الباقة</th><th>المدة</th><th>ملاحظة</th><th>الحالة</th></tr>${r.licenses.map(l=>`<tr><td><code>${esc(l.code)}</code></td><td>${P2[l.plan]}</td><td>${l.days} يوم</td><td>${esc(l.note)}</td><td>${l.used_by?`<span class="pill ok">مستخدم · ${esc(l.used_by)} · ${esc((l.used_at||'').slice(0,10))}</span>`:'<span class="pill">متاح</span>'}</td></tr>`).join('')}</table>`;
+  const act=r.schools.filter(s=>s.days7>0).length;
+  $('#schT').innerHTML=`<p style="font-size:13px;margin:0 0 8px">المدارس: <b>${r.schools.length}</b> · النشطة هذا الأسبوع: <b class="ok">${act}</b> · المشتركة: <b>${r.schools.filter(s=>['basic','pro'].includes(s.plan)&&s.plan_until>=today).length}</b></p><table><tr><th>رمز المدرسة</th><th>الاسم</th><th>الباقة</th><th>حتى</th><th>أيام نشاط (7)</th><th>رصد (7 أيام)</th><th>كل الرصد</th><th>رسائل (30)</th><th>آخر نشاط</th><th>أُنشئت</th></tr>${r.schools.map(s=>{const exp=s.plan_until<today;return `<tr><td><code>${esc(s.code.slice(0,4)+'-'+s.code.slice(4))}</code></td><td>${esc(s.name)}</td><td>${P2[s.plan]||s.plan}</td><td class="${exp?'bad':''}">${esc(s.plan_until)}${exp?' (منتهية)':''}</td><td class="${s.days7?'ok':''}">${s.days7||0}</td><td>${s.marks7||0}</td><td>${s.marks}</td><td>${s.sends30||0}</td><td>${esc((s.last||'').slice(0,10))}</td><td>${esc((s.created_at||'').slice(0,10))}</td></tr>`}).join('')}</table>`;
 }catch(e){msg(e.message,'bad')}}
-$('#load').onclick=load;$('#pass').addEventListener('keydown',e=>{if(e.key==='Enter')load()});
+$('#load').onclick=load;
+document.addEventListener('click',async e=>{const pd=e.target.closest('[data-paid]'),cn=e.target.closest('[data-cancel]');
+  if(pd){pd.disabled=true;try{const r=await rpc('lite_admin_order_paid',{p_pass:$('#pass').value,p_id:+pd.dataset.paid});msg(`✅ فُعّل الطلب · الكود ${r.license}`,'ok');
+    if(r.phone)window.open(wa(r.phone,`السلام عليكم\nتم تأكيد الدفع وتفعيل اشتراك راصد المبسّط لـ ${r.school}.\nالباقة مفعّلة الآن في راصد مباشرة، وكود الاشتراك للرجوع: ${r.license}\nشاكرين ثقتكم`),'_blank');load()}catch(x){msg(x.message,'bad');pd.disabled=false}}
+  if(cn){try{await rpc('lite_admin_order_cancel',{p_pass:$('#pass').value,p_id:+cn.dataset.cancel});load()}catch(x){msg(x.message,'bad')}}});
+$('#savePrc').onclick=async()=>{const o={};PK.forEach(k=>{const v=$('#p_'+k).value.trim();o[k]=['basic','pro','multi_discount','multi_min','trial_days','license_days'].includes(k)?(+v||0):v});
+  try{await rpc('lite_admin_prices_set',{p_pass:$('#pass').value,p_prices:o});msg('✅ حُفظت الأسعار، وتظهر في راصد وصفحة التعريف','ok')}catch(x){msg(x.message,'bad')}};$('#pass').addEventListener('keydown',e=>{if(e.key==='Enter')load()});
 $('#mk').onclick=async()=>{try{const r=await rpc('lite_admin_create',{p_pass:$('#pass').value,p_plan:$('#plan').value,p_count:+$('#count').value,p_days:+$('#days').value,p_note:$('#note').value});
   $('#newCodes').hidden=false;$('#cp').hidden=false;$('#newCodes').textContent=r.codes.join('\n');load()}catch(e){msg(e.message,'bad')}};
 $('#cp').onclick=async()=>{try{await navigator.clipboard.writeText($('#newCodes').textContent);msg('نُسخت الأكواد','ok')}catch(e){msg('انسخها يدويًا')}};

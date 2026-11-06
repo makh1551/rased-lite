@@ -27,7 +27,7 @@ function plan(cfg, date) {
 /* ---------- الجدولة ---------- */
 async function schedule() {
   const all = await chrome.alarms.getAll();
-  await Promise.all(all.filter(a => /^(chk|pre|prem|warep)\|/.test(a.name)).map(a => chrome.alarms.clear(a.name)));
+  await Promise.all(all.filter(a => /^(chk|pre|prem|warep|morn|wkrep)\|/.test(a.name)).map(a => chrome.alarms.clear(a.name)));
   chrome.alarms.create('tick', { periodInMinutes: 30 });
   chrome.alarms.create('watch', { periodInMinutes: 5 });
   chrome.alarms.create('upd', { periodInMinutes: 360 });
@@ -47,6 +47,11 @@ async function schedule() {
     const date = ymd(new Date()); const P = plan(cfg, date);
     if (P.length) { const w = P[P.length - 1].end + 20 * 60e3; if (w > Date.now()) chrome.alarms.create(`warep|${date}`, { when: w }); }
   }
+  if (cfg && cfg.auto && cfg.auto.wa && cfg.mgrPh) {
+    const date = ymd(new Date()); const P = plan(cfg, date);
+    if (P.length && cfg.auto.wa.morn) { const w = P[0].start - 30 * 60e3; if (w > Date.now()) chrome.alarms.create(`morn|${date}`, { when: w }); }
+    if (P.length && cfg.auto.wa.week && new Date().getDay() === 4) { const w = P[P.length - 1].end + 30 * 60e3; if (w > Date.now()) chrome.alarms.create(`wkrep|${date}`, { when: w }); }
+  }
   watch();
 }
 chrome.runtime.onInstalled.addListener(() => { schedule(); openApp(); checkUpdate(); });
@@ -61,6 +66,8 @@ chrome.alarms.onAlarm.addListener(a => {
   if (kind === 'chk') enqueue({ date, p: +p, n: +n });
   if (kind === 'pre') enqueue({ pre: true, date, p: +p });
   if (kind === 'prem') preRemind(date, +p);
+  if (kind === 'morn') enqueue({ wa: true, kind: 'morn', key: 'morn|' + date, date, name: 'المدير' });
+  if (kind === 'wkrep') enqueue({ wa: true, kind: 'week', key: 'week|' + date, date, name: 'المدير' });
   if (kind === 'warep') enqueue({ wa: true, kind: 'rep', key: 'rep|' + date, date, name: 'المدير' });
 });
 chrome.action.onClicked.addListener(() => openApp());
@@ -178,7 +185,7 @@ async function runCheck({ date, p, n, force }) {
       notify(`esc|${k}`, `راصد · متابعة الحصة ${p} · ${r.c}`, `الأستاذ/ ${r.t} لم يدخل الحصة حتى ${out.at}`);
       if (to && cfg.auto.wa && cfg.auto.wa.esc)
         await runWA({ wa: true, kind: 'esc', key: 'esc|' + k, k: '', date, to, name: who, vars: { name: r.t, period: String(p), class: r.c, time: out.at, school: cfg.school || '' },
-          text: `تنبيه متابعة – ${cfg.school || ''}\nالأستاذ/ ${r.t} لم يدخل الحصة (${p}) للصف ${r.c} حتى الساعة ${out.at}.` });
+          text: tplText(cfg, 'esc', r, p, out.at) || `تنبيه متابعة – ${cfg.school || ''}\nالأستاذ/ ${r.t} لم يدخل الحصة (${p}) للصف ${r.c} حتى الساعة ${out.at}.` });
     }
   }
 }
@@ -255,7 +262,10 @@ function waitLoad(tabId, ms) {
 /* ---------- الإرسال الآلي عبر واتساب ويب ---------- */
 function normPhone(p) { let d = String(p || '').replace(/\D/g, ''); if (!d) return ''; if (d.startsWith('00')) d = d.slice(2);
   if (d.startsWith('05') && d.length === 10) d = '966' + d.slice(1); else if (d.startsWith('5') && d.length === 9) d = '966' + d; return d; }
-function remindText(cfg, r, p) { const tm = (cfg.times[p - 1] || [''])[0];
+function fillTpl(t, v) { let s = String(t); const map = { 'الاسم': v.name, 'الحصة': v.period, 'الصف': v.class, 'الوقت': v.time, 'الرابط': v.link, 'المدرسة': v.school };
+  s = s.split('\n').filter(l => !(/\{الرابط\}/.test(l) && !v.link)).join('\n'); return s.replace(/\{([^{}]+)\}/g, (m, k) => k in map ? String(map[k] ?? '') : m); }
+function tplText(cfg, kind, r, p, time) { return cfg.tpl && cfg.tpl[kind] ? fillTpl(cfg.tpl[kind], { name: r.t, period: p, class: r.c, time: time || (cfg.times[p - 1] || [''])[0], link: r.l || '', school: cfg.school || '' }) : ''; }
+function remindText(cfg, r, p) { const own = tplText(cfg, 'rem', r, p); if (own) return own; const tm = (cfg.times[p - 1] || [''])[0];
   return `الأستاذ/ ${r.t}\nالسلام عليكم ورحمة الله وبركاته\nحصتك (${p}) للصف ${r.c} بدأت الساعة ${tm}، نأمل الدخول إلى الحصة الافتراضية الآن.` + (r.l ? `\nرابط الحصة: ${r.l}` : '') + `\nشاكرين تعاونكم\n${cfg.school || ''}`; }
 async function fallbackReport(cfg, date) { const res = (await chrome.storage.local.get('res:' + date))['res:' + date] || {};
   const v = Object.values(res).filter(x => x && x.final); const c = s => v.filter(x => x.st === s).length;
@@ -296,7 +306,7 @@ async function runWA(j) {
       : await waSendNow(ph, `✅ اختبار الإرسال الآلي من راصد\n${cfg.school || ''}`);
     await chrome.storage.local.set({ watest: { at: at(), ok: !!r.ok, err: r.err || '' } }); return;
   }
-  if (!({ rem: wa.remind, rep: wa.report, esc: wa.esc, pre: wa.pre })[j.kind]) return;
+  if (!({ rem: wa.remind, rep: wa.report, esc: wa.esc, pre: wa.pre, morn: wa.morn, week: wa.week })[j.kind]) return;
   const lk = 'walog:' + j.date; const log = (await chrome.storage.local.get(lk))[lk] || {};
   if (log[j.key] && log[j.key].ok) return;
   if (Object.values(log).filter(x => x.ok).length >= (wa.max || 40)) {
@@ -306,6 +316,7 @@ async function runWA(j) {
   let to = j.to, text = j.text, vars = j.vars || {};
   if (j.kind === 'rep') { to = cfg.mgrPh; text = (await chrome.storage.local.get('dayrep:' + j.date))['dayrep:' + j.date] || await fallbackReport(cfg, j.date);
     vars = (await chrome.storage.local.get('dayrepv:' + j.date))['dayrepv:' + j.date] || { school: cfg.school || '', date: j.date, ok: '-', late: '-', bad: '-', pct: '-' }; }
+  if (j.kind === 'morn' || j.kind === 'week') { to = cfg.mgrPh; const sk = (j.kind === 'morn' ? 'mornrep:' : 'weekrep:') + j.date; text = (await chrome.storage.local.get(sk))[sk] || ''; vars = { school: cfg.school || '', date: j.date }; }
   const ph = normPhone(to); if (!ph || !text) return;
   const r = apiMode(cfg) ? await apiSendSW(cfg, j.kind, ph, vars, text, j.key + '|' + j.date) : await waSendNow(ph, text);
   const log2 = (await chrome.storage.local.get(lk))[lk] || {};
@@ -437,5 +448,5 @@ async function preRemind(date, p) {
   const d = wdOf(date); if (d < 0) return; const W = new Set(cfg.watchT || []); const tm = (cfg.times[p - 1] || [''])[0];
   for (const r of cfg.rows.filter(x => x.d === d && x.p === p && x.ph && W.has(x.t)))
     enqueue({ wa: true, kind: 'pre', key: 'pre|' + mk(date, p, r.c), k: '', date, to: r.ph, name: r.t, vars: { name: r.t, period: String(p), class: r.c, time: tm, school: cfg.school || '' },
-      text: `الأستاذ/ ${r.t}\nالسلام عليكم ورحمة الله وبركاته\nتذكير بحصتك (${p}) للصف ${r.c} الساعة ${tm}.` + (r.l ? `\nرابط الحصة: ${r.l}` : '') + `\nشاكرين تعاونكم\n${cfg.school || ''}` });
+      text: tplText(cfg, 'pre', r, p, tm) || (`الأستاذ/ ${r.t}\nالسلام عليكم ورحمة الله وبركاته\nتذكير بحصتك (${p}) للصف ${r.c} الساعة ${tm}.` + (r.l ? `\nرابط الحصة: ${r.l}` : '') + `\nشاكرين تعاونكم\n${cfg.school || ''}`) });
 }

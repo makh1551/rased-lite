@@ -22,6 +22,10 @@ const TPL: Record<string, { slug: string; vars: string[] }> = {
   esc:  { slug: "rased_followup", vars: ["name", "period", "class", "time", "school"] },
   rep:  { slug: "rased_day",      vars: ["school", "date", "ok", "late", "bad", "pct"] },
   test: { slug: "rased_test",     vars: ["school"] },
+  morn: { slug: "rased_morning", vars: ["school", "date"] },
+  week: { slug: "rased_week",    vars: ["school", "date"] },
+  thanks: { slug: "rased_thanks", vars: ["name", "school"] },
+  nudge: { slug: "rased_nudge",  vars: ["name", "school"] },
 };
 
 function e164(p: string): string {
