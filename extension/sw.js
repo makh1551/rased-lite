@@ -31,6 +31,7 @@ async function schedule() {
   chrome.alarms.create('tick', { periodInMinutes: 30 });
   chrome.alarms.create('watch', { periodInMinutes: 5 });
   chrome.alarms.create('upd', { periodInMinutes: 360 });
+  chrome.alarms.create('mweek', { periodInMinutes: 60 });
   prune();
   const cfg = await getCfg();
   if (cfg && cfg.auto && cfg.auto.on) {
@@ -54,6 +55,7 @@ chrome.alarms.onAlarm.addListener(a => {
   if (a.name === 'tick') return schedule();
   if (a.name === 'watch') return watch();
   if (a.name === 'upd') return checkUpdate();
+  if (a.name === 'mweek') return madrasatiWeekly();
   const [kind, date, p, n] = a.name.split('|');
   if (kind === 'chk') enqueue({ date, p: +p, n: +n });
   if (kind === 'pre') enqueue({ pre: true, date, p: +p });
@@ -65,6 +67,8 @@ chrome.runtime.onMessage.addListener((m, s, send) => {
   if (!m) return;
   if (m.cmd === 'runNow') { enqueue({ date: m.date, p: +m.p, force: true }); send({ ok: 1 }); }
   if (m.cmd === 'test') { enqueue({ test: true, link: m.link, teacher: m.teacher }); send({ ok: 1 }); }
+  if (m.cmd === 'openApp') { openApp(); send({ ok: 1 }); }
+  if (m.cmd === 'mpOpen') { openMadrasati(); send({ ok: 1 }); }
   if (m.cmd === 'waTest') { enqueue({ wa: true, waTest: true, kind: 'test', key: 'test', date: ymd(new Date()), name: 'المدير' }); send({ ok: 1 }); }
 });
 
@@ -379,4 +383,26 @@ async function stamp(dataUrl, text) {
   const u8 = new Uint8Array(await blob.arrayBuffer()); let bin = '';
   for (let i = 0; i < u8.length; i += 0x8000) bin += String.fromCharCode.apply(null, u8.subarray(i, i + 0x8000));
   return 'data:image/jpeg;base64,' + btoa(bin);
+}
+
+/* ---------- جدول مدرستي: فتح اللوحة، والتحديث الأسبوعي صباح الأحد ---------- */
+const MAD = 'https://schools.madrasati.sa/';
+async function openMadrasati() {
+  await chrome.storage.local.set({ mreq: Date.now() });
+  const tabs = await chrome.tabs.query({ url: MAD + '*' });
+  if (tabs[0]) { await chrome.tabs.update(tabs[0].id, { active: true }); chrome.windows.update(tabs[0].windowId, { focused: true });
+    try { await chrome.tabs.sendMessage(tabs[0].id, { cmd: 'mpOpen' }); await chrome.storage.local.remove('mreq'); } catch (e) {} }
+  else chrome.tabs.create({ url: MAD + 'SchoolStructure/ClassRooms' });
+}
+async function madrasatiWeekly() {
+  const cfg = await getCfg(); if (!cfg || !cfg.auto || !cfg.auto.mweekly) return;
+  const now = new Date(); if (now.getDay() !== 0 || now.getHours() < 6 || now.getHours() > 13) return;
+  const today = ymd(now); const o = await chrome.storage.local.get(['mweekDone', 'mweekAsk']);
+  if (o.mweekDone === today) return;
+  const tabs = await chrome.tabs.query({ url: MAD + '*' });
+  for (const t of tabs) {
+    try { const r = await chrome.tabs.sendMessage(t.id, { cmd: 'mpAuto' }); if (r && r.ok) { await chrome.storage.local.set({ mweekDone: today }); return; } } catch (e) {}
+  }
+  if (o.mweekAsk !== today) { await chrome.storage.local.set({ mweekAsk: today });
+    notify('mweek', 'راصد · تحديث الجدول الأسبوعي', 'افتح منصة مدرستي وسجّل الدخول، وسيُحدَّث جدول راصد تلقائيًا خلال ساعة.'); }
 }

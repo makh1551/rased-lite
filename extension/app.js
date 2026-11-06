@@ -79,6 +79,35 @@ const EXT=!!(window.chrome&&chrome.runtime&&chrome.runtime.id&&chrome.storage&&c
 let AUTO={_date:null},PRE={},HB=null,TEST=null,UPD=null,WALOG={},WATEST=null,lastCfg='';
 S.auto.wa=Object.assign({remind:false,report:false,max:40},S.auto.wa||{});
 if(EXT)chrome.storage.local.get('upd').then(o=>{UPD=o.upd||null;if(UPD)render()});
+/* ---- سحب الجدول من منصة مدرستي (عبر الإضافة) ---- */
+let MP=null;
+function mpullSetupHTML(){if(isFol())return'';
+  if(!EXT)return `<div class="card small muted" style="margin-top:4px">🔄 <b>سحب الجدول تلقائيًا من مدرستي:</b> متاح عند فتح راصد من إضافة «راصد الآلي»؛ تقرأ جدول كل فصل ومعلميه وأنت مسجّل الدخول في مدرستي.</div>`;
+  return `<div class="card" style="display:grid;gap:8px;margin-top:4px"><b>🔄 سحب الجدول من منصة مدرستي</b>
+   <p class="small muted" style="margin:0">يفتح مدرستي (سجّل الدخول واختر المدرسة)، ثم اضغط «فحص عينة» للتأكد من الأسماء، ثم «سحب جدول كل الفصول». يُقرأ الجدول فقط ولا يُغيَّر شيء في مدرستي.</p>
+   <div class="bar-row" style="margin:0"><button class="btn primary" id="mpGo" type="button">سحب الجدول من مدرستي</button>${S.mpullAt?`<span class="small muted">آخر سحب: ${esc(new Date(S.mpullAt).toLocaleString('ar-SA-u-ca-gregory-nu-latn',{weekday:'long',hour:'2-digit',minute:'2-digit'}))}</span>`:''}</div>
+   <label style="display:flex;gap:8px;align-items:center" class="small"><input type="checkbox" id="mpWeek" ${S.auto.mweekly?'checked':''}> تحديث أسبوعي صباح كل أحد (إذا كانت مدرستي مفتوحة)، مع إشعار بالتغييرات قبل تطبيقها</label></div>`}
+function mpDiff(rows){const key=r=>r.d+'|'+r.p+'|'+r.c;const A={},B={};S.rows.forEach(r=>A[key(r)]=r);rows.forEach(r=>B[key(r)]=r);const out=[];
+  const nm=x=>normAr(x).replace(/\s/g,'');
+  for(const k in B){const a=A[k],b=B[k];if(!a)out.push({k,b,kind:'add'});else if(nm(a.t)!==nm(b.t))out.push({k,a,b,kind:'chg'})}
+  for(const k in A)if(!B[k])out.push({k,a:A[k],kind:'del'});return out}
+function onMpull(v){if(!v||!Array.isArray(v.rows)||!v.rows.length||isFol())return;if((S.mpullAt||0)>=v.at)return;
+  if(!v.auto){if(v.school&&(S.demo||/تجريبية|اسم مدرستك/.test(S.settings.school)))S.settings.school=v.school;S.mpullAt=v.at;MP=null;
+    applyRows({rows:v.rows.map(r=>Object.assign({},r)),bad:v.skipped||0});return}
+  const df=mpDiff(v.rows);if(!df.length){S.mpullAt=v.at;save();return}MP=Object.assign({},v,{diff:df});render()}
+function mpBar(){if(!MP||isFol())return'';return `<div class="alertbar" style="background:var(--accent-soft);color:var(--ink)">🔄 تغيّر الجدول في مدرستي: ${MP.diff.length} تغيير.
+  <div class="bar-row" style="margin-top:8px"><button class="btn primary" data-mp="show">عرض وتطبيق</button><button class="btn" data-mp="skip">تجاهل</button></div></div>`}
+function mpSheet(){const D=MP.diff;const lab={add:'حصة جديدة',chg:'تغيّر المعلم',del:'حُذفت'};
+  const d=document.createElement('div');d.className='sheet';d.innerHTML=`<div><h2 style="font-size:18px">تغييرات الجدول من مدرستي</h2>
+   <div class="tbl"><table><thead><tr><th>التغيير</th><th>اليوم</th><th>الحصة</th><th>الفصل</th><th>قبل</th><th>بعد</th></tr></thead><tbody>${D.slice(0,200).map(x=>{const r=x.b||x.a;
+    return `<tr><td>${lab[x.kind]}</td><td>${DAYS[r.d]}</td><td class="num">${r.p}</td><td>${esc(r.c)}</td><td>${esc(x.a?x.a.t:'—')}</td><td>${esc(x.b?x.b.t:'—')}</td></tr>`}).join('')}</tbody></table></div>
+   <div class="bar-row"><button class="btn primary" data-mp="apply">تطبيق التغييرات</button><button class="btn" data-mp="close">إغلاق</button></div></div>`;document.body.append(d)}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-mp]');if(!b)return;const k=b.dataset.mp;
+  if(k==='show')mpSheet();
+  if(k==='close'){const s=document.querySelector('.sheet');if(s)s.remove()}
+  if(k==='skip'){S.mpullAt=MP.at;MP=null;save();render()}
+  if(k==='apply'){const s=document.querySelector('.sheet');if(s)s.remove();const v=MP;MP=null;S.mpullAt=v.at;applyRows({rows:v.rows.map(r=>Object.assign({},r)),bad:0})}});
+if(EXT){chrome.storage.local.get('mpull').then(o=>onMpull(o.mpull));chrome.storage.onChanged.addListener((ch,a)=>{if(a==='local'&&ch.mpull)onMpull(ch.mpull.newValue)})}
 function updBar(){if(!EXT||!UPD)return'';return `<div class="alertbar" style="background:var(--accent-soft);color:var(--ink)">🔔 تحديث جديد لإضافة راصد ${esc(UPD.version)} (لديك ${esc(UPD.current)})${UPD.notes?': '+esc(UPD.notes):''}
   <div class="bar-row" style="margin-top:8px">${UPD.zip?`<a class="btn primary" href="${esc(UPD.zip)}" target="_blank" rel="noopener">${IC.dl} تنزيل التحديث</a>`:''}<span class="small" style="font-weight:500">فك الضغط داخل مجلد الإضافة نفسه (استبدال الملفات)، ثم اضغط ↻ على الإضافة في صفحة الإضافات. بياناتك لا تتأثر.</span></div></div>`}
 const PLANS={free:'المجانية',trial:'التجربة (14 يومًا)',basic:'الأساسية',pro:'الاحترافية'};
@@ -359,7 +388,7 @@ function render(){
     `<footer>راصد المبسّط · البيانات محفوظة على هذا الجهاز فقط<br><span class="credit">إعداد وتطوير: عبدالمجيد السيد · 0561955430</span> · جميع الحقوق محفوظة © 2026${PWA?' · <a href="about/">ما هو راصد؟</a>':''}</footer>`;
   bind();
 }
-function topBars(){return installBar()+planBar()+`${S.demo&&!isFol()?`<div class="demo-bar"><span>تعرض الآن <b>مدرسة تجريبية وهمية</b> للتجربة. ارفع جدول مدرستك من «الإعداد والجدول» لتبدأ.</span><button class="btn" id="wizB">ابدأ مدرستك في 3 خطوات</button></div>`:''}${updBar()}`}
+function topBars(){return installBar()+planBar()+`${S.demo&&!isFol()?`<div class="demo-bar"><span>تعرض الآن <b>مدرسة تجريبية وهمية</b> للتجربة. ارفع جدول مدرستك من «الإعداد والجدول» لتبدأ.</span><button class="btn" id="wizB">ابدأ مدرستك في 3 خطوات</button></div>`:''}${updBar()}${mpBar()}`}
 function header(){const cp=curPeriod(S.settings.times);const isToday=V.date===today();
   const tab=(id,t)=>`<a href="#${id}" ${V.tab===id?'aria-current="page"':''}>${t}</a>`;
   return `<header class="top"><div class="brand"><div><h1><span class="mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5 9 17 20 6"/></svg></span>راصد المبسّط</h1>
@@ -446,6 +475,7 @@ function setupView(){const s=S.settings;const nT=new Set(S.rows.map(r=>r.t)).siz
    <label class="drop" id="drop" for="file"><b>${IC.up} اختر ملف الجدول أو اسحبه هنا</b><br><span class="small muted">xlsx · xls · csv</span>
     <input type="file" id="file" accept=".xlsx,.xls,.csv,text/csv" hidden></label>
    <p class="small muted" style="margin:0">يقبل أيضًا ملف «الخطة الأسبوعية» المصدَّر من مدرستي كما هو، ويُحتفظ بجوالات المعلمين وروابط Teams المحفوظة سابقًا.</p>
+   ${mpullSetupHTML()}
    <details><summary class="small" style="cursor:pointer;font-weight:600;color:var(--accent)">أو الصق الجدول مباشرة من Excel أو منصة مدرستي</summary>
     <textarea class="pastebox" id="pasteT" placeholder="حدّد الجدول مع صف العناوين في Excel، انسخه (Ctrl+C) والصقه هنا (Ctrl+V)" style="margin-top:8px"></textarea>
     <div style="margin-top:8px"><button class="btn primary" id="pasteB" type="button">قراءة الجدول الملصوق</button></div></details>
@@ -531,6 +561,8 @@ function bindSetup(){
     const tg=()=>{const c=sec.classList.toggle('closed');h.setAttribute('aria-expanded',!c);c?OPENSEC.delete(i):OPENSEC.add(i)};
     h.onclick=tg;h.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();tg()}}});
   $('#dlTpl').onclick=()=>saveFile('قالب-جدول-راصد.csv',tplCSV(),'text/csv');
+  const mg=$('#mpGo');if(mg)mg.onclick=()=>{chrome.runtime.sendMessage({cmd:'mpOpen'});toast('افتح مدرستي واتبع اللوحة الظاهرة أسفل الصفحة')};
+  const mw=$('#mpWeek');if(mw)mw.onchange=()=>{S.auto.mweekly=mw.checked;save();toast(mw.checked?'فُعّل التحديث الأسبوعي':'أُوقف التحديث الأسبوعي')};
   $('#cpTpl').onclick=()=>copyText(TPL_HEAD.join('\t')+'\nالأحد\t1\tالأول أ\tاسم المعلم\t05xxxxxxxx\t');
   const drop=$('#drop'),fi=$('#file');
   fi.onchange=()=>fi.files[0]&&readSchedule(fi.files[0]);
