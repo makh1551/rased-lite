@@ -99,3 +99,7 @@ begin
     from (select * from public.lite_send_log where code = c and at > now() - make_interval(days => least(greatest(coalesce(p_days,7),1),90)) order by at desc limit 1000) x));
 end $$;
 grant execute on function public.lite_send_list(text,text,int) to anon, authenticated;
+
+-- الرقم كاملًا في الأرشيف (طلب ماجد)
+alter table public.lite_send_log add column if not exists to_phone text;
+-- lite_send_list تعيد الحقل phone

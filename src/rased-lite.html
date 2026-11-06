@@ -1314,12 +1314,12 @@ const SRC_ERR=e=>String(e||'').replace(/wsk_[A-Za-z0-9]+/g,'wsk_••••').s
 async function openArchive(days){days=days||1;const since=addD(today(),-(days-1));const rows=[];let srvErr='';
   if(S.sync&&S.sync.role==='mgr'){try{const r=await rpc('lite_send_list',{p_code:S.sync.code,p_key:S.sync.key,p_days:days});
     (r.list||[]).forEach(x=>{const m=String(x.dkey||'').match(/(\d{4}-\d{2}-\d{2})\|(\d)\|([^|]+)/);const d=new Date(x.at);
-      rows.push({at:d,day:ymd(d),time:`${pad(d.getHours())}:${pad(d.getMinutes())}`,kind:KIND[x.kind]||x.kind,who:x.name||'',where:m?`الحصة ${m[2]} – ${m[3]}`:'',to:x.to?'•••'+x.to:'',via:x.ch==='sms'?'رسالة نصية':x.ch==='whatsapp'?'واتساب (الخادم)':'—',ok:x.ok,err:SRC_ERR(x.err)})})}
+      rows.push({at:d,day:ymd(d),time:`${pad(d.getHours())}:${pad(d.getMinutes())}`,kind:KIND[x.kind]||x.kind,who:x.name||'',where:m?`الحصة ${m[2]} – ${m[3]}`:'',to:x.phone||(x.to?'•••'+x.to:''),via:x.ch==='sms'?'رسالة نصية':x.ch==='whatsapp'?'واتساب (الخادم)':'—',ok:x.ok,err:SRC_ERR(x.err)})})}
     catch(e){srvErr=String(e.message||e)}}
   const srvOn=S.sync&&S.sync.role==='mgr'&&!srvErr;
   for(const[k,v]of Object.entries(S.sent)){const[d,p,c]=k.split('|');if(!d||d<since)continue;const auto=String(v).includes('🤖'),api=/📨|✉️/.test(String(v));if(api&&srvOn)continue;
     const tm=String(v).replace(/[^\d:]/g,'');const at=new Date(`${d}T${tm||'00:00'}:00`);const r=S.rows.find(x=>x.d===wd(d)&&x.p===+p&&x.c===c);
-    rows.push({at,day:d,time:tm,kind:'تذكير المعلم',who:teacherOf(k,S.marks[k])||(r&&r.t)||'',where:`الحصة ${p} – ${c}`,to:r&&r.ph?'•••'+String(r.ph).slice(-4):'',via:auto?'واتساب ويب (آلي)':api?'الخادم':'واتساب الجهاز',ok:true,err:''})}
+    rows.push({at,day:d,time:tm,kind:'تذكير المعلم',who:teacherOf(k,S.marks[k])||(r&&r.t)||'',where:`الحصة ${p} – ${c}`,to:r&&r.ph?cleanPh(r.ph)||r.ph:'',via:auto?'واتساب ويب (آلي)':api?'الخادم':'واتساب الجهاز',ok:true,err:''})}
   rows.sort((a,b)=>b.at-a.at);const ok=rows.filter(r=>r.ok).length,bad=rows.length-ok;const byK={};rows.forEach(r=>byK[r.kind]=(byK[r.kind]||0)+1);
   document.querySelectorAll('.sheet.arch').forEach(x=>x.remove());
   const el=document.createElement('div');el.className='sheet arch';el.innerHTML=`<div role="dialog" aria-label="أرشيف الإرسال">
