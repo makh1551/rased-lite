@@ -96,6 +96,14 @@ Deno.serve(async (req) => {
       if (r.ok && j.success !== false && !j.error) { channel = "whatsapp"; id = String(j.id || j.message_id || j.data?.id || ""); } else addErr("الواتس المباشر: " + (j.message || j.error || r.status));
     } catch (e) { addErr("الواتس المباشر: " + e); }
   }
+  if (!channel && text && W.provider === "corbit" && W.token) {
+    try {
+      const r = await fetch("https://api.corbit.sa/wa/api/v1/messages", { method: "POST", headers: { Authorization: "Bearer " + W.token, "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify({ to: digits, text }) });
+      const j: any = await r.json().catch(() => ({}));
+      if (r.ok && j.success !== false) { channel = "whatsapp"; id = String(j.data?.message_id || ""); } else addErr("Corbit واتساب: " + (j.message || j.code || r.status));
+    } catch (e) { addErr("Corbit واتساب: " + e); }
+  }
   // 2) رسائل نصية عبر مزوّد سعودي للمدرسة
   if (!channel && text && M.provider === "taqnyat" && M.token && M.sender) {
     try {
@@ -104,6 +112,16 @@ Deno.serve(async (req) => {
       const j: any = await r.json().catch(() => ({}));
       if (r.status === 201 || j.statusCode === 201) { channel = "sms"; id = String(j.messageId || ""); } else addErr("Taqnyat: " + (j.message || r.status));
     } catch (e) { addErr("Taqnyat: " + e); }
+  }
+  if (!channel && text && M.provider === "corbit" && M.token && M.sender) {
+    try {
+      const h: Record<string, string> = { Authorization: "Bearer " + M.token, "Content-Type": "application/json", Accept: "application/json" };
+      if (dkey !== "-") h["Idempotency-Key"] = ("rased/" + code + "/" + dkey).slice(0, 250);
+      const r = await fetch("https://api.corbit.sa/api/v1/send", { method: "POST", headers: h,
+        body: JSON.stringify({ senderName: M.sender, number: digits, messageBody: text.slice(0, 1600), sendAtOption: "NOW" }) });
+      const j: any = await r.json().catch(() => ({}));
+      if (r.ok && j.status === "Success") { channel = "sms"; id = String(j.data?.message?.id || ""); } else addErr("Corbit SMS: " + (j.code || j.message || r.status));
+    } catch (e) { addErr("Corbit SMS: " + e); }
   }
   if (!channel && text && M.provider === "msegat" && M.user && M.token && M.sender) {
     try {
