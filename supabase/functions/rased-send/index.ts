@@ -143,6 +143,6 @@ Deno.serve(async (req) => {
     if (r.ok) { channel = "sms"; id = j.id || ""; } else addErr("Bird SMS: " + (j?.code || r.status));
   }
   if (!channel && !err) err = "no_channel";
-  await sb.from("lite_send_log").insert({ code, kind, dkey: dkey === "-" ? null : dkey, to_tail: to.slice(-4), channel: channel || null, ok: !!channel, err: channel ? null : (err || null), msg_id: id || null });
+  await sb.from("lite_send_log").insert({ code, kind, dkey: dkey === "-" ? null : dkey, to_tail: to.slice(-4), to_name: v.name ? clip(v.name, 80) : null, channel: channel || null, ok: !!channel, err: channel ? null : (err || null), msg_id: id || null });
   return channel ? json({ ok: true, channel, id }) : json({ err: "send", detail: err });
 });

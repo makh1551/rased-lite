@@ -619,7 +619,7 @@ function sendSetupHTML(){if(isFol())return'';const via=(S.auto.wa&&S.auto.wa.via
      <div id="smsUserW" ${M.provider==='msegat'?'':'hidden'}>${inp('smsUser','اسم المستخدم في مسجات',M.user)}</div></div>
     <p class="small muted" style="margin:0">🔒 الرموز تُحفظ على الخادم ولا تُعرض بعد الحفظ (تظهر مخفية ••••).</p>
     <div class="bar-row" style="margin:0"><button class="btn" id="apiTest" type="button">رسالة اختبار لجوال المدير</button><span class="small" id="apiOut"></span></div></div>`:''}
-   <div><button class="btn primary" id="viaSave" type="button">حفظ</button></div></div></div>`}
+   <div class="bar-row" style="margin:0"><button class="btn primary" id="viaSave" type="button">حفظ</button><button class="btn" data-archive type="button">📜 أرشيف الإرسال</button></div></div></div>`}
 function bindSend(){
   const wp=$('#waProv');if(wp)wp.onchange=()=>{$('#waUrlW').hidden=wp.value!=='greenapi';$('#waInstW').hidden=wp.value==='smartwhats';$('#waTok').placeholder=wp.value==='smartwhats'?'مفتاح API (wsk_...)':'Token'};
   const sp=$('#smsProv');if(sp)sp.onchange=()=>{$('#smsUserW').hidden=sp.value!=='msegat';$('#smsTok').placeholder=sp.value==='unifonic'?'AppSid':sp.value==='msegat'?'API Key':'Bearer Token'};
@@ -723,7 +723,7 @@ function nowView(){const d=wd(V.date);
   const w=x=>t.total?(x/t.total*100):0;
   h+=`<div class="prog" aria-hidden="true"><i class="ok" style="width:${w(t.ok)}%"></i><i class="late" style="width:${w(t.late)}%"></i><i class="bad" style="width:${w(t.bad)}%"></i></div>
    <div class="legend num"><span>رُصد <b>${t.total-t.un}</b> من ${t.total}</span><span>حاضر <b>${t.ok}</b></span><span>متأخر <b>${t.late}</b></span><span>غائب <b>${t.bad}</b></span>${t.nl?`<span>بلا رابط <b>${t.nl}</b></span>`:''}</div>${autoBarHTML()}${bulk.length?`<div class="autobar"><button class="btn wa hot" id="bulkB">${IC.wa} تذكير جماعي (${bulk.length})</button><span>لمن لم يُرصد حضوره أو سُجّل غائبًا/متأخرًا ولم يُذكَّر</span></div>`:''}
-   <div class="bar-row"><button class="btn" id="quickB" type="button">⚡ الوضع السريع</button>${notiBtnHTML()}</div>
+   <div class="bar-row"><button class="btn" id="quickB" type="button">⚡ الوضع السريع</button>${!isFol()?'<button class="btn" data-archive type="button">📜 أرشيف الإرسال</button>':''}${notiBtnHTML()}</div>
    <div class="list">`;
   list.forEach(r=>{const k=mk(V.date,r.p,r.c);const m=S.marks[k];const sent=S.sent[k];const ph=normPhone(r.ph);
     h+=`<div class="row" data-st="${m?m.st:''}"><div class="who"><div class="cls">${esc(r.c)}</div><div class="tch"><button class="tlink" data-teacher="${esc(r.t)}">الأستاذ/ ${esc(r.t)}</button></div>${r.s?`<div class="les" title="${esc(r.s)}">📘 ${esc(r.s)}</div>`:''}</div>
@@ -1308,6 +1308,36 @@ async function orderPlan(plan){if(!S.sync){toast('فعّل المزامنة أو
     d.onclick=e=>{if(e.target===d||e.target.closest('[data-ox]'))d.remove()};document.body.append(d)}
   catch(e){toast(String(e.message||e))}}
 document.addEventListener('click',e=>{const b=e.target.closest('[data-order]');if(b)orderPlan(b.dataset.order)});
+
+/* ---- أرشيف الإرسال: رسائل الخادم + ما أُرسل من واتساب الجهاز ---- */
+const KIND={rem:'تذكير المعلم',pre:'تذكير قبل الحصة',esc:'تنبيه متابعة',rep:'تقرير اليوم',morn:'تقرير الصباح',week:'تقرير الأسبوع',thanks:'رسالة شكر',nudge:'تنبيه ودّي',test:'رسالة اختبار'};
+const SRC_ERR=e=>String(e||'').replace(/wsk_[A-Za-z0-9]+/g,'wsk_••••').slice(0,140);
+async function openArchive(days){days=days||1;const since=addD(today(),-(days-1));const rows=[];let srvErr='';
+  if(S.sync&&S.sync.role==='mgr'){try{const r=await rpc('lite_send_list',{p_code:S.sync.code,p_key:S.sync.key,p_days:days});
+    (r.list||[]).forEach(x=>{const m=String(x.dkey||'').match(/(\d{4}-\d{2}-\d{2})\|(\d)\|([^|]+)/);const d=new Date(x.at);
+      rows.push({at:d,day:ymd(d),time:`${pad(d.getHours())}:${pad(d.getMinutes())}`,kind:KIND[x.kind]||x.kind,who:x.name||'',where:m?`الحصة ${m[2]} – ${m[3]}`:'',to:x.to?'•••'+x.to:'',via:x.ch==='sms'?'رسالة نصية':x.ch==='whatsapp'?'واتساب (الخادم)':'—',ok:x.ok,err:SRC_ERR(x.err)})})}
+    catch(e){srvErr=String(e.message||e)}}
+  const srvOn=S.sync&&S.sync.role==='mgr'&&!srvErr;
+  for(const[k,v]of Object.entries(S.sent)){const[d,p,c]=k.split('|');if(!d||d<since)continue;const auto=String(v).includes('🤖'),api=/📨|✉️/.test(String(v));if(api&&srvOn)continue;
+    const tm=String(v).replace(/[^\d:]/g,'');const at=new Date(`${d}T${tm||'00:00'}:00`);const r=S.rows.find(x=>x.d===wd(d)&&x.p===+p&&x.c===c);
+    rows.push({at,day:d,time:tm,kind:'تذكير المعلم',who:teacherOf(k,S.marks[k])||(r&&r.t)||'',where:`الحصة ${p} – ${c}`,to:r&&r.ph?'•••'+String(r.ph).slice(-4):'',via:auto?'واتساب ويب (آلي)':api?'الخادم':'واتساب الجهاز',ok:true,err:''})}
+  rows.sort((a,b)=>b.at-a.at);const ok=rows.filter(r=>r.ok).length,bad=rows.length-ok;const byK={};rows.forEach(r=>byK[r.kind]=(byK[r.kind]||0)+1);
+  document.querySelectorAll('.sheet.arch').forEach(x=>x.remove());
+  const el=document.createElement('div');el.className='sheet arch';el.innerHTML=`<div role="dialog" aria-label="أرشيف الإرسال">
+   <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><h2 style="font-size:19px">📜 أرشيف الإرسال</h2><button class="btn" data-ax>إغلاق</button></div>
+   <div class="tabs" style="margin:0">${[[1,'اليوم'],[7,'7 أيام'],[30,'30 يومًا']].map(([v,t])=>`<a href="#" data-ad="${v}" ${v===days?'aria-current="page"':''}>${t}</a>`).join('')}</div>
+   <div class="stats num"><div class="stat"><b>${rows.length}</b><span>رسالة</span></div><div class="stat ok"><b>${ok}</b><span>أُرسلت</span></div><div class="stat bad"><b>${bad}</b><span>تعذّر</span></div><div class="stat"><b>${Object.keys(byK).length}</b><span>نوع</span></div></div>
+   ${Object.keys(byK).length?`<div class="small muted">${Object.entries(byK).map(([k,n])=>`${k}: <b>${n}</b>`).join(' · ')}</div>`:''}
+   ${srvErr?`<div class="alertbar">تعذّر جلب سجل الخادم: ${esc(srvErr)}</div>`:''}
+   ${!S.sync?'<p class="small muted" style="margin:0">يعرض ما أُرسل من هذا الجهاز. فعّل المزامنة ليظهر سجل الإرسال من الخادم أيضًا.</p>':''}
+   ${rows.length?`<div class="tbl" style="max-height:60vh;overflow:auto"><table class="num"><thead><tr><th>الوقت</th><th>النوع</th><th>بخصوص</th><th>الحصة</th><th>الجوال</th><th>الطريقة</th><th>الحالة</th></tr></thead><tbody>
+    ${rows.map(r=>`<tr><td>${days>1?esc(r.day.slice(5))+' ':''}${esc(r.time)}</td><td>${esc(r.kind)}</td><td>${r.who?'الأستاذ/ '+esc(r.who):'—'}</td><td>${esc(r.where)||'—'}</td><td dir="ltr">${esc(r.to)||'—'}</td><td>${esc(r.via)}</td><td>${r.ok?'<span class="pill ok">أُرسلت</span>':`<span class="pill bad" title="${esc(r.err)}">تعذّر</span><div class="small" style="color:var(--bad);white-space:normal;max-width:240px">${esc(r.err)}</div>`}</td></tr>`).join('')}</tbody></table></div>
+    <div class="bar-row" style="margin:0"><button class="btn" data-acsv>${IC.dl} تصدير CSV</button></div>`:'<div class="empty" style="margin:0">لا رسائل في هذه المدة.</div>'}</div>`;
+  el.addEventListener('click',e=>{if(e.target===el||e.target.closest('[data-ax]')){el.remove();return}const a=e.target.closest('[data-ad]');if(a){e.preventDefault();openArchive(+a.dataset.ad);return}
+    if(e.target.closest('[data-acsv]')){const q=v=>'"'+String(v??'').replace(/"/g,'""')+'"';const csv='﻿'+[['التاريخ','الوقت','النوع','بخصوص','الحصة','الجوال','الطريقة','الحالة','الخطأ'],...rows.map(r=>[r.day,r.time,r.kind,r.who,r.where,r.to,r.via,r.ok?'أُرسلت':'تعذّر',r.err])].map(x=>x.map(q).join(',')).join('\n');
+      saveFile(`أرشيف-الإرسال-${today()}.csv`,csv,'text/csv')}});
+  document.body.append(el)}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-archive]');if(b){e.preventDefault();openArchive(1)}});
 
 /* ============ التوجيه والساعة ============ */
 function route(){V.anim=true;setTimeout(()=>{V.anim=false},50);const h=(location.hash||'').slice(1);V.tab=['now','day','week','month','setup'].includes(h)?h:'now';render();window.scrollTo(0,0)}

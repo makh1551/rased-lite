@@ -86,3 +86,16 @@ end $$;
 revoke all on function public.lite_mask(jsonb) from public, anon, authenticated;
 grant execute on function public.lite_send_cfg_get(text,text) to anon, authenticated;
 grant execute on function public.lite_send_cfg_set(text,text,jsonb,jsonb) to anon, authenticated;
+
+-- أرشيف الإرسال (طُبّق 6 نوفمبر)
+alter table public.lite_send_log add column if not exists to_name text;
+create or replace function public.lite_send_list(p_code text, p_key text, p_days int)
+returns jsonb language plpgsql security definer set search_path = public, extensions as $$
+declare r text; c text := upper(replace(p_code,'-',''));
+begin
+  r := public.lite_role(p_code, p_key);
+  if r <> 'mgr' then return jsonb_build_object('err', case when r = 'fol' then 'mgr_only' else r end); end if;
+  return jsonb_build_object('ok', true, 'list', (select coalesce(jsonb_agg(jsonb_build_object('kind',kind,'dkey',dkey,'to',to_tail,'name',to_name,'ch',channel,'ok',ok,'err',err,'at',at) order by at desc),'[]'::jsonb)
+    from (select * from public.lite_send_log where code = c and at > now() - make_interval(days => least(greatest(coalesce(p_days,7),1),90)) order by at desc limit 1000) x));
+end $$;
+grant execute on function public.lite_send_list(text,text,int) to anon, authenticated;
