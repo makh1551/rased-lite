@@ -1,0 +1,403 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>الملف التعريفي | رايا لوب RAYA LOOP</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap">
+<style>
+@page{size:A4;margin:0}
+:root{
+  --navy-950:#051631;--navy:#0B2B55;--navy-700:#123A6E;--blue:#1B5296;
+  --silver-500:#8E97A8;--silver:#A9B1BF;--silver-300:#C9CFD9;--silver-100:#E6EAF0;--ice:#F3F5F9;
+  --ink:#0E1A2B;--body:#33405A;--muted:#5A6577;--line:#DDE2EA;
+  --sg:linear-gradient(100deg,#8E97A8 0%,#E4E8EE 50%,#9AA3B3 100%);
+}
+*{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+html,body{margin:0;padding:0;background:#c8cdd6}
+body{font-family:'IBM Plex Sans Arabic',Tahoma,sans-serif;color:var(--ink);font-size:10.6pt;line-height:1.75}
+.page{width:210mm;height:297mm;position:relative;overflow:hidden;background:#fff;page-break-after:always;break-after:page;margin:0 auto}
+@media screen{.page{margin:10mm auto;box-shadow:0 10px 30px rgba(0,0,0,.2)}}
+h1,h2,h3,h4{margin:0;color:var(--navy);line-height:1.35}
+p{margin:0}
+.en{direction:ltr;unicode-bidi:isolate}
+.abs{position:absolute}
+.sw{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+
+/* inner page chrome */
+.inner{padding:30mm 18mm 26mm}
+.top{position:absolute;top:11mm;inset-inline:18mm;display:flex;justify-content:space-between;align-items:center}
+.top img{height:13mm}
+.top .sec{font-size:8.5pt;color:var(--silver-500);letter-spacing:.06em;font-weight:500}
+.bot{position:absolute;bottom:0;inset-inline:0;height:20mm}
+.bot .row{position:absolute;bottom:7mm;inset-inline:18mm;display:flex;justify-content:space-between;font-size:8pt;color:var(--muted)}
+.bot .pn{font-weight:700;color:var(--navy)}
+
+.kicker{display:inline-flex;align-items:center;gap:3mm;font-size:9.5pt;font-weight:600;color:var(--blue);margin-bottom:3mm}
+.kicker::before{content:"";width:9mm;height:1.2mm;border-radius:1mm;background:var(--sg)}
+.title{font-size:25pt;font-weight:700;margin-bottom:6mm}
+.lead{font-size:11.5pt;color:var(--body);line-height:1.9}
+.lead + .lead{margin-top:3.5mm}
+.quote{margin-top:8mm;padding:6mm 8mm;border-radius:4mm;background:var(--navy);color:#fff;font-size:13pt;font-weight:600;line-height:1.7;position:relative;overflow:hidden}
+.quote::after{content:"";position:absolute;inset-inline-start:0;top:0;bottom:0;width:2mm;background:var(--sg)}
+.note{margin-top:7mm;text-align:center;font-weight:600;color:var(--navy);font-size:11.5pt}
+.note::before,.note::after{content:"";display:inline-block;width:10mm;height:.6mm;background:var(--sg);vertical-align:middle;margin-inline:3mm}
+
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:5mm}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:4.5mm}
+.card{border:.3mm solid var(--line);border-radius:4mm;padding:5.5mm 6mm;background:#fff}
+.card.ice{background:var(--ice);border-color:var(--ice)}
+.card.navy{background:var(--navy);border-color:var(--navy);color:#fff}
+.card.navy h3,.card.navy h4{color:#fff}
+.card.navy p{color:#C9D1DE}
+.card h3{font-size:13pt;margin-bottom:2mm}
+.card h4{font-size:11.5pt;margin-bottom:2mm}
+.card p{color:var(--body);font-size:10pt;line-height:1.7}
+.no{font-size:9pt;font-weight:700;color:var(--silver-500);letter-spacing:.1em;display:block;margin-bottom:1mm}
+ul.dots{list-style:none;margin:0;padding:0;display:grid;gap:1.4mm}
+ul.dots li{position:relative;padding-inline-start:4.5mm;font-size:9.8pt;color:var(--body);line-height:1.6}
+ul.dots li::before{content:"";position:absolute;inset-inline-start:0;top:2.2mm;width:2mm;height:2mm;border-radius:50%;background:var(--sg)}
+
+/* track header */
+.track-head{display:flex;gap:6mm;align-items:center;margin-bottom:6mm}
+.track-no{flex:none;width:22mm;height:22mm;border-radius:6mm;background:var(--navy);color:#fff;display:grid;place-items:center;font-size:20pt;font-weight:700;position:relative;overflow:hidden}
+.track-no::after{content:"";position:absolute;inset:auto -4mm -5mm -4mm;height:9mm;background:var(--sg);transform:rotate(-12deg)}
+.track-no span{position:relative;z-index:1}
+.track-head h2{font-size:21pt;font-weight:700}
+.track-head .tg{color:var(--blue);font-size:11.5pt;font-weight:500}
+.band{background:var(--ice);border-radius:4mm;padding:5mm 7mm;margin-bottom:6mm;font-size:10.6pt;color:var(--body);line-height:1.85}
+
+/* cover */
+.cover{background:radial-gradient(120% 80% at 85% 5%,var(--navy-700) 0%,var(--navy) 45%,var(--navy-950) 100%);color:#fff}
+.cover .logo{position:absolute;top:58mm;left:50%;transform:translateX(-50%);width:92mm}
+.cover .t{position:absolute;top:160mm;inset-inline:18mm;text-align:center}
+.cover .t h1{color:#fff;font-size:30pt;font-weight:700}
+.cover .t h1 span{background:var(--sg);-webkit-background-clip:text;background-clip:text;color:transparent}
+.cover .t p{color:#C9D1DE;font-size:12pt;margin-top:4mm}
+.cover .t .en{color:var(--silver);font-size:11pt;margin-top:3mm;letter-spacing:.04em}
+.cover .lbl{position:absolute;top:16mm;inset-inline-start:18mm;font-size:9pt;letter-spacing:.1em;color:var(--silver-300);border:.3mm solid rgba(255,255,255,.25);border-radius:10mm;padding:1.5mm 5mm}
+.cover .foot{position:absolute;bottom:14mm;inset-inline:18mm;display:flex;justify-content:space-between;font-size:9pt;color:#C9D1DE}
+
+/* loop */
+.loop{display:grid;grid-template-columns:72mm 1fr;gap:7mm;align-items:center}
+.steps{display:grid;gap:3mm}
+.step{display:grid;grid-template-columns:11mm 1fr;gap:4mm;align-items:start;border:.3mm solid var(--line);border-radius:3.5mm;padding:2.6mm 4.5mm}
+.step .n{width:11mm;height:11mm;border-radius:50%;display:grid;place-items:center;background:var(--ice);border:.5mm solid var(--silver-300);font-weight:700;color:var(--navy);font-size:10pt}
+.step h4{font-size:11.5pt}
+.step .s{color:var(--blue);font-size:9.3pt;font-weight:500}
+.step p{font-size:9.1pt;color:var(--body);line-height:1.55}
+
+.chain{display:flex;justify-content:center;align-items:center;gap:2mm;margin-top:7mm;flex-wrap:nowrap}
+.chain span{border:.3mm solid var(--line);border-radius:10mm;padding:2mm 4mm;font-weight:600;color:var(--navy);font-size:9.6pt;white-space:nowrap;background:#fff}
+.chain span:last-child{background:var(--navy);color:#fff;border-color:var(--navy)}
+.chain i{font-style:normal;color:var(--silver-500)}
+
+.word{display:flex;align-items:baseline;gap:4mm;margin-bottom:2mm}
+.word b{font-size:24pt;color:var(--navy)}
+.word .en{font-size:11pt;letter-spacing:.3em;color:var(--silver-500);font-weight:600}
+
+.contact{display:grid;grid-template-columns:1fr 1fr;gap:4mm;margin-top:10mm}
+.ci{border:.3mm solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);border-radius:4mm;padding:5mm 6mm}
+.ci small{display:block;color:var(--silver);font-size:8.5pt}
+.ci b{font-size:12.5pt;font-weight:600}
+</style>
+</head>
+<body>
+
+<!-- shared swoosh gradient defs -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <linearGradient id="sgv" x1="0" x2="1"><stop offset="0" stop-color="#8E97A8" stop-opacity="0"/><stop offset=".5" stop-color="#E4E8EE" stop-opacity=".85"/><stop offset="1" stop-color="#9AA3B3" stop-opacity=".25"/></linearGradient>
+  <linearGradient id="sgs" x1="0" x2="1"><stop offset="0" stop-color="#8E97A8"/><stop offset=".5" stop-color="#E4E8EE"/><stop offset="1" stop-color="#9AA3B3"/></linearGradient>
+</defs></svg>
+
+<!-- 1 COVER -->
+<section class="page cover">
+  <svg class="sw" viewBox="0 0 210 297" preserveAspectRatio="none"><path d="M-10 250 C 40 232, 90 268, 140 246 S 200 214, 225 220" fill="none" stroke="url(#sgv)" stroke-width="3.2" stroke-linecap="round"/><path d="M-10 258 C 45 242, 95 276, 145 254 S 205 224, 225 229" fill="none" stroke="url(#sgv)" stroke-width=".8" opacity=".7"/><circle cx="185" cy="20" r="55" fill="none" stroke="#fff" stroke-opacity=".04" stroke-width="12"/></svg>
+  <span class="lbl">الملف التعريفي</span>
+  <img class="logo" src="/assets/img/logo-white.svg" alt="رايا لوب RAYA LOOP">
+  <div class="t">
+    <h1>نصنع الفرص.. <span>ونستدام بالأثر</span></h1>
+    <p>من الفكرة إلى المشروع، ومن الموارد إلى الفرص، ومن التشغيل إلى الاستدامة.</p>
+    <p class="en">Creating Opportunities. Sustaining Impact.</p>
+  </div>
+  <div class="foot"><span class="en">rayaloop.com</span><span>المملكة العربية السعودية</span></div>
+</section>
+
+<!-- 2 ABOUT -->
+<section class="page">
+  <div class="top"><img src="/assets/img/logo-color.svg" alt=""><span class="sec">من نحن</span></div>
+  <div class="inner">
+    <span class="kicker">من نحن؟</span>
+    <h2 class="title">شريك في التطوير..<br>وصانع للفرص</h2>
+    <p class="lead"><b style="color:var(--navy)">رايا لوب | RAYA LOOP</b> مؤسسة متخصصة في تقديم الحلول الاستشارية والتنموية والتشغيلية المتكاملة، تسعى إلى تطوير المنظمات وتمكينها من تحقيق أهدافها، وتعظيم الاستفادة من مواردها وإمكاناتها، وتحويل أفكارها وتحدياتها إلى فرص ومشاريع تحقق قيمة اقتصادية وأثرًا مستدامًا.</p>
+    <p class="lead">نركز بصورة رئيسية على تطوير وتمكين القطاع غير الربحي، مع امتداد خدماتنا إلى القطاعين الحكومي والخاص، من خلال منظومة متكاملة تجمع بين التطوير المؤسسي والحوكمة وصناعة المشاريع والاستثمار والاستدامة المالية والتحول الرقمي والتشغيل.</p>
+    <p class="lead">نؤمن بأن النجاح لا يتحقق بالتخطيط وحده، بل بتكامل الرؤية مع التنفيذ، وتحويل الفرص إلى مشاريع، والمشاريع إلى عوائد، والعوائد إلى استدامة.</p>
+    <p class="lead">ولهذا نقدم نموذج عمل يجمع بين الاستشارة والتطوير وصناعة الفرص والتمكين والتنفيذ والتشغيل، لنكون شريكًا فاعلًا في رحلة النمو، لا مجرد مقدم خدمة.</p>
+    <div class="g3" style="margin-top:8mm">
+      <div class="card ice" style="text-align:center"><b style="font-size:22pt;color:var(--navy);display:block;line-height:1.2">4</b><p>مسارات خدمية مترابطة</p></div>
+      <div class="card ice" style="text-align:center"><b style="font-size:22pt;color:var(--navy);display:block;line-height:1.2">6</b><p>مراحل في دورة العمل</p></div>
+      <div class="card ice" style="text-align:center"><b style="font-size:22pt;color:var(--navy);display:block;line-height:1.2">6</b><p>نماذج تعاون مرنة</p></div>
+    </div>
+    <div class="quote">لا نكتفي بتقديم الحلول.. بل نشارك في تحويلها إلى واقع يصنع القيمة والأثر.</div>
+  </div>
+  <div class="bot"><svg class="sw" viewBox="0 0 210 20" preserveAspectRatio="none"><path d="M0 14 C 50 8, 120 20, 210 6" fill="none" stroke="url(#sgs)" stroke-width=".7"/></svg><div class="row"><span class="en">rayaloop.com</span><span class="pn">02</span></div></div>
+</section>
+
+<!-- 3 PHILOSOPHY -->
+<section class="page">
+  <div class="top"><img src="/assets/img/logo-color.svg" alt=""><span class="sec">فلسفتنا</span></div>
+  <div class="inner">
+    <span class="kicker">فلسفتنا</span>
+    <h2 class="title">حلول مترابطة.. وفرص متجددة</h2>
+    <p class="lead">ينطلق اسم RAYA LOOP من فلسفة تجمع بين القيادة والتكامل والاستمرارية، وتعكس رؤيتنا في ربط الأفكار بالموارد، وتحويل الإمكانات إلى فرص ومشاريع تصنع القيمة والأثر.</p>
+    <div class="g2" style="margin-top:8mm">
+      <div class="card"><div class="word"><b>رايا</b><span class="en">RAYA</span></div><p>مستوحاة من كلمة «راية»، التي ترمز إلى القيادة والطموح والتميز، وتعبر عن تطلعنا إلى الريادة في تطوير المنظمات وصناعة الفرص.</p></div>
+      <div class="card"><div class="word"><b>لوب</b><span class="en">LOOP</span></div><p>تعني الحلقة المتصلة، وترمز إلى الترابط والتكامل والاستمرارية، حيث تتكامل الأفكار والموارد والفرص والمشاريع ضمن دورة متجددة من التطوير والنمو.</p></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 60mm;gap:8mm;align-items:center;margin-top:12mm">
+      <div>
+        <h3 style="font-size:15pt;margin-bottom:3mm">فلسفتنا في العمل</h3>
+        <p class="lead">نؤمن بأن كل منظمة تمتلك إمكانات قابلة للتطوير، وكل تحدٍ قد يخفي فرصة، وكل مورد يمكن استثماره بكفاءة أعلى.</p>
+        <p class="lead">ومن هنا نعمل على بناء منظومة مترابطة تحول الأفكار إلى مشاريع، والمشاريع إلى عوائد، والعوائد إلى فرص جديدة للنمو والاستدامة.</p>
+      </div>
+      <img src="/assets/img/mark-color.svg" alt="" style="width:60mm;opacity:.9">
+    </div>
+    <div class="quote" style="margin-top:12mm">في رايا لوب، لا تنتهي رحلتنا عند نجاح المشروع، بل يبدأ منها مسار جديد لصناعة الفرص.</div>
+  </div>
+  <div class="bot"><svg class="sw" viewBox="0 0 210 20" preserveAspectRatio="none"><path d="M0 14 C 50 8, 120 20, 210 6" fill="none" stroke="url(#sgs)" stroke-width=".7"/></svg><div class="row"><span class="en">rayaloop.com</span><span class="pn">03</span></div></div>
+</section>
+
+<!-- 4 VISION MISSION VALUES -->
+<section class="page" style="background:var(--navy)">
+  <svg class="sw" viewBox="0 0 210 297" preserveAspectRatio="none"><path d="M-10 285 C 50 270, 110 296, 160 276 S 205 255, 225 260" fill="none" stroke="url(#sgv)" stroke-width="1.6"/></svg>
+  <div class="top"><img src="/assets/img/logo-white.svg" alt=""><span class="sec" style="color:var(--silver)">رؤيتنا ورسالتنا وقيمنا</span></div>
+  <div class="inner">
+    <span class="kicker" style="color:var(--silver-300)">رؤيتنا ورسالتنا وقيمنا</span>
+    <div class="g2" style="margin-top:3mm">
+      <div class="card" style="background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.15)"><h3 style="color:#fff;font-size:16pt">رؤيتنا</h3><p style="color:#D2D9E4;font-size:10.8pt;line-height:1.85">أن نكون شريكًا رائدًا في تطوير المنظمات وصناعة الفرص والمشاريع المستدامة، بما يعزز كفاءتها ونموها ويضاعف أثرها الاقتصادي والمجتمعي.</p></div>
+      <div class="card" style="background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.15)"><h3 style="color:#fff;font-size:16pt">رسالتنا</h3><p style="color:#D2D9E4;font-size:10.8pt;line-height:1.85">تقديم حلول استشارية وتنموية وتشغيلية مبتكرة، تجمع بين المعرفة والتطوير والتمكين والتنفيذ، وتسهم في تحويل الموارد والإمكانات إلى مشاريع وفرص تحقق القيمة والاستدامة.</p></div>
+    </div>
+    <h2 style="color:#fff;font-size:21pt;margin:12mm 0 6mm">قيمنا</h2>
+    <div class="g2" style="gap:4mm">
+      <div class="card" style="background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.12)"><span class="no">01</span><h4 style="color:#fff">الشراكة</h4><p style="color:#C9D1DE">نبني علاقات قائمة على الثقة والتكامل والنجاح المشترك.</p></div>
+      <div class="card" style="background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.12)"><span class="no">02</span><h4 style="color:#fff">الابتكار</h4><p style="color:#C9D1DE">نبتكر حلولًا وفرصًا تتجاوز الأساليب التقليدية.</p></div>
+      <div class="card" style="background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.12)"><span class="no">03</span><h4 style="color:#fff">التمكين</h4><p style="color:#C9D1DE">ننقل المعرفة ونطور القدرات لضمان استمرارية النجاح.</p></div>
+      <div class="card" style="background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.12)"><span class="no">04</span><h4 style="color:#fff">الكفاءة</h4><p style="color:#C9D1DE">نعظم الاستفادة من الموارد ونرفع جودة الأداء.</p></div>
+      <div class="card" style="background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.12)"><span class="no">05</span><h4 style="color:#fff">الاستدامة</h4><p style="color:#C9D1DE">نطور حلولًا ومشاريع قادرة على النمو والاستمرار.</p></div>
+      <div class="card" style="background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.12)"><span class="no">06</span><h4 style="color:#fff">الأثر</h4><p style="color:#C9D1DE">نقيس نجاحنا بما نصنعه من قيمة ونتائج ملموسة.</p></div>
+    </div>
+  </div>
+  <div class="bot"><div class="row" style="color:var(--silver)"><span class="en">rayaloop.com</span><span class="pn" style="color:#fff">04</span></div></div>
+</section>
+
+<!-- 5 WHAT WE OFFER -->
+<section class="page">
+  <div class="top"><img src="/assets/img/logo-color.svg" alt=""><span class="sec">ماذا نقدم؟</span></div>
+  <div class="inner">
+    <span class="kicker">ماذا نقدم؟</span>
+    <h2 class="title">منظومة متكاملة لتطوير<br>المنظمات وصناعة الفرص</h2>
+    <p class="lead">تقدم رايا لوب منظومة مترابطة من الحلول الاستشارية والتنموية والتشغيلية، تغطي احتياجات المنظمات في مختلف مراحل نموها، بدءًا من التخطيط والتطوير، وصولًا إلى التنفيذ والتشغيل وتحقيق الاستدامة. وتتكامل خدماتنا ضمن أربعة مسارات رئيسية:</p>
+    <div class="g2" style="margin-top:8mm">
+      <div class="card navy"><span class="no" style="color:var(--silver-300)">01</span><h3>الاستشارات والتطوير المؤسسي</h3><p>نطور المنظمات من الداخل، ونرفع كفاءتها المؤسسية، ونعزز جاهزيتها للنمو وتحقيق أهدافها.</p></div>
+      <div class="card ice"><span class="no">02</span><h3>صناعة الفرص والاستدامة</h3><p>نكتشف الإمكانات غير المستغلة، ونحول الموارد والأفكار إلى مشاريع وفرص استثمارية وتنموية تحقق القيمة والعوائد.</p></div>
+      <div class="card ice"><span class="no">03</span><h3>إدارة المشاريع والتشغيل</h3><p>نحول الخطط إلى واقع، وندير المشاريع والبرامج والعمليات التشغيلية بكفاءة، مع التركيز على النتائج والاستدامة.</p></div>
+      <div class="card navy"><span class="no" style="color:var(--silver-300)">04</span><h3>التمكين والتحول الرقمي</h3><p>نبني قدرات القيادات وفرق العمل، ونطور الأنظمة والحلول الرقمية التي ترفع الكفاءة وتحسن جودة الخدمات.</p></div>
+    </div>
+    <p class="note" style="margin-top:12mm">أربعة مسارات مترابطة.. وحلول متكاملة تصنع فرصًا أكبر للنمو والاستدامة.</p>
+  </div>
+  <div class="bot"><svg class="sw" viewBox="0 0 210 20" preserveAspectRatio="none"><path d="M0 14 C 50 8, 120 20, 210 6" fill="none" stroke="url(#sgs)" stroke-width=".7"/></svg><div class="row"><span class="en">rayaloop.com</span><span class="pn">05</span></div></div>
+</section>
+
+<!-- 6 TRACK 01 -->
+<section class="page">
+  <div class="top"><img src="/assets/img/logo-color.svg" alt=""><span class="sec">المسار الأول</span></div>
+  <div class="inner">
+    <div class="track-head"><div class="track-no"><span>01</span></div><div><h2>الاستشارات والتطوير المؤسسي</h2><p class="tg">نبني مؤسسات أكثر كفاءة.. وأكثر جاهزية للمستقبل</p></div></div>
+    <div class="band">نساعد المنظمات على تطوير بنيتها المؤسسية وتعزيز كفاءة إدارتها وعملياتها، من خلال حلول استشارية وتطويرية تستند إلى فهم واقع المنظمة واحتياجاتها وتحدياتها وأهدافها المستقبلية.</div>
+    <div class="g2">
+      <div class="card"><h4>التخطيط والتطوير الاستراتيجي</h4><ul class="dots"><li>إعداد وتطوير الخطط الاستراتيجية والتشغيلية.</li><li>تحليل الواقع المؤسسي وتحديد الفجوات والفرص.</li><li>تطوير الأهداف والمبادرات ومؤشرات الأداء.</li><li>تصميم نماذج العمل وخطط التطوير والتحول المؤسسي.</li></ul></div>
+      <div class="card"><h4>التطوير التنظيمي والإداري</h4><ul class="dots"><li>إعداد وتطوير الهياكل التنظيمية.</li><li>تصميم الأوصاف الوظيفية والصلاحيات والمسؤوليات.</li><li>تطوير الإجراءات والأدلة والنماذج التشغيلية.</li><li>تحسين العمليات ورفع كفاءة الأداء المؤسسي.</li></ul></div>
+      <div class="card"><h4>الحوكمة والامتثال</h4><ul class="dots"><li>إعداد وتطوير السياسات واللوائح التنظيمية.</li><li>بناء أطر الحوكمة والرقابة الداخلية.</li><li>تطوير إجراءات الالتزام والشفافية والمساءلة.</li><li>تقييم المخاطر المؤسسية وتطوير آليات إدارتها.</li><li>دعم جاهزية المنظمات لمتطلبات الجهات التنظيمية والإشرافية.</li></ul></div>
+      <div class="card"><h4>إدارة الأداء والجودة</h4><ul class="dots"><li>بناء مؤشرات الأداء المؤسسي والتشغيلي.</li><li>تطوير أنظمة المتابعة والتقييم.</li><li>إعداد تقارير الأداء ولوحات المؤشرات.</li><li>تحسين جودة الخدمات ورفع كفاءة العمليات.</li></ul></div>
+    </div>
+    <div class="quote">نطور المنظومة المؤسسية لتصبح أكثر قدرة على تحقيق أهدافها واستثمار فرصها.</div>
+  </div>
+  <div class="bot"><svg class="sw" viewBox="0 0 210 20" preserveAspectRatio="none"><path d="M0 14 C 50 8, 120 20, 210 6" fill="none" stroke="url(#sgs)" stroke-width=".7"/></svg><div class="row"><span class="en">rayaloop.com</span><span class="pn">06</span></div></div>
+</section>
+
+<!-- 7 TRACK 02 -->
+<section class="page">
+  <div class="top"><img src="/assets/img/logo-color.svg" alt=""><span class="sec">المسار الثاني</span></div>
+  <div class="inner" style="padding-top:28mm">
+    <div class="track-head"><div class="track-no"><span>02</span></div><div><h2>صناعة الفرص والاستدامة</h2><p class="tg">كل مورد فرصة.. وكل فرصة مشروع محتمل</p></div></div>
+    <div class="band">نؤمن بأن الاستدامة تبدأ من اكتشاف الإمكانات المتاحة، وإعادة النظر في الموارد والأصول والقدرات باعتبارها فرصًا قابلة للتطوير والاستثمار. ونساعد المنظمات في الانتقال من الاعتماد على مصادر التمويل التقليدية إلى تنويع الإيرادات، وتطوير نماذج أعمال ومشاريع تحقق عوائد مالية وقيمة اقتصادية وأثرًا مجتمعيًا مستدامًا.</div>
+    <div class="g2" style="gap:4mm">
+      <div class="card"><h4>اكتشاف الفرص الاستثمارية والتنموية</h4><ul class="dots"><li>دراسة واقع المنظمة ومواردها وإمكاناتها.</li><li>تحديد الأصول والموارد غير المستغلة.</li><li>اكتشاف الفرص الاستثمارية والتجارية المناسبة.</li><li>تحليل الفرص وتقييم جدواها وقابليتها للتنفيذ.</li></ul></div>
+      <div class="card"><h4>تصميم المبادرات والمشاريع</h4><ul class="dots"><li>ابتكار المبادرات والمشاريع التنموية.</li><li>تطوير الأفكار وتحويلها إلى مشاريع قابلة للتنفيذ.</li><li>إعداد دراسات الجدوى الفنية والمالية والتشغيلية.</li><li>تصميم نماذج الأعمال والإيرادات.</li><li>إعداد خطط التنفيذ والتشغيل والاستدامة.</li></ul></div>
+      <div class="card"><h4>الاستثمار والاستدامة المالية</h4><ul class="dots"><li>تطوير المشاريع والأنشطة المدرة للدخل.</li><li>تصميم نماذج الإيرادات وتنويع مصادرها.</li><li>تعظيم الاستفادة من الأصول والإمكانات.</li><li>تطوير المشاريع القائمة لزيادة كفاءتها وعوائدها.</li><li>إعداد خطط الاستدامة المالية والتشغيلية.</li></ul></div>
+      <div class="card"><h4>الشراكات وتنمية الموارد</h4><ul class="dots"><li>بناء وتطوير الشراكات الاستراتيجية.</li><li>تصميم الفرص التمويلية والرعائية.</li><li>إعداد العروض الاستثمارية والتسويقية.</li><li>تطوير فرص التعاون مع القطاعين الحكومي والخاص.</li><li>تصميم نماذج الشراكات التجارية والتنموية.</li><li>دعم استقطاب الموارد والشركاء للمشاريع والمبادرات.</li></ul></div>
+    </div>
+    <h4 style="text-align:center;margin-top:6mm;font-size:11pt">القيمة التي نصنعها</h4>
+    <div class="chain" style="margin-top:3mm"><span>موارد متاحة</span><i>←</i><span>فرص واعدة</span><i>←</i><span>مشاريع منتجة</span><i>←</i><span>عوائد مستدامة</span><i>←</i><span>أثر متجدد</span></div>
+    <p class="note" style="margin-top:5mm;font-size:10.5pt">لا نبحث فقط عن مصادر تمويل جديدة.. بل نصنع فرصًا تحول الموارد إلى قيمة مستمرة.</p>
+  </div>
+  <div class="bot"><svg class="sw" viewBox="0 0 210 20" preserveAspectRatio="none"><path d="M0 14 C 50 8, 120 20, 210 6" fill="none" stroke="url(#sgs)" stroke-width=".7"/></svg><div class="row"><span class="en">rayaloop.com</span><span class="pn">07</span></div></div>
+</section>
+
+<!-- 8 TRACK 03 -->
+<section class="page">
+  <div class="top"><img src="/assets/img/logo-color.svg" alt=""><span class="sec">المسار الثالث</span></div>
+  <div class="inner" style="padding-top:28mm">
+    <div class="track-head"><div class="track-no"><span>03</span></div><div><h2>إدارة المشاريع والتشغيل</h2><p class="tg">من التخطيط إلى التنفيذ.. ومن المشروع إلى الاستدامة</p></div></div>
+    <div class="band">لا تتوقف خدمات رايا لوب عند إعداد الدراسات والخطط والتوصيات، بل تمتد إلى إدارة وتنفيذ وتشغيل المشاريع والبرامج، بما يضمن تحويل الأفكار إلى نتائج عملية قابلة للقياس والتطوير.</div>
+    <div class="g2" style="gap:4mm">
+      <div class="card"><h4>تأسيس وإطلاق المشاريع</h4><ul class="dots"><li>إعداد الخطط التنفيذية والتشغيلية.</li><li>تصميم الهياكل والنماذج التشغيلية للمشاريع.</li><li>تحديد الموارد والاحتياجات والميزانيات.</li><li>تطوير إجراءات العمل ومؤشرات الأداء.</li><li>تنظيم مراحل الإطلاق والتشغيل.</li></ul></div>
+      <div class="card"><h4>إدارة وتنفيذ المشاريع والبرامج</h4><ul class="dots"><li>إدارة المشاريع والمبادرات التنموية والتجارية.</li><li>تنسيق فرق العمل والموارد والشركاء.</li><li>متابعة الجداول الزمنية والميزانيات.</li><li>إدارة المخاطر والتحديات التشغيلية.</li><li>إعداد تقارير الإنجاز والأداء.</li></ul></div>
+      <div class="card"><h4>التشغيل والإسناد التنفيذي</h4><ul class="dots"><li>تقديم خدمات الإدارة والتشغيل للمشاريع.</li><li>الإسناد التنفيذي والتشغيلي للمنظمات.</li><li>تطوير آليات المتابعة والرقابة التشغيلية.</li><li>تحسين كفاءة الموارد والعمليات.</li><li>دعم استمرارية المشاريع وتحقيق مستهدفاتها.</li></ul></div>
+      <div class="card"><h4>تطوير وإعادة هيكلة المشاريع</h4><ul class="dots"><li>تقييم أداء المشاريع القائمة.</li><li>تحليل أسباب التعثر وضعف العوائد.</li><li>تطوير نماذج التشغيل والإيرادات.</li><li>إعادة تصميم العمليات وتحسين الكفاءة.</li><li>إعداد وتنفيذ خطط التحسين والتطوير.</li></ul></div>
+    </div>
+    <div class="card ice" style="margin-top:5mm"><h4>ما الذي يميز منهجنا؟</h4><p>نجمع بين التفكير الاستراتيجي والخبرة التنفيذية، ونعمل على ربط أهداف المشروع بموارده وعملياته ومؤشرات نجاحه، لضمان تحقيق نتائج ملموسة وقابلة للاستمرار.</p></div>
+    <div class="quote" style="margin-top:5mm">نحوّل الخطط إلى مشاريع.. والمشاريع إلى نتائج.. والنتائج إلى فرص جديدة للنمو.</div>
+  </div>
+  <div class="bot"><svg class="sw" viewBox="0 0 210 20" preserveAspectRatio="none"><path d="M0 14 C 50 8, 120 20, 210 6" fill="none" stroke="url(#sgs)" stroke-width=".7"/></svg><div class="row"><span class="en">rayaloop.com</span><span class="pn">08</span></div></div>
+</section>
+
+<!-- 9 TRACK 04 -->
+<section class="page">
+  <div class="top"><img src="/assets/img/logo-color.svg" alt=""><span class="sec">المسار الرابع</span></div>
+  <div class="inner" style="padding-top:28mm">
+    <div class="track-head"><div class="track-no"><span>04</span></div><div><h2>التمكين والتحول الرقمي</h2><p class="tg">نمكّن الإنسان.. ونطوّر منظومة العمل</p></div></div>
+    <div class="band" style="margin-bottom:5mm">نؤمن بأن نجاح المنظمات واستدامة مشاريعها يعتمدان على تكامل الكفاءات البشرية مع الأنظمة والإجراءات والتقنيات الحديثة، ولهذا نقدم حلولًا تجمع بين بناء القدرات المؤسسية وتطوير المهارات والتحول الرقمي.</div>
+    <h3 style="font-size:12pt;margin-bottom:3mm">أولًا: التدريب والتمكين المؤسسي</h3>
+    <div class="g2" style="gap:4mm">
+      <div class="card"><h4>تطوير القيادات والكفاءات</h4><ul class="dots"><li>تصميم وتنفيذ البرامج التدريبية والتطويرية.</li><li>تأهيل القيادات والإدارات التنفيذية.</li><li>تطوير مهارات التخطيط والقيادة والإدارة.</li><li>تدريب فرق المشاريع والبرامج والتشغيل.</li><li>تطوير مهارات تنمية الموارد وبناء الشراكات.</li></ul></div>
+      <div class="card"><h4>بناء القدرات المؤسسية</h4><ul class="dots"><li>تأهيل فرق الحوكمة والامتثال.</li><li>تطوير قدرات فرق العمل التطوعي.</li><li>إعداد الأدلة والإجراءات والنماذج التشغيلية.</li><li>تطوير أدوات المتابعة وقياس الأداء.</li><li>نقل المعرفة وتمكين الفرق من إدارة أعمالها باستقلالية وكفاءة.</li></ul></div>
+    </div>
+    <h3 style="font-size:12pt;margin:5mm 0 3mm">ثانيًا: التحول الرقمي والأتمتة</h3>
+    <div class="g2" style="gap:4mm">
+      <div class="card"><h4>الحلول التقنية والأنظمة الرقمية</h4><ul class="dots"><li>تصميم وتطوير المواقع الإلكترونية.</li><li>بناء المنصات والبوابات الرقمية.</li><li>تطوير أنظمة إدارة المستفيدين والعملاء.</li><li>أتمتة العضويات والتبرعات والخدمات.</li><li>تطوير أنظمة إدارة المشاريع والمتطوعين.</li><li>بناء قواعد البيانات وربط الأنظمة.</li><li>تحسين تجربة المستخدم ورحلة المستفيد.</li></ul></div>
+      <div class="card"><h4>البيانات والذكاء الاصطناعي</h4><ul class="dots"><li>تطوير لوحات مؤشرات الأداء والتقارير الذكية.</li><li>تحليل البيانات لدعم اتخاذ القرار.</li><li>أتمتة الإجراءات والعمليات المتكررة.</li><li>توظيف حلول الذكاء الاصطناعي في تطوير الخدمات والعمليات.</li><li>تحسين كفاءة العمل من خلال الحلول الرقمية.</li></ul></div>
+    </div>
+    <div class="quote" style="margin-top:5mm;font-size:11pt;padding:5mm 7mm"><span style="font-weight:500;color:#C9D1DE;font-size:9.8pt;display:block;margin-bottom:1mm">منهجنا في التمكين: لا نكتفي بتوفير الأنظمة أو تنفيذ البرامج التدريبية، بل ننقل المعرفة ونبني القدرات اللازمة لتشغيل الحلول وتطويرها على المدى الطويل.</span>نطور الأنظمة.. ونمكّن الإنسان الذي يديرها.</div>
+  </div>
+  <div class="bot"><svg class="sw" viewBox="0 0 210 20" preserveAspectRatio="none"><path d="M0 14 C 50 8, 120 20, 210 6" fill="none" stroke="url(#sgs)" stroke-width=".7"/></svg><div class="row"><span class="en">rayaloop.com</span><span class="pn">09</span></div></div>
+</section>
+
+<!-- 10 HOW WE WORK -->
+<section class="page">
+  <div class="top"><img src="/assets/img/logo-color.svg" alt=""><span class="sec">كيف نعمل؟</span></div>
+  <div class="inner" style="padding-top:28mm">
+    <span class="kicker">كيف نعمل؟</span>
+    <h2 class="title" style="font-size:21pt;margin-bottom:3mm">رحلة متكاملة.. من اكتشاف الفرصة إلى صناعة الأثر</h2>
+    <p class="lead" style="font-size:10.5pt">تتبنى رايا لوب منهجية عمل مترابطة ترافق من خلالها المنظمات في مختلف مراحل التطوير، بدءًا من فهم الاحتياجات وتحليل الواقع، وصولًا إلى التنفيذ والتشغيل وقياس النتائج وتحقيق الاستدامة.</p>
+    <div class="loop" style="margin-top:6mm">
+      <svg viewBox="0 0 500 500" style="width:72mm" aria-label="دورة رايا لوب">
+        <defs><linearGradient id="lgp" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0B2B55"/><stop offset="1" stop-color="#1B5296"/></linearGradient></defs>
+        <circle cx="250" cy="250" r="185" fill="none" stroke="url(#sgs)" stroke-width="14"/>
+        <circle cx="250" cy="250" r="112" fill="#F3F5F9"/>
+        <image href="/assets/img/mark-color.svg" x="175" y="195" width="150" height="99"/>
+        <text x="250" y="322" text-anchor="middle" font-family="IBM Plex Sans Arabic" font-size="16" font-weight="600" fill="#0B2B55">دورة رايا لوب</text>
+        <g font-family="IBM Plex Sans Arabic" font-weight="700" text-anchor="middle" fill="#fff">
+          <g transform="translate(250,65)"><circle r="46" fill="url(#lgp)"/><text y="6" font-size="18">نكتشف</text></g>
+          <g transform="translate(410,157)"><circle r="46" fill="url(#lgp)"/><text y="6" font-size="18">نصمم</text></g>
+          <g transform="translate(410,343)"><circle r="46" fill="url(#lgp)"/><text y="6" font-size="18">نمكّن</text></g>
+          <g transform="translate(250,435)"><circle r="46" fill="url(#lgp)"/><text y="6" font-size="18">ننفّذ</text></g>
+          <g transform="translate(90,343)"><circle r="46" fill="url(#lgp)"/><text y="6" font-size="18">نشغّل</text></g>
+          <g transform="translate(90,157)"><circle r="46" fill="url(#lgp)"/><text y="-2" font-size="16">نطوّر</text><text y="18" font-size="14">ونستدام</text></g>
+        </g>
+      </svg>
+      <div class="steps">
+        <div class="step"><span class="n">01</span><div><h4>نكتشف</h4><p class="s">نفهم الواقع.. ونحدد الفرص</p><p>ندرس واقع المنظمة، ونحلل احتياجاتها ومواردها وإمكاناتها وتحدياتها، ونحدد الفجوات والفرص القابلة للتطوير والاستثمار.</p></div></div>
+        <div class="step"><span class="n">02</span><div><h4>نصمم</h4><p class="s">نحوّل الأفكار إلى حلول قابلة للتنفيذ</p><p>نبتكر الحلول والمبادرات والمشاريع، ونطور نماذجها الفنية والمالية والتشغيلية، ونضع الخطط اللازمة لتنفيذها.</p></div></div>
+        <div class="step"><span class="n">03</span><div><h4>نمكّن</h4><p class="s">نبني الجاهزية.. ونطور القدرات</p><p>نجهز فرق العمل، ونطور الأدوات والأنظمة والإجراءات، ونبني القدرات المؤسسية والبشرية اللازمة لنجاح التنفيذ.</p></div></div>
+        <div class="step"><span class="n">04</span><div><h4>ننفّذ</h4><p class="s">نحوّل الخطط إلى واقع</p><p>ندير إطلاق المشاريع والمبادرات، وننسق الموارد والشركاء وفرق العمل، ونتابع تنفيذ الأنشطة وفق الأهداف والجداول الزمنية المعتمدة.</p></div></div>
+        <div class="step"><span class="n">05</span><div><h4>نشغّل</h4><p class="s">ندير الأداء.. ونعزز الكفاءة</p><p>نساند في الإدارة والتشغيل والمتابعة، ونطور العمليات ونرفع كفاءة استخدام الموارد لضمان استقرار المشاريع وتحقيق مستهدفاتها.</p></div></div>
+        <div class="step"><span class="n">06</span><div><h4>نطوّر ونستدام</h4><p class="s">نقيس النتائج.. ونصنع فرصًا جديدة</p><p>نقيّم الأداء والأثر، ونحدد فرص التحسين والنمو، ونعمل على تطوير نماذج الاستدامة وتعظيم العوائد والقيمة المتحققة.</p></div></div>
+      </div>
+    </div>
+    <p class="note" style="margin-top:4mm">دورة متكاملة تجعل كل نجاح بداية لفرصة جديدة.</p>
+  </div>
+  <div class="bot"><svg class="sw" viewBox="0 0 210 20" preserveAspectRatio="none"><path d="M0 14 C 50 8, 120 20, 210 6" fill="none" stroke="url(#sgs)" stroke-width=".7"/></svg><div class="row"><span class="en">rayaloop.com</span><span class="pn">10</span></div></div>
+</section>
+
+<!-- 11 COOPERATION MODELS -->
+<section class="page">
+  <div class="top"><img src="/assets/img/logo-color.svg" alt=""><span class="sec">نماذج التعاون</span></div>
+  <div class="inner">
+    <span class="kicker">نماذج التعاون</span>
+    <h2 class="title">حلول مرنة.. تتناسب مع<br>احتياج كل منظمة</h2>
+    <p class="lead">ندرك أن احتياجات المنظمات تختلف باختلاف طبيعة أعمالها ومراحل نموها وأهدافها وإمكاناتها، ولهذا نقدم نماذج تعاون مرنة تتيح لكل منظمة اختيار الحلول والخدمات المناسبة لاحتياجاتها، سواء من خلال خدمات متخصصة أو شراكات تطويرية وتشغيلية ممتدة.</p>
+    <div class="g2" style="margin-top:7mm;gap:4.5mm">
+      <div class="card"><span class="no">01</span><h4>الاستشارات المتخصصة</h4><p>تقديم حلول استشارية لمعالجة تحديات محددة، أو تطوير مجالات عمل معينة، من خلال الدراسات والتقييمات والخطط والتوصيات التنفيذية.</p></div>
+      <div class="card"><span class="no">02</span><h4>التطوير والتحول المؤسسي</h4><p>تنفيذ برامج تطوير متكاملة تشمل الاستراتيجيات والحوكمة والهياكل التنظيمية والعمليات ورفع كفاءة الأداء.</p></div>
+      <div class="card"><span class="no">03</span><h4>صناعة الفرص والاستثمار</h4><p>اكتشاف وتطوير الفرص الاستثمارية والتنموية، وتصميم المشاريع ونماذج الإيرادات والاستدامة، وإعداد دراسات الجدوى والخطط التشغيلية.</p></div>
+      <div class="card"><span class="no">04</span><h4>إدارة المشاريع والبرامج</h4><p>تولي مهام إدارة المشاريع والمبادرات، أو تقديم الإسناد التنفيذي والتشغيلي للمنظمات خلال مراحل التنفيذ والتشغيل.</p></div>
+      <div class="card"><span class="no">05</span><h4>التمكين والتدريب</h4><p>تصميم وتنفيذ برامج تدريبية وتطويرية لبناء قدرات القيادات والموظفين وفرق العمل، ونقل المعرفة وتعزيز الجاهزية المؤسسية.</p></div>
+      <div class="card navy"><span class="no" style="color:var(--silver-300)">06</span><h4>الشراكة التشغيلية</h4><p>بناء نماذج تعاون ممتدة تشمل التخطيط والتطوير والتنفيذ والتشغيل والتحسين المستمر، وفق اتفاقيات واضحة تحدد المسؤوليات والمخرجات ومؤشرات الأداء.</p></div>
+    </div>
+    <p class="note" style="margin-top:9mm">نصمم نموذج التعاون وفق احتياج المنظمة.. ونربط نطاق العمل بالنتائج المستهدفة.</p>
+  </div>
+  <div class="bot"><svg class="sw" viewBox="0 0 210 20" preserveAspectRatio="none"><path d="M0 14 C 50 8, 120 20, 210 6" fill="none" stroke="url(#sgs)" stroke-width=".7"/></svg><div class="row"><span class="en">rayaloop.com</span><span class="pn">11</span></div></div>
+</section>
+
+<!-- 12 WHY -->
+<section class="page" style="background:var(--navy)">
+  <svg class="sw" viewBox="0 0 210 297" preserveAspectRatio="none"><path d="M-10 285 C 50 270, 110 296, 160 276 S 205 255, 225 260" fill="none" stroke="url(#sgv)" stroke-width="1.6"/></svg>
+  <div class="top"><img src="/assets/img/logo-white.svg" alt=""><span class="sec" style="color:var(--silver)">لماذا رايا لوب؟</span></div>
+  <div class="inner">
+    <span class="kicker" style="color:var(--silver-300)">لماذا رايا لوب؟</span>
+    <h2 class="title" style="color:#fff">لأن الاستشارة وحدها لا تكفي</h2>
+    <p class="lead" style="color:#D2D9E4">في رايا لوب، لا ننظر إلى التحديات باعتبارها مشكلات منفصلة، بل فرصًا لإعادة التفكير والتطوير وصناعة القيمة. ونتميز بنموذج عمل يربط بين التفكير الاستراتيجي والعمل التنفيذي، ويضع احتياجات العميل ونتائجه في قلب كل مشروع.</p>
+    <div class="g2" style="margin-top:7mm;gap:4.5mm">
+      <div class="card" style="background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.13)"><h4 style="color:#fff">نفكر كشريك</h4><p style="color:#C9D1DE">نتعامل مع أهداف عملائنا وتحدياتهم وفرصهم بمنظور شامل، ونسعى إلى بناء علاقات قائمة على الثقة والنجاح المشترك.</p></div>
+      <div class="card" style="background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.13)"><h4 style="color:#fff">نصنع الفرص</h4><p style="color:#C9D1DE">لا ننتظر الأفكار الجاهزة، بل نبحث عن الإمكانات غير المستغلة، ونبتكر فرصًا جديدة للنمو والاستثمار والاستدامة.</p></div>
+      <div class="card" style="background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.13)"><h4 style="color:#fff">نربط المسارات</h4><p style="color:#C9D1DE">نجمع بين الحوكمة والتطوير المؤسسي والمشاريع والاستثمار والتقنية والتدريب والتشغيل ضمن منظومة متكاملة.</p></div>
+      <div class="card" style="background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.13)"><h4 style="color:#fff">نشارك في التنفيذ</h4><p style="color:#C9D1DE">لا تتوقف أعمالنا عند تقديم الدراسات والتوصيات، بل تمتد إلى تحويل الخطط إلى خطوات عملية ومشاريع قابلة للتطبيق والتشغيل.</p></div>
+      <div class="card" style="background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.13)"><h4 style="color:#fff">نمكّن الفرق</h4><p style="color:#C9D1DE">نعمل على بناء القدرات الداخلية ونقل المعرفة وتطوير الأدوات والأنظمة، بما يعزز استقلالية المنظمات واستمرارية نجاحها.</p></div>
+      <div class="card" style="background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.13)"><h4 style="color:#fff">نركز على النتائج</h4><p style="color:#C9D1DE">نربط نجاح أعمالنا بمؤشرات الأداء والكفاءة والعوائد والقيمة والأثر المتحقق، ونطور الحلول لتحقيق أفضل النتائج الممكنة.</p></div>
+    </div>
+    <p class="note" style="color:#fff;margin-top:9mm">رايا لوب.. شريك يفكر معك، ويطور لأجلك، ويعمل معك لتحقيق النتائج.</p>
+  </div>
+  <div class="bot"><div class="row" style="color:var(--silver)"><span class="en">rayaloop.com</span><span class="pn" style="color:#fff">12</span></div></div>
+</section>
+
+<!-- 13 PARTNERS -->
+<section class="page">
+  <div class="top"><img src="/assets/img/logo-color.svg" alt=""><span class="sec">شركاء في صناعة المستقبل</span></div>
+  <div class="inner">
+    <span class="kicker">شركاء في صناعة المستقبل</span>
+    <h2 class="title">منظمات أقوى.. ومشاريع أنجح..<br>وأثر أبقى</h2>
+    <p class="lead">تتطلع رايا لوب إلى بناء شراكات استراتيجية وتنفيذية فاعلة مع مختلف الجهات والمنظمات، لتطوير حلول ومشاريع تسهم في رفع الكفاءة، وتعزيز الاستدامة، وتحقيق قيمة اقتصادية ومجتمعية مشتركة. ونؤمن بأن التكامل بين القطاعات والخبرات والموارد يفتح آفاقًا أوسع لصناعة الفرص.</p>
+    <h3 style="font-size:14pt;margin:6mm 0 3mm">الجهات التي نخدمها</h3>
+    <div style="display:grid;gap:3.5mm">
+      <div class="card navy" style="display:grid;grid-template-columns:58mm 1fr;gap:5mm;align-items:center;padding:4mm 6mm"><h4 style="margin:0">الجمعيات والمؤسسات غير الربحية</h4><p>تطوير الأداء المؤسسي والحوكمة والمشاريع، وتنمية الموارد وتعزيز الاستدامة المالية والتشغيلية.</p></div>
+      <div class="card" style="display:grid;grid-template-columns:58mm 1fr;gap:5mm;align-items:center;padding:4mm 6mm"><h4 style="margin:0">المؤسسات المانحة والأوقاف</h4><p>تصميم وتطوير المبادرات والمشاريع، وتعظيم الاستفادة من الموارد والأصول، وتطوير نماذج الاستثمار والأثر المستدام.</p></div>
+      <div class="card" style="display:grid;grid-template-columns:58mm 1fr;gap:5mm;align-items:center;padding:4mm 6mm"><h4 style="margin:0">القطاع الحكومي</h4><p>تقديم الحلول الاستشارية والتطويرية والتشغيلية، والإسهام في تصميم وإدارة المبادرات والمشاريع وبرامج التمكين والتحول المؤسسي.</p></div>
+      <div class="card" style="display:grid;grid-template-columns:58mm 1fr;gap:5mm;align-items:center;padding:4mm 6mm"><h4 style="margin:0">القطاع الخاص والشركات</h4><p>تطوير المشاريع والعمليات، وتصميم المبادرات المجتمعية وبرامج المسؤولية الاجتماعية، وبناء الشراكات ذات القيمة المشتركة.</p></div>
+      <div class="card" style="display:grid;grid-template-columns:58mm 1fr;gap:5mm;align-items:center;padding:4mm 6mm"><h4 style="margin:0">المشاريع والكيانات ذات الأثر المجتمعي</h4><p>تطوير نماذج الأعمال والتشغيل والاستدامة، وتحسين الكفاءة وتعزيز فرص النمو والتوسع.</p></div>
+    </div>
+    <div class="card ice" style="margin-top:4mm;text-align:center;padding:4mm 6mm"><h4>نؤمن بقوة الشراكة</h4><p>الفرص الكبرى تبدأ بفكرة، وتنمو بالتكامل، وتتحول إلى واقع بالتنفيذ، وتستمر بكفاءة التشغيل.</p></div>
+    <p class="note" style="margin-top:4mm">معًا نصنع فرصًا أكبر.. ونبني مستقبلًا أكثر استدامة.</p>
+  </div>
+  <div class="bot"><svg class="sw" viewBox="0 0 210 20" preserveAspectRatio="none"><path d="M0 14 C 50 8, 120 20, 210 6" fill="none" stroke="url(#sgs)" stroke-width=".7"/></svg><div class="row"><span class="en">rayaloop.com</span><span class="pn">13</span></div></div>
+</section>
+
+<!-- 14 BACK COVER -->
+<section class="page cover">
+  <svg class="sw" viewBox="0 0 210 297" preserveAspectRatio="none"><path d="M-10 60 C 40 42, 90 78, 140 56 S 200 24, 225 30" fill="none" stroke="url(#sgv)" stroke-width="3" stroke-linecap="round"/><path d="M-10 280 C 50 265, 110 292, 160 272 S 205 250, 225 255" fill="none" stroke="url(#sgv)" stroke-width="1.2"/></svg>
+  <div class="inner" style="padding-top:78mm;color:#fff">
+    <img src="/assets/img/logo-white.svg" alt="رايا لوب" style="width:58mm;margin:0 auto 8mm;display:block">
+    <h2 style="color:#fff;text-align:center;font-size:20pt">لنجعل من تحديات اليوم فرصًا<br>لمستقبل أكثر استدامة</h2>
+    <p style="text-align:center;color:#C9D1DE;margin-top:4mm;font-size:11pt;line-height:1.9">نرافقكم في رحلة التطوير، ونربط الأفكار بالإمكانات، ونحوّل التحديات إلى فرص،<br>والفرص إلى مشاريع تحقق القيمة والنمو والأثر المستدام.</p>
+    <p style="text-align:center;margin-top:5mm;font-weight:600;font-size:12pt">رايا لوب.. شريكك في صناعة الفرص.</p>
+    <div class="contact">
+      <div class="ci"><small>البريد الإلكتروني</small><b class="en">info@rayaloop.com</b></div>
+      <div class="ci"><small>رقم التواصل</small><b class="en">0559605523</b></div>
+      <div class="ci"><small>الموقع الإلكتروني</small><b class="en">rayaloop.com</b></div>
+      <div class="ci"><small>الرقم الوطني الموحد للمنشأة</small><b class="en">7055549047</b></div>
+    </div>
+    <p style="text-align:center;margin-top:8mm;color:var(--silver);font-size:10pt">المملكة العربية السعودية · <span class="en">Creating Opportunities. Sustaining Impact.</span></p>
+  </div>
+</section>
+
+</body>
+</html>

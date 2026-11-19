@@ -1,0 +1,396 @@
+<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>هوية رايا لوب</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap">
+<style>
+/* Layout: an RTL brand book — navy cover band, then numbered chapters on a pale ice ground, each chapter a white sheet. */
+:root{
+  --navy-950:#051631; --navy:#0B2B55; --navy-700:#123A6E; --blue:#1B5296;
+  --silver-500:#8E97A8; --silver:#A9B1BF; --silver-300:#C9CFD9; --silver-100:#E6EAF0; --ice:#F3F5F9;
+  --white:#FFFFFF; --ink:#0E1A2B; --muted:#5A6577; --line:#DDE2EA;
+  --silver-grad:linear-gradient(100deg,#8E97A8 0%,#E4E8EE 50%,#9AA3B3 100%);
+  --font:'IBM Plex Sans Arabic',system-ui,'Segoe UI',Tahoma,sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ice);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.8;direction:rtl}
+.wrap{max-width:1120px;margin-inline:auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{color:var(--navy);line-height:1.35;margin:0;text-wrap:balance}
+p{margin:0}
+.en{direction:ltr;unicode-bidi:isolate}
+.num{font-variant-numeric:tabular-nums}
+
+/* cover */
+.cover{position:relative;overflow:hidden;background:radial-gradient(110% 120% at 90% 0%,var(--navy-700),var(--navy) 45%,var(--navy-950));color:#fff}
+.cover .wrap{position:relative;display:grid;grid-template-columns:1.2fr .8fr;gap:32px;align-items:center;padding-block:72px 96px}
+.cover h1{color:#fff;font-size:clamp(32px,5vw,54px);font-weight:700}
+.cover h1 span{background:var(--silver-grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.cover p{color:#CBD3E0;max-width:560px;margin-top:14px;font-size:17px}
+.cover .meta{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px}
+.cover .meta span{font-size:13px;padding:6px 14px;border-radius:999px;border:1px solid rgba(255,255,255,.22);color:#E4E8EE}
+.cover img{width:min(300px,70%);justify-self:center}
+.cover svg.sw{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+
+/* toc */
+.toc{display:flex;flex-wrap:wrap;gap:8px;margin-top:-26px;position:relative;z-index:2}
+.toc a{background:#fff;border:1px solid var(--line);border-radius:999px;padding:8px 16px;font-size:14px;color:var(--navy);text-decoration:none;font-weight:500}
+.toc a:hover,.toc a:focus-visible{border-color:var(--navy);outline:none}
+
+/* chapter */
+.ch{background:#fff;border:1px solid var(--line);border-radius:22px;padding:40px;margin-block:28px}
+.ch-head{display:flex;gap:18px;align-items:baseline;margin-bottom:26px;flex-wrap:wrap}
+.ch-head .n{font-size:14px;font-weight:700;color:var(--silver-500);letter-spacing:.12em}
+.ch-head h2{font-size:clamp(24px,3vw,32px)}
+.ch-head p{flex-basis:100%;color:var(--muted);max-width:68ch}
+.grid{display:grid;gap:18px}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.label{font-size:13px;color:var(--muted);margin-top:10px}
+
+/* essence */
+.essence{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+.ess{background:var(--ice);border-radius:16px;padding:22px}
+.ess b{display:block;color:var(--navy);font-size:15px;margin-bottom:6px}
+.ess p{color:#3A4659;font-size:15px}
+.words{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.words span{background:#fff;border:1px solid var(--line);border-radius:999px;padding:4px 12px;font-size:14px;color:var(--navy)}
+
+/* logo */
+.tile{border-radius:16px;display:grid;place-items:center;padding:34px;min-height:230px;border:1px solid var(--line)}
+.tile img{max-height:170px;width:auto}
+.t-white{background:#fff}.t-ice{background:var(--ice)}.t-navy{background:var(--navy);border-color:var(--navy)}.t-dark{background:var(--navy-950);border-color:var(--navy-950)}
+.t-silver{background:var(--silver-grad)}
+.clear{position:relative;display:grid;place-items:center;background:var(--ice);border-radius:16px;min-height:300px}
+.clear .box{position:relative;padding:42px;border:1.5px dashed var(--blue)}
+.clear .box img{height:150px}
+.clear .x{position:absolute;width:42px;height:42px;display:grid;place-items:center;font-weight:700;color:var(--blue);font-size:14px}
+.rules{display:grid;gap:12px}
+.rule{display:flex;gap:12px;align-items:flex-start;font-size:15px;color:#3A4659}
+.rule i{flex:none;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-style:normal;font-size:13px;font-weight:700;color:#fff;background:var(--navy);margin-top:3px}
+.dont .tile{position:relative}
+.dont .tile::after{content:"✕";position:absolute;top:10px;inset-inline-start:12px;width:26px;height:26px;border-radius:50%;background:#B42318;color:#fff;display:grid;place-items:center;font-size:13px}
+
+/* color */
+.sw-card{border-radius:16px;overflow:hidden;border:1px solid var(--line);background:#fff}
+.sw-card .chip{height:130px;display:flex;align-items:flex-end;padding:14px;color:#fff;font-weight:600}
+.sw-card .chip.light{color:var(--navy)}
+.sw-card .info{padding:14px 16px;font-size:13.5px;color:#3A4659;display:grid;gap:2px}
+.sw-card .info b{color:var(--navy);font-size:15px}
+.sw-card .info code{font-family:var(--font);direction:ltr;unicode-bidi:isolate;font-variant-numeric:tabular-nums}
+.ratio{display:flex;height:56px;border-radius:14px;overflow:hidden;margin-top:22px}
+.ratio div{display:grid;place-items:center;font-size:13px;font-weight:600}
+.copy-btn{border:1px solid var(--line);background:var(--ice);border-radius:8px;padding:2px 10px;font-family:inherit;font-size:12px;cursor:pointer;color:var(--navy);justify-self:start;margin-top:6px}
+.copy-btn:focus-visible{outline:2px solid var(--blue)}
+
+/* type */
+.type-hero{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:center;background:var(--ice);border-radius:18px;padding:30px}
+.type-hero .big{font-size:clamp(70px,11vw,130px);font-weight:700;color:var(--navy);line-height:1}
+.scale{display:grid;gap:14px;margin-top:26px}
+.scale-row{display:grid;grid-template-columns:150px minmax(0,1fr);gap:18px;align-items:baseline;border-bottom:1px solid var(--line);padding-bottom:12px}
+.scale-row small{color:var(--muted);font-size:13px}
+.weights{display:flex;flex-wrap:wrap;gap:24px;margin-top:10px;font-size:22px;color:var(--navy)}
+
+/* elements */
+.el{border-radius:16px;overflow:hidden;border:1px solid var(--line)}
+.el svg{display:block;width:100%;height:auto}
+.el .cap{padding:14px 16px;font-size:14px;color:#3A4659;background:#fff}
+.el .cap b{display:block;color:var(--navy)}
+
+/* stationery */
+.card-mock{aspect-ratio:85/55;border-radius:12px;position:relative;overflow:hidden;box-shadow:0 20px 40px -24px rgba(11,43,85,.55);max-width:100%}
+.bc-front{background:radial-gradient(120% 120% at 90% 0%,var(--navy-700),var(--navy) 50%,var(--navy-950));display:grid;place-items:center}
+.bc-front img{width:30%;height:auto;position:relative}
+.bc-back{background:#fff;padding:7% 8% 14%;display:flex;flex-direction:column;justify-content:space-between;border:1px solid var(--line)}
+.bc-back .top{display:flex;justify-content:space-between;align-items:flex-start}
+.bc-back .top img{height:54px}
+.bc-back .nm{font-weight:700;color:var(--navy);font-size:17px;line-height:1.3}
+.bc-back .rl{color:var(--blue);font-size:12.5px}
+.bc-back ul{list-style:none;margin:0;padding:0;font-size:12px;color:#3A4659;display:grid;gap:2px}
+.bc-back ul li b{direction:ltr;unicode-bidi:isolate;font-weight:500}
+.mock-sw{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+
+.lh{aspect-ratio:210/297;background:#fff;border:1px solid var(--line);border-radius:6px;position:relative;overflow:hidden;box-shadow:0 20px 40px -24px rgba(11,43,85,.4);max-width:420px;margin-inline:auto;width:100%}
+.lh .hd{position:absolute;top:5%;inset-inline:7%;display:flex;align-items:center;gap:12px}
+.lh .hd img{height:52px}
+.lh .hd .t{border-inline-start:1.5px solid var(--navy);padding-inline-start:12px;font-size:11px;color:var(--navy);font-weight:600;line-height:1.5}
+.lh .hd .t span{display:block;font-weight:400;font-size:9.5px}
+.lh .body{position:absolute;top:22%;inset-inline:9%;display:grid;gap:7px}
+.lh .body i{display:block;height:6px;border-radius:4px;background:var(--silver-100)}
+.lh .wm{position:absolute;top:38%;left:50%;width:48%;transform:translateX(-50%);opacity:.07}
+.lh .ft{position:absolute;bottom:0;inset-inline:0;height:7%;background:var(--navy);color:#fff;display:flex;justify-content:space-around;align-items:center;font-size:8.5px;gap:4px;padding-inline:4%}
+.lh .ft span{direction:ltr;unicode-bidi:isolate}
+
+.sig{border:1px solid var(--line);border-radius:14px;padding:22px;display:flex;gap:18px;align-items:center;background:#fff;flex-wrap:wrap}
+.sig img{height:64px}
+.sig .d{border-inline-start:2px solid;border-image:var(--silver-grad) 1;padding-inline-start:16px;font-size:13.5px;color:#3A4659;line-height:1.7}
+.sig .d b{color:var(--navy);font-size:16px}
+.sig .d .en{color:var(--blue)}
+
+/* social */
+.post{aspect-ratio:1/1;border-radius:14px;position:relative;overflow:hidden;padding:9%;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 20px 40px -24px rgba(11,43,85,.5)}
+.post .lg{width:22%;height:auto;align-self:flex-start}
+.post h3{font-size:clamp(17px,2.4vw,28px);line-height:1.45}
+.post > *{position:relative}
+.post > .mock-sw{position:absolute}
+.post .foot{display:flex;justify-content:space-between;align-items:center;font-size:12px}
+.post .foot .en{opacity:.85}
+.p1{background:radial-gradient(120% 120% at 90% 0%,var(--navy-700),var(--navy) 50%,var(--navy-950));color:#fff}
+.p1 h3{color:#fff}
+.p2{background:var(--ice);color:var(--navy)}
+.p2 .pill{background:var(--navy);color:#fff;border-radius:999px;padding:4px 14px;font-size:12px;justify-self:start}
+.p2 ul{margin:0;padding:0;list-style:none;display:grid;gap:4px;font-size:13px;color:#3A4659}
+.p2 ul li::before{content:"● ";color:var(--silver-500)}
+.p3{background:#fff;color:var(--navy);border:1px solid var(--line)}
+.p3 .big{font-size:clamp(42px,6vw,64px);font-weight:700;line-height:1;background:var(--silver-grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.p3 .row{display:flex;gap:6px;flex-wrap:wrap;font-size:12px}
+.p3 .row span{border:1px solid var(--line);border-radius:999px;padding:2px 10px}
+
+/* voice */
+.voice{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.voice div{border-radius:16px;padding:22px}
+.voice .yes{background:#EEF6F0}.voice .no{background:#FBEFEE}
+.voice h3{font-size:17px;margin-bottom:8px}
+.voice ul{margin:0;padding-inline-start:20px;font-size:15px;color:#3A4659}
+
+footer{padding-block:30px 60px;text-align:center;color:var(--muted);font-size:14px}
+
+@media (max-width:860px){
+  .cover .wrap,.type-hero,.voice{grid-template-columns:1fr}
+  .cover img{width:180px;justify-self:start;order:-1}
+  .g3,.g4,.essence{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .ch{padding:26px 20px}
+}
+@media (max-width:520px){
+  .g2,.g3,.g4,.essence{grid-template-columns:1fr}
+  .scale-row{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto}}
+</style>
+
+<header class="cover">
+  <svg class="sw" viewBox="0 0 1440 520" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <defs><linearGradient id="cg" x1="0" x2="1"><stop offset="0" stop-color="#8E97A8" stop-opacity="0"/><stop offset=".5" stop-color="#E4E8EE" stop-opacity=".7"/><stop offset="1" stop-color="#9AA3B3" stop-opacity=".15"/></linearGradient></defs>
+    <path d="M-60 470 C 340 360, 640 560, 1000 430 S 1380 260, 1520 300" fill="none" stroke="url(#cg)" stroke-width="20" stroke-linecap="round"/>
+    <path d="M-60 505 C 360 420, 700 600, 1040 470 S 1400 320, 1520 345" fill="none" stroke="url(#cg)" stroke-width="5" opacity=".6"/>
+  </svg>
+  <div class="wrap">
+    <div>
+      <h1>دليل الهوية البصرية<br><span>رايا لوب | RAYA LOOP</span></h1>
+      <p>المرجع الموحد لاستخدام الشعار والألوان والخطوط والعناصر الجرافيكية في كل ما يصدر عن المؤسسة: من المطبوعات والمراسلات إلى الموقع والمنصات الاجتماعية.</p>
+      <div class="meta"><span>الإصدار 1.0</span><span>نوفمبر 2026</span><span class="en">Creating Opportunities. Sustaining Impact.</span></div>
+    </div>
+    <img src="/assets/img/logo-white.svg" alt="شعار رايا لوب بالأبيض">
+  </div>
+</header>
+
+<main class="wrap">
+  <nav class="toc" aria-label="فهرس الدليل">
+    <a href="#essence">جوهر العلامة</a><a href="#logo">الشعار</a><a href="#color">الألوان</a><a href="#type">الخطوط</a><a href="#elements">العناصر الجرافيكية</a><a href="#stationery">المطبوعات</a><a href="#social">المنصات الاجتماعية</a><a href="#voice">نبرة الكتابة</a>
+  </nav>
+
+  <!-- 01 -->
+  <section class="ch" id="essence">
+    <div class="ch-head"><span class="n">01</span><h2>جوهر العلامة</h2><p>كل قرار بصري في هذا الدليل مأخوذ من الملف التعريفي: «راية» للقيادة والطموح، و«لوب» للحلقة المتصلة التي تجعل كل نجاح بداية لفرصة جديدة.</p></div>
+    <div class="essence">
+      <div class="ess"><b>الوعد</b><p>نصنع الفرص.. ونستدام بالأثر</p><p class="en" style="color:var(--blue);font-size:14px">Creating Opportunities. Sustaining Impact.</p></div>
+      <div class="ess"><b>الشخصية</b><p>شريك يفكر معك، ويطور لأجلك، ويعمل معك لتحقيق النتائج.</p></div>
+      <div class="ess"><b>القيم الست</b><div class="words"><span>الشراكة</span><span>الابتكار</span><span>التمكين</span><span>الكفاءة</span><span>الاستدامة</span><span>الأثر</span></div></div>
+      <div class="ess"><b>الراية (RAYA)</b><p>القيادة والثقة والرصانة، ويعبر عنها اللون الكحلي.</p></div>
+      <div class="ess"><b>الحلقة (LOOP)</b><p>الترابط والاستمرارية، ويعبر عنها الشريط الفضي المنحني.</p></div>
+      <div class="ess"><b>الجمهور الأول</b><p>الجمعيات والمؤسسات غير الربحية والمانحة والأوقاف، ثم القطاعان الحكومي والخاص.</p></div>
+    </div>
+  </section>
+
+  <!-- 02 -->
+  <section class="ch" id="logo">
+    <div class="ch-head"><span class="n">02</span><h2>الشعار</h2><p>الشعار المعتمد يتكون من الحرف R بخط منساب يلتف حوله شريط فضي، وتحته الاسم بالعربية والإنجليزية. لا يُعاد رسمه ولا تُغيّر نسبه. ملفاته المتجهة (SVG) مرفقة مع هذا الدليل.</p></div>
+    <div class="grid g4">
+      <div><div class="tile t-white"><img src="/assets/img/logo-color.svg" alt="الشعار الأساسي"></div><p class="label">الأساسي: على الخلفيات الفاتحة</p></div>
+      <div><div class="tile t-navy"><img src="/assets/img/logo-white.svg" alt="الشعار المعكوس"></div><p class="label">المعكوس: على الكحلي والصور الداكنة</p></div>
+      <div><div class="tile t-ice"><img src="/assets/img/logo-mono.svg" alt="الشعار أحادي اللون"></div><p class="label">أحادي اللون: للختم والطباعة بلون واحد</p></div>
+      <div><div class="tile t-white"><img src="/assets/img/mark-color.svg" alt="الرمز" style="max-height:120px"></div><p class="label">الرمز وحده: أيقونة الموقع والحسابات</p></div>
+    </div>
+
+    <div class="grid g2" style="margin-top:26px;align-items:center">
+      <div class="clear">
+        <div class="box">
+          <span class="x" style="top:0;left:50%;transform:translateX(-50%)">X</span><span class="x" style="bottom:0;left:50%;transform:translateX(-50%)">X</span>
+          <span class="x" style="right:0;top:50%;transform:translateY(-50%)">X</span><span class="x" style="left:0;top:50%;transform:translateY(-50%)">X</span>
+          <img src="/assets/img/logo-color.svg" alt="المساحة الآمنة حول الشعار">
+        </div>
+      </div>
+      <div class="rules">
+        <h3 style="font-size:19px">المساحة الآمنة والحجم الأدنى</h3>
+        <div class="rule"><i>1</i><p>اترك حول الشعار مساحة فارغة تساوي ارتفاع حرف «R» في كلمة RAYA (القيمة X) من كل الجهات.</p></div>
+        <div class="rule"><i>2</i><p>الحد الأدنى للشعار الكامل: 22 مم في الطباعة و 90 بكسل على الشاشة. تحت ذلك استخدم الرمز وحده.</p></div>
+        <div class="rule"><i>3</i><p>الحد الأدنى للرمز وحده: 8 مم في الطباعة و 24 بكسل على الشاشة.</p></div>
+        <div class="rule"><i>4</i><p>الموضع المفضل: أعلى يمين الصفحة في التصاميم العربية، وأعلى يسارها في الإنجليزية.</p></div>
+      </div>
+    </div>
+
+    <h3 style="font-size:19px;margin:34px 0 14px">استخدامات غير مسموحة</h3>
+    <div class="grid g4 dont">
+      <div><div class="tile t-white"><img src="/assets/img/logo-color.svg" alt="" style="transform:scaleX(1.45);max-height:120px"></div><p class="label">لا تمط الشعار ولا تضغطه</p></div>
+      <div><div class="tile t-white"><img src="/assets/img/logo-color.svg" alt="" style="filter:hue-rotate(140deg) saturate(3)"></div><p class="label">لا تغيّر ألوانه</p></div>
+      <div><div class="tile t-white"><img src="/assets/img/logo-color.svg" alt="" style="transform:rotate(-14deg);max-height:140px"></div><p class="label">لا تدوّره ولا تميله</p></div>
+      <div><div class="tile" style="background:#7a8fb0"><img src="/assets/img/logo-color.svg" alt=""></div><p class="label">لا تضعه على خلفية بتباين ضعيف</p></div>
+    </div>
+  </section>
+
+  <!-- 03 -->
+  <section class="ch" id="color">
+    <div class="ch-head"><span class="n">03</span><h2>الألوان</h2><p>الألوان مستخرجة مباشرة من الشعار والختم: كحلي الراية، وفضي الحلقة، ومعهما أزرق مساعد للتمييز. قيم CMYK تقريبية، فاطلب من المطبعة بروفة قبل الطباعة الكبيرة.</p></div>
+    <div class="grid g4">
+      <div class="sw-card"><div class="chip" style="background:var(--navy)">كحلي الراية</div><div class="info"><b>Raya Navy</b><code>HEX #0B2B55</code><code>RGB 11 43 85</code><code>CMYK 87 49 0 67</code><button class="copy-btn" data-hex="#0B2B55">نسخ HEX</button></div></div>
+      <div class="sw-card"><div class="chip" style="background:var(--navy-950)">كحلي عميق</div><div class="info"><b>Deep Navy</b><code>HEX #051631</code><code>RGB 5 22 49</code><code>CMYK 90 55 0 81</code><button class="copy-btn" data-hex="#051631">نسخ HEX</button></div></div>
+      <div class="sw-card"><div class="chip light" style="background:var(--silver-grad)">فضي الحلقة</div><div class="info"><b>Loop Silver</b><code>HEX #A9B1BF</code><code>RGB 169 177 191</code><code>CMYK 12 7 0 25</code><button class="copy-btn" data-hex="#A9B1BF">نسخ HEX</button></div></div>
+      <div class="sw-card"><div class="chip" style="background:var(--blue)">أزرق مساعد</div><div class="info"><b>Accent Blue</b><code>HEX #1B5296</code><code>RGB 27 82 150</code><code>CMYK 82 45 0 41</code><button class="copy-btn" data-hex="#1B5296">نسخ HEX</button></div></div>
+      <div class="sw-card"><div class="chip light" style="background:var(--silver-300)">فضي فاتح</div><div class="info"><b>Light Silver</b><code>HEX #C9CFD9</code><code>RGB 201 207 217</code><code>CMYK 7 5 0 15</code><button class="copy-btn" data-hex="#C9CFD9">نسخ HEX</button></div></div>
+      <div class="sw-card"><div class="chip light" style="background:var(--ice);border-bottom:1px solid var(--line)">ثلجي</div><div class="info"><b>Ice</b><code>HEX #F3F5F9</code><code>RGB 243 245 249</code><code>CMYK 2 1 0 2</code><button class="copy-btn" data-hex="#F3F5F9">نسخ HEX</button></div></div>
+      <div class="sw-card"><div class="chip" style="background:var(--ink)">حبر النصوص</div><div class="info"><b>Ink</b><code>HEX #0E1A2B</code><code>RGB 14 26 43</code><code>CMYK 67 40 0 83</code><button class="copy-btn" data-hex="#0E1A2B">نسخ HEX</button></div></div>
+      <div class="sw-card"><div class="chip light" style="background:#fff;border-bottom:1px solid var(--line)">أبيض</div><div class="info"><b>White</b><code>HEX #FFFFFF</code><code>RGB 255 255 255</code><code>CMYK 0 0 0 0</code><button class="copy-btn" data-hex="#FFFFFF">نسخ HEX</button></div></div>
+    </div>
+    <h3 style="font-size:17px;margin-top:28px">نسبة الاستخدام التقريبية</h3>
+    <div class="ratio" role="img" aria-label="أبيض وثلجي 55٪، كحلي 30٪، فضي 10٪، أزرق 5٪">
+      <div style="flex:55;background:var(--ice);color:var(--navy)">أبيض وثلجي 55٪</div>
+      <div style="flex:30;background:var(--navy);color:#fff">كحلي 30٪</div>
+      <div style="flex:10;background:var(--silver-grad);color:var(--navy)">فضي 10٪</div>
+      <div style="flex:5;background:var(--blue);color:#fff">5٪</div>
+    </div>
+    <p class="label">الفضي يستخدم بتدرج لامع (من #8E97A8 إلى #E4E8EE ثم #9AA3B3) في الخطوط المنحنية والإبراز فقط، ولا يُستخدم لون نص على خلفية بيضاء.</p>
+  </section>
+
+  <!-- 04 -->
+  <section class="ch" id="type">
+    <div class="ch-head"><span class="n">04</span><h2>الخطوط</h2><p>خط واحد للعربية والإنجليزية: IBM Plex Sans Arabic. هندسي واضح ويتناغم مع حروف اسم «رايا لوب» في الشعار، ومجاني من Google Fonts للطباعة والويب.</p></div>
+    <div class="type-hero">
+      <div class="big">رايا Aa</div>
+      <div>
+        <h3 style="font-size:22px">IBM Plex Sans Arabic</h3>
+        <p style="color:#3A4659">العناوين بوزن عريض (Bold 700)، والعناوين الفرعية بوزن متوسط (SemiBold 600)، والنصوص بوزن عادي (Regular 400)، والملاحظات بوزن خفيف (Light 300).</p>
+        <div class="weights"><span style="font-weight:300">خفيف</span><span style="font-weight:400">عادي</span><span style="font-weight:500">متوسط</span><span style="font-weight:600">نصف عريض</span><span style="font-weight:700">عريض</span></div>
+        <p class="label">البديل في Word عند عدم توفره: Segoe UI أو Tahoma.</p>
+      </div>
+    </div>
+    <div class="scale">
+      <div class="scale-row"><small>عنوان رئيسي · 48 / 700</small><span style="font-size:clamp(28px,4vw,48px);font-weight:700;color:var(--navy);line-height:1.3">نصنع الفرص.. ونستدام بالأثر</span></div>
+      <div class="scale-row"><small>عنوان قسم · 32 / 700</small><span style="font-size:clamp(22px,3vw,32px);font-weight:700;color:var(--navy)">منظومة متكاملة لتطوير المنظمات</span></div>
+      <div class="scale-row"><small>عنوان فرعي · 22 / 600</small><span style="font-size:22px;font-weight:600;color:var(--navy)">الاستشارات والتطوير المؤسسي</span></div>
+      <div class="scale-row"><small>شعار فرعي · 17 / 500</small><span style="font-size:17px;font-weight:500;color:var(--blue)">نبني مؤسسات أكثر كفاءة.. وأكثر جاهزية للمستقبل</span></div>
+      <div class="scale-row"><small>نص · 16 / 400</small><span style="font-size:16px;color:#3A4659">نساعد المنظمات على تطوير بنيتها المؤسسية وتعزيز كفاءة إدارتها وعملياتها، من خلال حلول استشارية وتطويرية.</span></div>
+      <div class="scale-row"><small>إنجليزي · 15 / 400</small><span class="en" style="font-size:15px;color:var(--blue);letter-spacing:.02em">Creating Opportunities. Sustaining Impact.</span></div>
+    </div>
+  </section>
+
+  <!-- 05 -->
+  <section class="ch" id="elements">
+    <div class="ch-head"><span class="n">05</span><h2>العناصر الجرافيكية</h2><p>عنصران فقط يحملان شخصية العلامة: الشريط الفضي المنحني المأخوذ من الشعار، والحلقة التي تمثل دورة العمل. استخدم واحدًا منهما في كل تصميم، لا الاثنين بكثافة.</p></div>
+    <div class="grid g3">
+      <div class="el">
+        <svg viewBox="0 0 400 240" aria-hidden="true"><rect width="400" height="240" fill="#0B2B55"/><defs><linearGradient id="e1" x1="0" x2="1"><stop offset="0" stop-color="#8E97A8" stop-opacity=".1"/><stop offset=".5" stop-color="#E4E8EE"/><stop offset="1" stop-color="#9AA3B3" stop-opacity=".3"/></linearGradient></defs><path d="M-20 200 C 100 150, 180 240, 290 180 S 390 100, 430 115" fill="none" stroke="url(#e1)" stroke-width="12" stroke-linecap="round"/><path d="M-20 222 C 110 180, 200 260, 300 205 S 400 130, 430 140" fill="none" stroke="url(#e1)" stroke-width="3" opacity=".6"/></svg>
+        <div class="cap"><b>الشريط الفضي</b>منحنى أفقي في أسفل أو أعلى التصميم، بتدرج فضي، ويُفضّل على الكحلي.</div>
+      </div>
+      <div class="el">
+        <svg viewBox="0 0 400 240" aria-hidden="true"><rect width="400" height="240" fill="#F3F5F9"/><circle cx="200" cy="120" r="78" fill="none" stroke="#C9CFD9" stroke-width="10"/><g fill="#0B2B55"><circle cx="200" cy="42" r="15"/><circle cx="267.5" cy="81" r="15"/><circle cx="267.5" cy="159" r="15"/><circle cx="200" cy="198" r="15"/><circle cx="132.5" cy="159" r="15"/><circle cx="132.5" cy="81" r="15"/></g></svg>
+        <div class="cap"><b>الحلقة</b>ست نقاط على دائرة تمثل: نكتشف، نصمم، نمكّن، ننفّذ، نشغّل، نطوّر ونستدام.</div>
+      </div>
+      <div class="el">
+        <svg viewBox="0 0 400 240" aria-hidden="true"><rect width="400" height="240" fill="#FFFFFF"/><image href="/assets/img/mark-color.svg" x="110" y="40" width="180" height="160" opacity=".08"/><rect x="40" y="60" width="200" height="10" rx="5" fill="#E6EAF0"/><rect x="40" y="82" width="260" height="10" rx="5" fill="#E6EAF0"/><rect x="40" y="104" width="230" height="10" rx="5" fill="#E6EAF0"/><rect x="40" y="126" width="180" height="10" rx="5" fill="#E6EAF0"/></svg>
+        <div class="cap"><b>الرمز علامةً مائية</b>الحرف R بشفافية 6 إلى 8٪ في منتصف الأوراق الرسمية والشرائح.</div>
+      </div>
+    </div>
+    <div class="grid g3" style="margin-top:18px">
+      <div class="ess"><b>الزوايا</b><p>انحناء 16 إلى 24 بكسل للبطاقات، و 999 للأزرار (كبسولة).</p></div>
+      <div class="ess"><b>الأيقونات</b><p>خطية بسماكة 2 بكسل وأطراف مستديرة، بالكحلي أو الأبيض.</p></div>
+      <div class="ess"><b>الصور</b><p>صور حقيقية لفرق عمل واجتماعات، بإضاءة طبيعية ودرجات باردة، مع طبقة كحلية شفافة عند وضع نص عليها.</p></div>
+    </div>
+  </section>
+
+  <!-- 06 -->
+  <section class="ch" id="stationery">
+    <div class="ch-head"><span class="n">06</span><h2>المطبوعات والمراسلات</h2><p>بطاقة العمل مقاس 85 × 55 مم، والورق الرسمي A4 مطابق للقالب الحالي للمؤسسة، وتوقيع البريد يستخدم الشعار الأساسي.</p></div>
+    <div class="grid g2" style="align-items:start">
+      <div class="grid" style="gap:22px">
+        <div class="card-mock bc-front">
+          <svg class="mock-sw" viewBox="0 0 850 550" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="b1" x1="0" x2="1"><stop offset="0" stop-color="#8E97A8" stop-opacity="0"/><stop offset=".5" stop-color="#E4E8EE" stop-opacity=".8"/><stop offset="1" stop-color="#9AA3B3" stop-opacity=".2"/></linearGradient></defs><path d="M-20 480 C 220 410, 420 560, 640 450 S 830 330, 880 345" fill="none" stroke="url(#b1)" stroke-width="16"/></svg>
+          <img src="/assets/img/logo-white.svg" alt="بطاقة العمل: الوجه">
+        </div>
+        <div class="card-mock bc-back">
+          <div class="top">
+            <div><div class="nm">الاسم الكامل</div><div class="rl">المسمى الوظيفي</div></div>
+            <img src="/assets/img/logo-color.svg" alt="">
+          </div>
+          <ul>
+            <li>الجوال: <b>0559605523</b></li>
+            <li>البريد: <b>info@rayaloop.com</b></li>
+            <li>الموقع: <b>rayaloop.com</b></li>
+            <li>المملكة العربية السعودية · الرقم الموحد <b>7055549047</b></li>
+          </ul>
+          <svg class="mock-sw" viewBox="0 0 850 550" preserveAspectRatio="none" aria-hidden="true"><path d="M-20 540 C 220 500, 420 580, 640 520 S 830 450, 880 460" fill="none" stroke="#0B2B55" stroke-width="22"/><path d="M-20 515 C 220 475, 420 555, 640 495 S 830 425, 880 435" fill="none" stroke="#C9CFD9" stroke-width="6"/></svg>
+        </div>
+        <div class="sig">
+          <img src="/assets/img/logo-color.svg" alt="">
+          <div class="d"><b>الاسم الكامل</b><br>المسمى الوظيفي · رايا لوب<br><span class="en">0559605523 · info@rayaloop.com · rayaloop.com</span><br><span class="en">Creating Opportunities. Sustaining Impact.</span></div>
+        </div>
+      </div>
+      <div class="lh" aria-label="نموذج الورق الرسمي">
+        <svg class="mock-sw" viewBox="0 0 210 297" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="l1" x1="0" x2="1"><stop offset="0" stop-color="#8E97A8"/><stop offset=".5" stop-color="#E4E8EE"/><stop offset="1" stop-color="#9AA3B3"/></linearGradient></defs><path d="M120 0 C 165 8, 200 30, 210 62 L210 0 Z" fill="#0B2B55"/><path d="M110 0 C 160 10, 195 34, 210 70" fill="none" stroke="url(#l1)" stroke-width="2.4"/><path d="M0 284 C 60 272, 140 290, 210 262 L210 297 L0 297 Z" fill="#0B2B55"/><path d="M0 280 C 60 268, 140 286, 210 257" fill="none" stroke="url(#l1)" stroke-width="2"/></svg>
+        <div class="hd"><img src="/assets/img/logo-color.svg" alt=""><div class="t">نصنع الفرص.. ونستدام بالأثر<span class="en">Creating Opportunities. Sustaining Impact.</span></div></div>
+        <img class="wm" src="/assets/img/mark-color.svg" alt="">
+        <div class="body"><i style="width:40%"></i><i style="width:25%;margin-bottom:10px"></i><i></i><i></i><i style="width:92%"></i><i></i><i style="width:70%"></i><i style="width:0;margin:6px 0"></i><i></i><i style="width:85%"></i><i></i><i style="width:60%"></i></div>
+        <div class="ft"><span>0559605523</span><span>info@rayaloop.com</span><span style="direction:rtl">المملكة العربية السعودية</span><span>7055549047</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 07 -->
+  <section class="ch" id="social">
+    <div class="ch-head"><span class="n">07</span><h2>المنصات الاجتماعية</h2><p>ثلاثة قوالب مربعة (1080 × 1080) تغطي أغلب المنشورات: اقتباس أو رسالة، تعريف بخدمة، ورقم أو إنجاز. صورة الحساب: الرمز وحده على خلفية كحلية.</p></div>
+    <div class="grid g2" style="max-width:700px">
+      <div class="post p1">
+        <svg class="mock-sw" viewBox="0 0 400 400" preserveAspectRatio="none" aria-hidden="true"><path d="M-10 350 C 100 300, 190 390, 290 330 S 390 250, 420 260" fill="none" stroke="url(#b1)" stroke-width="9"/></svg>
+        <img class="lg" src="/assets/img/logo-white.svg" alt="">
+        <h3>لا نكتفي بتقديم الحلول.. بل نشارك في تحويلها إلى واقع يصنع القيمة والأثر.</h3>
+        <div class="foot"><span>rayaloop.com</span><span class="en">@rayaloop</span></div>
+      </div>
+      <div class="post p2">
+        <img class="lg" src="/assets/img/logo-color.svg" alt="">
+        <div style="display:grid;gap:10px"><span class="pill">المسار 02</span><h3>صناعة الفرص والاستدامة</h3>
+        <ul><li>اكتشاف الفرص الاستثمارية</li><li>دراسات الجدوى ونماذج الإيرادات</li><li>الشراكات وتنمية الموارد</li></ul></div>
+        <div class="foot"><span>كل مورد فرصة.. وكل فرصة مشروع محتمل</span></div>
+      </div>
+      <div class="post p3">
+        <img class="lg" src="/assets/img/logo-color.svg" alt="">
+        <div><div class="big num">6</div><h3 style="font-size:20px;margin-top:8px">مراحل في دورة رايا لوب</h3></div>
+        <div class="row"><span>نكتشف</span><span>نصمم</span><span>نمكّن</span><span>ننفّذ</span><span>نشغّل</span><span>نطوّر</span></div>
+      </div>
+      <div class="post" style="background:var(--navy);display:grid;place-items:center;border-radius:50%;aspect-ratio:1/1;padding:18%">
+        <img src="/assets/img/mark-white.svg" alt="صورة الحساب" style="width:100%">
+      </div>
+    </div>
+    <p class="label">اسم الحساب @rayaloop مقترح للتوحيد على جميع المنصات، ويُتحقق من توفره قبل الاعتماد.</p>
+  </section>
+
+  <!-- 08 -->
+  <section class="ch" id="voice">
+    <div class="ch-head"><span class="n">08</span><h2>نبرة الكتابة</h2><p>نكتب كشريك واثق: عربية فصيحة واضحة، جمل قصيرة، وأفعال تدل على العمل (نكتشف، نصمم، ننفّذ). الثنائيات المتوازنة بنقطتين (..) جزء من أسلوب العلامة.</p></div>
+    <div class="voice">
+      <div class="yes"><h3>نكتب هكذا</h3><ul><li>نحوّل الخطط إلى مشاريع.. والمشاريع إلى نتائج.</li><li>ندرس واقع منظمتكم ونحدد الفرص القابلة للتطوير.</li><li>أرقام ونتائج ملموسة عند الحديث عن الأثر.</li></ul></div>
+      <div class="no"><h3>نتجنب</h3><ul><li>المبالغة والوعود المطلقة مثل «الأفضل في المملكة».</li><li>المصطلحات الأجنبية حين يوجد مقابل عربي واضح.</li><li>الفقرات الطويلة بلا عناوين في المنشورات.</li></ul></div>
+    </div>
+  </section>
+</main>
+
+<footer>رايا لوب | RAYA LOOP · الرقم الوطني الموحد <span class="num">7055549047</span> · info@rayaloop.com</footer>
+
+<script>
+document.querySelectorAll('.copy-btn').forEach(function(b){
+  b.addEventListener('click',function(){
+    var hex=b.getAttribute('data-hex'),old=b.textContent;
+    function done(t){b.textContent=t;setTimeout(function(){b.textContent=old},1400)}
+    try{navigator.clipboard.writeText(hex).then(function(){done('تم النسخ')},function(){done(hex)})}catch(e){done(hex)}
+  });
+});
+</script>
+</html>
