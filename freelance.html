@@ -1,8 +1,7 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="description" content="انضم إلى فريقنا المرن — مجالات نبحث فيها عن مستقلين متخصصين. قدّم عرضك">
+<meta charset="utf-8">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="ar_SA">
 <meta property="og:site_name" content="رايا لوب RAYA LOOP">
@@ -19,235 +18,356 @@
 <meta name="twitter:title" content="فرص العمل الحر | رايا لوب">
 <meta name="twitter:description" content="انضم إلى فريقنا المرن — مجالات نبحث فيها عن مستقلين متخصصين. قدّم عرضك">
 <meta name="twitter:image" content="https://rayaloop.wasl.uk/og/freelance.jpg">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>فرص العمل الحر | رايا لوب</title>
-<link rel="icon" href="/assets/img/mark-color.svg">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;600;700&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>فرص المستقلين | رايا لوب RAYA LOOP</title>
+<meta name="description" content="مجالات العمل التي تطرحها رايا لوب للمستقلين المتخصصين: وصف كل مجال ومخرجاته والمهارات المطلوبة والمدة، مع نموذج لتقديم العروض.">
+<meta name="theme-color" content="#0B2B55">
+<link rel="icon" type="image/svg+xml" href="/assets/img/mark-color.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap">
+<link rel="stylesheet" href="/assets/style.css">
 <style>
-/* VOICE: شريك واثق، فصحى قصيرة، ثنائيات متوازنة
-   IDEA: لوحة فرص لرايا لوب — كل عمل بطاقة كأمر عمل مختصر
-   PICTURE: الحلقة ذات النقاط الست على الكحلي مع بطاقة الموقع الإلكتروني
-   COLOUR and TYPE: كحلي الراية #0B2B55، كحلي عميق، فضي الحلقة، أزرق مساعد، ثلجي — IBM Plex Sans Arabic وحده
-   LAYOUT: شريط علوي، واجهة كحلية، شبكة الأعمال، التقديم والشروط، تذييل كحلي */
-:root{color-scheme:light dark;
---bg:light-dark(#ffffff,#051631);--ice:light-dark(#F3F5F9,#0a2142);--ink:light-dark(#0E1A2B,#F3F5F9);
---mute:light-dark(#4a5568,#A9B1BF);--navy:#0B2B55;--deep:#051631;--blue:light-dark(#1B5296,#7fa9e0);
---silver:#A9B1BF;--lsilver:#C9CFD9;--line:light-dark(#dfe3ea,#1d3558);--card:light-dark(#fff,#0b2147)}
-:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
-*{box-sizing:border-box;min-width:0}
-body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.7 "IBM Plex Sans Arabic","Segoe UI",Tahoma,sans-serif;overflow-x:clip}
-h1,h2,h3{margin:0;text-wrap:balance;line-height:1.2;font-weight:700}
-a{color:inherit}
-.band{padding:clamp(28px,4vw,64px) max(5vw,16px)}
-.wrap{max-width:1240px;margin:0 auto}
-nav.bar{background:var(--deep);color:#fff;padding:12px max(5vw,16px)}
-nav .wrap{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap}
-.brand{display:flex;align-items:center;gap:10px;text-decoration:none}
-.brand b{font-size:19px;display:block;line-height:1.1}.brand small{font-size:12px;letter-spacing:.06em;color:var(--lsilver)}
-.links{display:flex;gap:6px;flex-wrap:wrap}
-.links a{text-decoration:none;font-size:14px;padding:8px 12px;border-radius:99px;color:var(--lsilver)}
-.links a:hover{background:rgba(255,255,255,.08);color:#fff}
-header.band{background:var(--navy);color:#fff;position:relative;overflow:hidden;padding-bottom:clamp(40px,5vw,76px)}
-header .ring{position:absolute;inset-inline-end:-140px;top:-140px;width:440px;opacity:.07;pointer-events:none}
-.hero{position:relative;display:grid;grid-template-columns:minmax(0,.95fr) minmax(0,1.05fr);gap:clamp(24px,4vw,56px);align-items:center}
-.kick{color:var(--lsilver);font-weight:600;margin:0 0 10px}
-h1{font-size:clamp(32px,4.4vw,48px)}
-.lead{font-size:17px;max-width:52ch;color:#e3e8f0;margin:16px 0 24px}
-.btn{display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:0 24px;border-radius:99px;border:0;font:600 16px "IBM Plex Sans Arabic",sans-serif;cursor:pointer;text-decoration:none}
-.btn.p{background:#fff;color:var(--navy)}.btn.g{background:transparent;color:#fff;border:1.5px solid var(--silver)}
-.btn.n{background:var(--navy);color:#fff}:root[data-theme=dark] .btn.n{background:#1B5296}
-@media(prefers-color-scheme:dark){:root:not([data-theme=light]) .btn.n{background:#1B5296}}
-.btn:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,.chip:focus-visible,a:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
-.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-.facts{display:flex;gap:26px;flex-wrap:wrap;margin-top:28px;font-size:14px;color:var(--lsilver)}
-.facts b{display:block;font-size:26px;color:#fff}
-.ticket{background:var(--card);color:var(--ink);border-radius:20px;box-shadow:0 24px 50px rgba(5,22,49,.45);overflow:hidden}
-.thead{background:var(--ice);padding:18px 22px;display:flex;gap:16px;align-items:center}
-.thead svg{flex:none;width:64px;height:64px}
-.tbody{padding:20px 22px 24px}
-.tag{display:inline-block;font-size:13px;font-weight:600;padding:3px 12px;border-radius:99px;white-space:nowrap}
-.s-open{background:light-dark(#e6eef9,#123366);color:var(--blue)}
-.s-prog{background:light-dark(#eef0f4,#1a2c4a);color:light-dark(#4a5568,#C9CFD9)}
-.s-done{background:light-dark(#f3f5f9,#0f2140);color:var(--mute)}
-.prio{background:var(--navy);color:#fff}
-.meta{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:14px 0;font-size:14px}
-.meta div{background:var(--ice);border-radius:12px;padding:8px 10px}.meta span{display:block;color:var(--mute);font-size:13px;font-weight:300}
-ul.out{margin:6px 0 0;padding-inline-start:20px;font-size:15px}
-.trk{font-size:13px;color:var(--blue);font-weight:600}
-.sec h2{font-size:clamp(26px,3vw,32px);margin-bottom:8px}.sub{color:var(--mute);margin:0 0 22px;max-width:70ch}
-.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:22px}
-.chip{min-height:44px;padding:0 18px;border-radius:99px;border:1.5px solid var(--line);background:var(--card);color:var(--ink);font:600 15px "IBM Plex Sans Arabic",sans-serif;cursor:pointer}
-.chip[aria-pressed=true]{background:var(--navy);border-color:var(--navy);color:#fff}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,330px),1fr));gap:18px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:22px;display:flex;flex-direction:column;gap:6px}
-.card h3{font-size:21px}.card p{margin:0;color:var(--mute);font-size:15px}
-.card .btn{margin-top:auto;align-self:flex-start}
-.card.done{opacity:.65}
-.ico{width:40px;height:40px;border-radius:12px;background:var(--ice);display:grid;place-items:center;color:var(--blue)}
-.ico svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.empty{padding:30px;text-align:center;color:var(--mute);border:1px dashed var(--line);border-radius:18px}
-.two{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,.8fr);gap:clamp(20px,4vw,48px)}
-form{display:grid;gap:14px;background:var(--card);padding:24px;border-radius:20px;border:1px solid var(--line)}
-label{font-weight:600;font-size:15px;display:grid;gap:6px}
-input,select,textarea{font:16px "IBM Plex Sans Arabic",sans-serif;padding:11px 14px;border-radius:12px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink);min-height:46px;width:100%}
-textarea{min-height:96px;resize:vertical}
-.req{color:var(--blue)}
-.pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
-.err{color:#b42318;font-size:14px;min-height:1em;margin:0}
-.result{display:none;background:var(--card);border:1.5px solid var(--blue);border-radius:16px;padding:18px;margin-top:16px}
-.result pre{white-space:pre-wrap;font:15px/1.7 "IBM Plex Sans Arabic",sans-serif;margin:0 0 12px}
-.terms{padding-inline-start:20px}.terms li{margin-bottom:10px}
-.contact{margin-top:20px;background:var(--navy);color:#fff;border-radius:18px;padding:18px 20px;font-size:15px}
-.contact a{color:#fff}.contact span{white-space:nowrap;direction:ltr;unicode-bidi:embed}
-footer{background:var(--deep);color:var(--lsilver);font-size:14px}
-footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
-.note{font-size:13px;color:var(--mute);font-weight:300}
-@media(max-width:860px){.hero,.two{grid-template-columns:minmax(0,1fr)}}
-@media(max-width:600px){.meta{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.pair{grid-template-columns:minmax(0,1fr)}.links{display:none}}
-@media(prefers-reduced-motion:no-preference){.card{transition:transform .2s,box-shadow .2s}.card:hover{transform:translateY(-3px);box-shadow:0 12px 26px rgba(11,43,85,.10)}}
+  .hero.fl{padding:90px 0 110px}
+  .hero.fl h1{font-size:clamp(34px,4.6vw,56px)}
+  .meta-row{display:flex;flex-wrap:wrap;gap:12px;margin-top:6px}
+  .chip{display:inline-flex;align-items:center;gap:8px;padding:8px 16px;border-radius:999px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);font-size:14px;color:#D5DCE7}
+  .chip b{color:#fff;font-weight:600}
+
+  .legend{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:28px}
+  .filter{font-family:inherit;font-size:14.5px;font-weight:500;padding:8px 18px;border-radius:999px;border:1px solid var(--line);background:#fff;color:var(--navy);cursor:pointer}
+  .filter[aria-pressed="true"]{background:var(--navy);border-color:var(--navy);color:#fff}
+
+  .works{display:grid;grid-template-columns:repeat(2,1fr);gap:22px}
+  .work{position:relative;background:#fff;border:1px solid var(--line);border-radius:22px;padding:30px;display:flex;flex-direction:column;gap:14px}
+  .work.featured{grid-column:1/-1;border:0;background:var(--navy);color:#fff;padding:38px}
+  .work.featured h3{color:#fff;font-size:clamp(22px,2.4vw,28px)}
+  .work.featured .desc,.work.featured li{color:#D5DCE7}
+  .work.featured .label{color:var(--silver-300)}
+  .work.featured .facts div{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.14)}
+  .work.featured .facts b{color:#fff}
+  .work.featured .skill{background:rgba(255,255,255,.1);color:#fff}
+  .work-top{display:flex;justify-content:space-between;align-items:flex-start;gap:14px}
+  .work .no{font-size:13px;font-weight:700;color:var(--silver-500);letter-spacing:.1em}
+  .work.featured .no{color:var(--silver)}
+  .work h3{font-size:21px;margin:4px 0 0}
+  .work .desc{margin:0;color:#3A4659;font-size:15.5px}
+  .status{flex:none;display:inline-flex;align-items:center;gap:7px;font-size:13.5px;font-weight:600;padding:6px 14px;border-radius:999px;white-space:nowrap}
+  .status::before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor}
+  .st-open{background:#E5F4EC;color:#17784A}
+  .st-progress{background:#FFF3DD;color:#9A6300}
+  .st-done{background:var(--silver-100);color:var(--muted)}
+  .label{font-size:13.5px;font-weight:600;color:var(--blue);margin:0 0 6px}
+  .work ul{margin:0;padding-inline-start:20px;font-size:15px;color:#3A4659}
+  .work li{margin-bottom:3px}
+  .two{display:grid;grid-template-columns:1.3fr 1fr;gap:22px}
+  .skills{display:flex;flex-wrap:wrap;gap:8px}
+  .skill{font-size:13.5px;padding:5px 12px;border-radius:999px;background:var(--ice);color:var(--navy)}
+  .facts{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:auto}
+  .facts div{border:1px solid var(--line);border-radius:14px;padding:10px 14px;background:var(--ice)}
+  .facts small{display:block;font-size:12.5px;color:var(--silver-500)}
+  .work.featured .facts small{color:var(--silver)}
+  .facts b{font-size:15px;color:var(--navy);font-weight:600}
+  .work .btn{align-self:flex-start;margin-top:4px}
+  .work .btn[disabled]{opacity:.55;cursor:not-allowed;transform:none}
+
+  .form-wrap{display:grid;grid-template-columns:.8fr 1.2fr;gap:40px;align-items:start}
+  form.offer{background:#fff;border:1px solid var(--line);border-radius:24px;padding:34px;display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .field{display:flex;flex-direction:column;gap:6px}
+  .field.full{grid-column:1/-1}
+  .field label{font-size:14.5px;font-weight:600;color:var(--navy)}
+  .field label i{font-style:normal;color:#B4232C}
+  .field input,.field select,.field textarea{font-family:inherit;font-size:16px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--ice);color:var(--ink);width:100%}
+  .field input:focus,.field select:focus,.field textarea:focus{outline:2px solid var(--blue);outline-offset:1px;background:#fff}
+  .field .hint{font-size:13px;color:var(--muted)}
+  .field .err{font-size:13px;color:#B4232C;display:none}
+  .field.bad .err{display:block}
+  .field.bad input{border-color:#B4232C}
+  .actions{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+  .btn-wa{background:#128C4B;color:#fff}
+  .btn-wa:hover{background:#0F7A41}
+  .btn-line{background:#fff;color:var(--navy);box-shadow:inset 0 0 0 1.5px var(--navy)}
+  .toast{font-size:14px;color:#17784A;font-weight:600}
+  .wa-flag{font-size:13px;color:var(--muted);grid-column:1/-1;margin:0}
+
+  .terms{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+  .term{border-radius:20px;padding:26px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12)}
+  .term h3{font-size:18px;color:#fff}
+  .term p{margin:0;color:#C3CCDA;font-size:15px}
+
+  @media (max-width:920px){
+    .works,.two,.form-wrap,.terms{grid-template-columns:1fr}
+    .terms{grid-template-columns:1fr 1fr}
+    .work.featured{padding:30px}
+  }
+  @media (max-width:600px){
+    form.offer{grid-template-columns:1fr;padding:24px}
+    .terms,.facts{grid-template-columns:1fr}
+    .work{padding:24px}
+    .work-top{flex-direction:column-reverse}
+  }
 </style>
 </head>
 <body>
-<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
- <linearGradient id="sv" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#C9CFD9"/><stop offset="1" stop-color="#A9B1BF"/></linearGradient>
- <g id="loop"><circle cx="50" cy="50" r="34" fill="none" stroke="url(#sv)" stroke-width="4"/>
-  <g fill="url(#sv)"><circle cx="50" cy="16" r="6"/><circle cx="79.4" cy="33" r="6"/><circle cx="79.4" cy="67" r="6"/><circle cx="50" cy="84" r="6"/><circle cx="20.6" cy="67" r="6"/><circle cx="20.6" cy="33" r="6"/></g></g>
-</defs></svg>
 
-<nav class="bar"><div class="wrap">
- <a class="brand" href="/"><img src="/assets/img/mark-white.svg" alt="" width="38" height="38"><span><b>رايا لوب</b><small>RAYA LOOP</small></span></a>
- <div class="links"><a href="/">الموقع</a><a href="/profile">الملف التعريفي</a><a href="/guide">دليل الهوية</a><a href="#apply">قدّم عرضك</a></div>
-</div></nav>
-
-<header class="band">
- <svg class="ring" viewBox="0 0 100 100" aria-hidden="true"><use href="#loop"/></svg>
- <div class="wrap hero">
-  <div>
-   <p class="kick">فرص العمل الحر · آخر تحديث: <span id="upd"></span></p>
-   <h1>نطرح العمل بوضوح.. ونختار الشريك بعناية</h1>
-   <p class="lead">صفحة خاصة بالمستقلين. نعرض فيها الأعمال ذات القيمة المضافة التي تحتاج خبرة متخصصة ضمن مسارات رايا لوب الأربعة، ولكل عمل وصف ومخرجات ومدة. اختر العمل المناسب، وقدّم عرضك في دقيقتين.</p>
-   <div class="row"><a class="btn p" href="#apply">قدّم عرضك</a><a class="btn g" href="#works">استعرض الأعمال</a></div>
-   <div class="facts" id="facts"></div>
+<header class="site-header" id="top">
+  <div class="container nav">
+    <a href="/" class="brand" aria-label="رايا لوب - الصفحة الرئيسية"><img src="/assets/img/logo-color.svg" alt="شعار رايا لوب RAYA LOOP" width="56" height="54"></a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="#works">الأعمال المطروحة</a></li>
+      <li><a href="#offer">قدّم عرضك</a></li>
+      <li><a href="#terms">الشروط العامة</a></li>
+      <li><a href="/">موقع رايا لوب</a></li>
+    </ul>
+    <a href="#offer" class="btn btn-primary">قدّم عرضك</a>
+    <button class="menu-btn" id="menuBtn" aria-label="القائمة" aria-expanded="false" aria-controls="navLinks">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+    </button>
   </div>
-  <article class="ticket" aria-label="العمل الأبرز">
-   <div class="thead"><svg viewBox="0 0 100 100" aria-hidden="true"><use href="#loop"/></svg><div><span class="tag prio">الأولوية الأولى</span><div class="trk" style="margin-top:6px">مسار التمكين والتحول الرقمي</div></div></div>
-   <div class="tbody" id="featured"></div>
-  </article>
- </div>
 </header>
 
-<section class="band sec" id="works">
- <div class="wrap">
-  <h2>الأعمال المطروحة</h2>
-  <p class="sub">كل بطاقة تبيّن المسار والمخرجات والمدة المتوقعة. تتحدد الميزانية حسب العرض، وتُثبَّت التفاصيل النهائية في العقد.</p>
-  <div class="filters" role="group" aria-label="تصفية حسب الحالة" id="filters"></div>
-  <div class="grid" id="grid"></div>
-  
- </div>
-</section>
-
-<section class="band sec" id="apply" style="background:var(--ice)">
- <div class="wrap two">
-  <div>
-   <h2>قدّم عرضك</h2>
-   <p class="sub">رابط الأعمال السابقة شرط للمراجعة، ولا يُنظر في عرض بدونه.</p>
-   <form id="f" novalidate>
-    <label>العمل المطلوب <span class="req" aria-hidden="true">*</span><select id="work" required></select></label>
-    <div class="pair">
-     <label>الاسم <span class="req">*</span><input id="name" required autocomplete="name"></label>
-     <label>الجوال أو الواتساب <span class="req">*</span><input id="phone" inputmode="tel" required dir="ltr" placeholder="05xxxxxxxx"></label>
+<main>
+<section class="hero fl">
+  <svg class="swoosh" viewBox="0 0 1440 760" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <defs>
+      <linearGradient id="sw1" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#8E97A8" stop-opacity="0"/><stop offset=".45" stop-color="#E4E8EE" stop-opacity=".75"/><stop offset="1" stop-color="#9AA3B3" stop-opacity=".2"/></linearGradient>
+      <linearGradient id="sw2" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#C9CFD9" stop-opacity=".05"/><stop offset=".6" stop-color="#C9CFD9" stop-opacity=".35"/><stop offset="1" stop-color="#C9CFD9" stop-opacity="0"/></linearGradient>
+    </defs>
+    <path d="M-60 640 C 320 520, 620 760, 980 600 S 1380 380, 1520 420" fill="none" stroke="url(#sw1)" stroke-width="26" stroke-linecap="round"/>
+    <path d="M-60 700 C 360 600, 700 820, 1040 660 S 1400 470, 1520 500" fill="none" stroke="url(#sw2)" stroke-width="8"/>
+  </svg>
+  <div class="container hero-grid">
+    <div>
+      <span class="eyebrow">فرص المستقلين</span>
+      <h1>خبرتك تكمل حلقتنا..<br><span class="shine">ونصنع الأثر معًا</span></h1>
+      <p class="lead">رايا لوب مؤسسة سعودية للحلول الاستشارية والتنموية والتشغيلية، تخدم القطاع غير الربحي والحكومي والخاص. ونفتح هنا مجالات عملنا الستة للمستقلين المتخصصين الذين يكملون فريقنا في تنفيذ المشاريع.</p>
+      <div class="meta-row">
+        <span class="chip">آخر تحديث: <b id="updated">19 نوفمبر 2026</b></span>
+        <span class="chip">الميزانية: <b>حسب العرض</b></span>
+        <span class="chip">العمل: <b>عن بُعد</b></span>
+      </div>
     </div>
-    <label>رابط الأعمال السابقة <span class="req">*</span><input id="port" type="url" required dir="ltr" placeholder="https://"></label>
-    <div class="pair">
-     <label>السعر المقترح (ريال) <span class="req">*</span><input id="price" inputmode="numeric" required></label>
-     <label>مدة التنفيذ <span class="req">*</span><input id="dur" required placeholder="مثال: 4 أسابيع"></label>
-    </div>
-    <label>منهجيتك في التنفيذ<textarea id="msg"></textarea></label>
-    <p class="err" id="err" role="alert"></p>
-    <button class="btn n" type="submit">جهّز العرض</button>
-   </form>
-   <div class="result" id="res" aria-live="polite">
-    <pre id="out"></pre>
-    <div class="row"><a class="btn n" id="wa" target="_blank" rel="noopener">إرسال عبر واتساب</a><button class="btn" style="border:1.5px solid var(--line);background:transparent;color:var(--ink)" type="button" id="copy">نسخ العرض</button></div>
-    <p class="note" id="copied"></p>
-   </div>
+    <img class="hero-mark" src="/assets/img/mark-white.svg" alt="" aria-hidden="true">
   </div>
-  <aside>
-   <h2 style="font-size:22px;margin-bottom:12px">شروط عامة</h2>
-   <ul class="terms">
-    <li><b>الملكية:</b> المخرجات والملفات المصدرية تؤول إلى رايا لوب بعد السداد.</li>
-    <li><b>التسليم:</b> على مراحل محددة، ولكل مرحلة محضر استلام وقبول.</li>
-    <li><b>الدفع:</b> دفعات مرتبطة بالمراحل، وفق ما يحدده العقد.</li>
-    <li><b>التعديلات:</b> يُتفق على عدد جولاتها قبل البدء.</li>
-    <li><b>السرية:</b> بيانات العملاء والجهات لا تُستخدم خارج نطاق العمل.</li>
-    <li><b>الهوية:</b> كل مخرج يلتزم بدليل الهوية البصرية لرايا لوب.</li>
-   </ul>
-   <div class="contact">للاستفسار<br>واتساب وجوال: <span>0559605523</span><br>البريد: <span>info@rayaloop.com</span></div>
-  </aside>
- </div>
 </section>
 
-<footer class="band"><div class="wrap"><span>رايا لوب · نصنع الفرص.. ونستدام بالأثر</span><span>الرقم الوطني الموحد: 7055549047</span></div></footer>
+<section id="works">
+  <div class="container">
+    <div class="section-head">
+      <span class="kicker">الأعمال المطروحة</span>
+      <h2>أعمال محددة.. ومخرجات واضحة</h2>
+      <p>لكل عمل وصف ومخرجات ومهارات ومدة متوقعة، حتى تقدّم عرضًا دقيقًا. الأعمال التي قيد التنفيذ أو المنجزة لا تستقبل عروضًا.</p>
+    </div>
+    <div class="legend" role="group" aria-label="تصفية حسب الحالة">
+      <button class="filter" data-f="all" aria-pressed="true">الكل</button>
+      <button class="filter" data-f="open" aria-pressed="false">متاح</button>
+      <button class="filter" data-f="progress" aria-pressed="false">قيد التنفيذ</button>
+      <button class="filter" data-f="done" aria-pressed="false">منجز</button>
+    </div>
+    <div class="works" id="worksGrid"></div>
+  </div>
+</section>
+
+<section id="offer" class="bg-ice">
+  <div class="container form-wrap">
+    <div class="section-head" style="margin:0">
+      <span class="kicker">قدّم عرضك</span>
+      <h2>عرض قصير.. يكفي للبداية</h2>
+      <p>اختر العمل، وأرفق رابط أعمالك السابقة، واكتب سعرك ومدتك. يصلنا العرض عبر واتساب، ونرد على العروض المناسبة خلال أيام العمل.</p>
+      <p style="font-size:15px">رابط الأعمال السابقة إلزامي، والعروض بدونه لا تُراجع.</p>
+    </div>
+    <form class="offer" id="offerForm" novalidate>
+      <div class="field full">
+        <label for="fWork">العمل المطلوب <i>*</i></label>
+        <select id="fWork" required></select>
+      </div>
+      <div class="field">
+        <label for="fName">الاسم <i>*</i></label>
+        <input id="fName" autocomplete="name" required>
+        <span class="err">اكتب اسمك.</span>
+      </div>
+      <div class="field">
+        <label for="fPhone">رقم التواصل</label>
+        <input id="fPhone" type="tel" inputmode="tel" autocomplete="tel" placeholder="05xxxxxxxx" dir="ltr">
+      </div>
+      <div class="field full">
+        <label for="fLink">رابط أعمالك السابقة <i>*</i></label>
+        <input id="fLink" type="url" inputmode="url" placeholder="https://" dir="ltr" required>
+        <span class="hint">معرض أعمال، أو Behance، أو GitHub، أو ملف على Drive.</span>
+        <span class="err">أضف رابطًا صحيحًا يبدأ بـ https://</span>
+      </div>
+      <div class="field">
+        <label for="fPrice">السعر المقترح (ريال) <i>*</i></label>
+        <input id="fPrice" inputmode="numeric" required>
+        <span class="err">اكتب السعر المقترح.</span>
+      </div>
+      <div class="field">
+        <label for="fDur">المدة المقترحة <i>*</i></label>
+        <input id="fDur" placeholder="مثال: 4 أسابيع" required>
+        <span class="err">اكتب المدة المقترحة.</span>
+      </div>
+      <div class="field full">
+        <label for="fNote">ملاحظات</label>
+        <textarea id="fNote" rows="3" placeholder="خبرتك في أعمال مشابهة، أو أي توضيح على المخرجات"></textarea>
+      </div>
+      <div class="actions">
+        <button type="submit" class="btn btn-wa">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm5.3 14.2c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .1-3.3-.8-2.8-1.1-4.5-3.9-4.7-4.1-.1-.2-1.1-1.5-1.1-2.9s.7-2 1-2.3c.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.4 0 .5l-.4.6-.4.4c-.1.2-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.1 1 2.1 1.3 2.4 1.5.3.1.5.1.6-.1l.9-1c.2-.3.4-.2.6-.1l1.9.9c.3.1.5.2.5.3.1.2.1.7-.1 1.3z"/></svg>
+          إرسال عبر واتساب
+        </button>
+        <button type="button" class="btn btn-line" id="copyBtn">نسخ العرض</button>
+        <span class="toast" id="toast" role="status" aria-live="polite"></span>
+      </div>
+    </form>
+  </div>
+</section>
+
+<section id="terms" class="bg-navy">
+  <div class="container">
+    <div class="section-head">
+      <span class="kicker">الشروط العامة</span>
+      <h2>وضوح من أول يوم</h2>
+      <p>هذه شروط عامة مختصرة. التفاصيل النهائية لكل عمل تُكتب في عقد منفصل يوقّعه الطرفان قبل البدء.</p>
+    </div>
+    <div class="terms">
+      <div class="term"><h3>الملكية</h3><p>تنتقل ملكية المخرجات والملفات المصدرية كاملة إلى رايا لوب بعد استلام الدفعة الأخيرة، ويحق للمستقل عرض العمل في معرض أعماله ما لم يُتفق على غير ذلك.</p></div>
+      <div class="term"><h3>التسليم</h3><p>التسليم على مراحل متفق عليها، لكل مرحلة مراجعة. تشمل كل مرحلة جولتي تعديل، وتسلَّم الملفات المصدرية مع التسليم النهائي.</p></div>
+      <div class="term"><h3>الدفع</h3><p>دفعة مقدمة عند توقيع العقد، والباقي يُصرف على مراحل التسليم المعتمدة، بتحويل بنكي داخل المملكة.</p></div>
+      <div class="term"><h3>السرية</h3><p>يلتزم المستقل بسرية بيانات رايا لوب وعملائها، ولا يستخدمها خارج نطاق العمل المتفق عليه.</p></div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="container">
+    <div class="foot">
+      <img src="/assets/img/logo-white.svg" alt="رايا لوب RAYA LOOP">
+      <p class="tag">رايا لوب.. شريكك في صناعة الفرص<span class="en">Creating Opportunities. Sustaining Impact.</span></p>
+      <ul class="nav-links" style="display:flex;flex-wrap:wrap;color:#C3CCDA">
+        <li><a href="/">الرئيسية</a></li><li><a href="#works">الأعمال المطروحة</a></li><li><a href="#offer">قدّم عرضك</a></li><li><a href="mailto:info@rayaloop.com">info@rayaloop.com</a></li>
+      </ul>
+    </div>
+    <div class="copy"><span>© <span id="yr">2026</span> مؤسسة رايا لوب. جميع الحقوق محفوظة.</span><span class="en">rayaloop.com</span></div>
+  </div>
+</footer>
 
 <script>
-{
-const CONFIG={whatsapp:"966559605523",updated:"19 نوفمبر 2026"};
-const ST={open:["متاح","s-open"],prog:["قيد التنفيذ","s-prog"],done:["منجز","s-done"]};
-const IC={web:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M7 6.5h.01M10 6.5h.01"/>',chart:'<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',train:'<circle cx="12" cy="7" r="3"/><path d="M5 21a7 7 0 0 1 14 0"/>',study:'<path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 13h7M9 17h5"/>',fund:'<path d="M12 3v18M17 7.5c0-1.9-2.2-3-5-3s-5 1.1-5 3 2 2.6 5 3 5 1.1 5 3-2.2 3-5 3-5-1.1-5-3"/>',pm:'<path d="M9 11l2 2 4-4"/><rect x="4" y="4" width="16" height="16" rx="3"/>'};
-const WORKS=[
- {id:"web",ic:"web",t:"الموقع الإلكتروني",trk:"التمكين والتحول الرقمي",st:"open",featured:true,d:"موقع رسمي لرايا لوب يعرض المسارات الأربعة ونماذج التعاون، ويستقبل طلبات العملاء، مع لوحة تحكم لتحديث المحتوى دون برمجة.",dur:"4 إلى 6 أسابيع",budget:"حسب العرض",skills:"تصميم واجهات، برمجة، استضافة",out:["تصميم متجاوب ملتزم بدليل الهوية","صفحات: من نحن، ماذا نقدم، كيف نعمل، نماذج التعاون، تواصل","نموذج طلب خدمة يصل للبريد والواتساب","لوحة تحكم للمحتوى والأخبار","ربط النطاق rayaloop.com وشهادة الأمان، وتسليم الملفات المصدرية"]},
- {id:"data",ic:"chart",t:"لوحات المؤشرات وتحليل البيانات",trk:"التمكين والتحول الرقمي",st:"open",d:"لوحات تفاعلية تقيس أداء المشاريع والبرامج لدى العملاء، وتحوّل البيانات إلى قرارات.",dur:"3 إلى 5 أسابيع",budget:"حسب العرض",skills:"تحليل بيانات، Power BI أو Looker",out:["نموذج مؤشرات قابل للتكرار","لوحة تفاعلية لكل مشروع","دليل استخدام مختصر"]},
- {id:"study",ic:"study",t:"دراسات الجدوى",trk:"صناعة الفرص والاستدامة",st:"open",d:"دراسات جدوى فنية ومالية للمبادرات والأصول غير المستغلة لدى الجمعيات والأوقاف.",dur:"3 إلى 6 أسابيع لكل دراسة",budget:"حسب العرض",skills:"تحليل مالي، نمذجة إيرادات",out:["دراسة سوقية وفنية","نموذج مالي بسيناريوهات","ملخص تنفيذي للعرض على المجلس"]},
- {id:"fund",ic:"fund",t:"كتابة مقترحات التمويل",trk:"صناعة الفرص والاستدامة",st:"open",d:"صياغة مقترحات المشاريع للمانحين والأوقاف وفق نماذجهم، بلغة واضحة ومؤشرات قابلة للقياس.",dur:"حسب المقترح",budget:"حسب العرض",skills:"كتابة مقترحات، إطار منطقي",out:["مقترح مكتمل وفق نموذج المانح","إطار منطقي ومؤشرات","ميزانية تفصيلية"]},
- {id:"train",ic:"train",t:"تقديم البرامج التدريبية",trk:"التمكين والتحول الرقمي",st:"prog",d:"تقديم ورش بناء القدرات للقيادات والفرق في الجهات المستفيدة.",dur:"حسب البرنامج",budget:"حسب العرض",skills:"تدريب معتمد، تصميم حقائب",out:["حقيبة تدريبية","تنفيذ الورش","تقرير أثر التدريب"]},
- {id:"pm",ic:"pm",t:"الإسناد في إدارة المشاريع",trk:"إدارة المشاريع والتشغيل",st:"done",d:"دعم فرق التنفيذ في متابعة الخطط والمخاطر والتقارير خلال مراحل المشروع.",dur:"حسب المشروع",budget:"حسب العرض",skills:"إدارة مشاريع PMP",out:["خطة تنفيذ ومتابعة","تقارير دورية","سجل المخاطر"]}
+/* ============================================================
+   لتحديث الصفحة: عدّل القائمة WORKS والتاريخ UPDATED فقط.
+   الحالة: "open" متاح | "progress" قيد التنفيذ | "done" منجز
+   ============================================================ */
+var WHATSAPP = "966559605523";
+var UPDATED  = "19 نوفمبر 2026";
+var WORKS = [
+  { id:"consult", status:"open",
+    title:"الاستشارات المتخصصة",
+    desc:"حلول استشارية لمعالجة تحديات محددة أو تطوير مجالات عمل معينة، من خلال الدراسات والتقييمات والخطط والتوصيات التنفيذية.",
+    deliverables:["دراسة أو تقييم للتحدي المطروح","تقرير بالنتائج والتوصيات","خطة تنفيذية بمؤشرات قياس"],
+    skills:["خبرة استشارية في مجال التخصص","التحليل وكتابة التقارير","العمل مع القطاع غير الربحي"],
+    duration:"2 إلى 6 أسابيع حسب النطاق", budget:"حسب العرض" },
+  { id:"orgdev", status:"open",
+    title:"التطوير والتحول المؤسسي",
+    desc:"برامج تطوير متكاملة تشمل الاستراتيجيات والحوكمة والهياكل التنظيمية والعمليات ورفع كفاءة الأداء.",
+    deliverables:["خطة استراتيجية أو تشغيلية","هيكل تنظيمي وأوصاف وظيفية","سياسات ولوائح وأدلة إجراءات","مؤشرات أداء ولوحة متابعة"],
+    skills:["التخطيط الاستراتيجي","الحوكمة والامتثال","التطوير التنظيمي","إدارة الأداء"],
+    duration:"1 إلى 3 أشهر", budget:"حسب العرض" },
+  { id:"invest", status:"open",
+    title:"صناعة الفرص والاستثمار",
+    desc:"اكتشاف وتطوير الفرص الاستثمارية والتنموية، وتصميم المشاريع ونماذج الإيرادات والاستدامة، وإعداد دراسات الجدوى والخطط التشغيلية.",
+    deliverables:["دراسة جدوى سوقية وفنية ومالية","نموذج مالي ونموذج إيرادات","خطة تشغيلية للمشروع","ملخص تنفيذي للعرض على المانحين والمستثمرين"],
+    skills:["دراسات الجدوى","النمذجة المالية","الاستثمار الاجتماعي والأوقاف"],
+    duration:"2 إلى 4 أسابيع للدراسة", budget:"حسب العرض" },
+  { id:"pm", status:"open",
+    title:"إدارة المشاريع والبرامج",
+    desc:"تولي مهام إدارة المشاريع والمبادرات، أو تقديم الإسناد التنفيذي والتشغيلي للمنظمات خلال مراحل التنفيذ والتشغيل.",
+    deliverables:["خطة المشروع والجدول الزمني","تنسيق الفرق والموردين","تقارير إنجاز دورية","تقرير ختامي بالنتائج"],
+    skills:["إدارة المشاريع PMP أو ما يعادلها","المتابعة والتقارير","إدارة أصحاب المصلحة"],
+    duration:"حسب مدة المشروع", budget:"حسب العرض" },
+  { id:"train", status:"open",
+    title:"التمكين والتدريب",
+    desc:"برامج تدريبية وتطويرية لبناء قدرات القيادات والموظفين وفرق العمل، ونقل المعرفة وتعزيز الجاهزية المؤسسية.",
+    deliverables:["تصميم البرنامج والحقيبة التدريبية","تنفيذ التدريب حضوريًا أو عن بعد","تقرير تقييم المتدربين والأثر"],
+    skills:["تدريب معتمد","تصميم المحتوى التدريبي","خبرة في القطاع غير الربحي"],
+    duration:"حسب البرنامج", budget:"حسب العرض" },
+  { id:"ops", status:"open",
+    title:"الشراكة التشغيلية",
+    desc:"نماذج تعاون ممتدة تشمل التخطيط والتطوير والتنفيذ والتشغيل والتحسين المستمر، وفق اتفاقيات واضحة للمسؤوليات والمخرجات ومؤشرات الأداء.",
+    deliverables:["خطة تشغيل متفق عليها","تنفيذ المهام التشغيلية المسندة","تقارير أداء شهرية بالمؤشرات","مقترحات تحسين مستمر"],
+    skills:["التشغيل والإسناد","إدارة العمليات","قياس الأداء"],
+    duration:"عقد ممتد قابل للتجديد", budget:"حسب العرض" }
 ];
-const ico=k=>`<span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24">${IC[k]}</svg></span>`;
-const $=s=>document.querySelector(s);
-const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-const tag=st=>`<span class="tag ${ST[st][1]}">${ST[st][0]}</span>`;
-$("#upd").textContent=CONFIG.updated;
-const cnt=k=>WORKS.filter(w=>w.st===k).length;
-$("#facts").innerHTML=`<div><b>${cnt("open")}</b>أعمال متاحة</div><div><b>${cnt("prog")}</b>قيد التنفيذ</div><div><b>${cnt("done")}</b>منجزة</div>`;
-const f=WORKS.find(w=>w.featured)||WORKS[0];
-$("#featured").innerHTML=`<div class="row">${tag(f.st)}</div>
-<h3 style="font-size:24px;margin-top:10px">${esc(f.t)}</h3><p style="margin:6px 0 0;color:var(--mute)">${esc(f.d)}</p>
-<div class="meta"><div><span>المدة</span>${esc(f.dur)}</div><div><span>الميزانية</span>${esc(f.budget)}</div><div><span>المهارات</span>${esc(f.skills)}</div></div>
-<strong style="font-size:15px">المخرجات</strong><ul class="out">${f.out.map(o=>`<li>${esc(o)}</li>`).join("")}</ul>
-<a class="btn n" style="margin-top:16px" href="#apply" data-pick="${f.id}">قدّم على هذا العمل</a>`;
-const FL=[["all","الكل"],["open","متاح"],["prog","قيد التنفيذ"],["done","منجز"]];
-let cur="all";
-const renderF=()=>$("#filters").innerHTML=FL.map(([k,l])=>`<button class="chip" type="button" data-f="${k}" aria-pressed="${k===cur}">${l}</button>`).join("");
-const renderG=()=>{const list=WORKS.filter(w=>cur==="all"||w.st===cur);
- $("#grid").innerHTML=list.length?list.map(w=>`<article class="card ${w.st==="done"?"done":""}">
- <div class="row" style="justify-content:space-between">${ico(w.ic)}<span class="row">${w.featured?'<span class="tag prio">الأبرز</span>':""}${tag(w.st)}</span></div>
- <div class="trk" style="margin-top:8px">${esc(w.trk)}</div><h3>${esc(w.t)}</h3><p>${esc(w.d)}</p>
- <div class="meta" style="grid-template-columns:repeat(2,minmax(0,1fr))"><div><span>المدة</span>${esc(w.dur)}</div><div><span>المهارات</span>${esc(w.skills)}</div></div>
- <ul class="out">${w.out.map(o=>`<li>${esc(o)}</li>`).join("")}</ul>
- ${w.st==="open"?`<a class="btn n" href="#apply" data-pick="${w.id}" style="margin-top:14px">قدّم عرضك</a>`:`<span class="note" style="margin-top:12px">لا يستقبل عروضاً حالياً</span>`}
- </article>`).join(""):`<div class="empty">لا توجد أعمال بهذه الحالة حالياً.</div>`};
-renderF();renderG();
-$("#filters").addEventListener("click",e=>{const b=e.target.closest("[data-f]");if(!b)return;cur=b.dataset.f;renderF();renderG()});
-const sel=$("#work");
-sel.innerHTML=WORKS.filter(w=>w.st==="open").map(w=>`<option value="${w.id}">${esc(w.t)}</option>`).join("");
-document.addEventListener("click",e=>{const a=e.target.closest("[data-pick]");if(a)sel.value=a.dataset.pick});
-const KEY="fl-draft",ids=["name","phone","port","price","dur","msg"];
-try{const d=JSON.parse(localStorage.getItem(KEY)||"{}");ids.forEach(i=>{if(d[i])$("#"+i).value=d[i]})}catch(_){}
-$("#f").addEventListener("input",()=>{try{const d={};ids.forEach(i=>d[i]=$("#"+i).value);localStorage.setItem(KEY,JSON.stringify(d))}catch(_){}});
-$("#f").addEventListener("submit",e=>{e.preventDefault();
- const v=Object.fromEntries(ids.map(i=>[i,$("#"+i).value.trim()]));
- if(!v.name||!v.phone||!v.port||!v.price||!v.dur){$("#err").textContent="فضلاً أكمل الحقول المطلوبة.";return}
- if(!/^https?:\/\/\S+\.\S+/.test(v.port)){$("#err").textContent="يجب أن يبدأ رابط الأعمال بـ https:// وأن يكون صحيحاً.";return}
- $("#err").textContent="";
- const w=WORKS.find(x=>x.id===sel.value);
- const txt=`عرض مستقل — رايا لوب\nالعمل: ${w?w.t:""}\nالاسم: ${v.name}\nالجوال: ${v.phone}\nرابط الأعمال: ${v.port}\nالسعر المقترح: ${v.price} ريال\nمدة التنفيذ: ${v.dur}${v.msg?`\nنبذة: ${v.msg}`:""}`;
- $("#out").textContent=txt;$("#res").style.display="block";
- const wa=$("#wa");if(CONFIG.whatsapp){wa.style.display="";wa.href=`https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(txt)}`}else wa.style.display="none";
- $("#res").scrollIntoView({behavior:"smooth",block:"nearest"});
-});
-$("#copy").addEventListener("click",async()=>{try{await navigator.clipboard.writeText($("#out").textContent);$("#copied").textContent="تم النسخ، أرسله عبر الواتساب أو إلى info@rayaloop.com"}catch(_){$("#copied").textContent="تعذّر النسخ التلقائي، حدّد النص وانسخه يدوياً."}});
-}
+
+(function(){
+  var ST = {open:["متاح","st-open"],progress:["قيد التنفيذ","st-progress"],done:["منجز","st-done"]};
+  function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+  document.getElementById("updated").textContent = UPDATED;
+  var grid = document.getElementById("worksGrid"), sel = document.getElementById("fWork");
+  grid.innerHTML = WORKS.map(function(w,i){
+    var s = ST[w.status]||ST.open, open = w.status==="open";
+    return '<article class="work'+(w.featured?' featured':'')+'" data-s="'+w.status+'" id="w-'+w.id+'">'+
+      '<div class="work-top"><div><span class="no">'+(i<9?'0':'')+(i+1)+(w.featured?' · الأولوية الأولى':'')+'</span><h3>'+esc(w.title)+'</h3></div>'+
+      '<span class="status '+s[1]+'">'+s[0]+'</span></div>'+
+      '<p class="desc">'+esc(w.desc)+'</p>'+
+      '<div class="'+(w.featured?'two':'')+'"><div><p class="label">المخرجات المطلوبة</p><ul>'+w.deliverables.map(function(d){return '<li>'+esc(d)+'</li>'}).join('')+'</ul></div>'+
+      '<div'+(w.featured?'':' style="margin-top:14px"')+'><p class="label">المهارات</p><div class="skills">'+w.skills.map(function(k){return '<span class="skill">'+esc(k)+'</span>'}).join('')+'</div></div></div>'+
+      '<div class="facts"><div><small>المدة المتوقعة</small><b>'+esc(w.duration)+'</b></div><div><small>الميزانية</small><b>'+esc(w.budget)+'</b></div></div>'+
+      '<button class="btn '+(w.featured?'btn-silver':'btn-primary')+'" data-apply="'+w.id+'"'+(open?'':' disabled')+'>'+(open?'قدّم عرضك':'لا يستقبل عروضًا')+'</button>'+
+    '</article>';
+  }).join('');
+  WORKS.filter(function(w){return w.status==="open"}).forEach(function(w){
+    var o=document.createElement("option"); o.value=w.id; o.textContent=w.title; sel.appendChild(o);
+  });
+
+  grid.addEventListener("click",function(e){
+    var b=e.target.closest("[data-apply]"); if(!b||b.disabled) return;
+    sel.value=b.getAttribute("data-apply");
+    document.getElementById("offer").scrollIntoView({behavior:"smooth"});
+    setTimeout(function(){document.getElementById("fName").focus({preventScroll:true})},500);
+  });
+
+  [].forEach.call(document.querySelectorAll(".filter"),function(f){
+    f.addEventListener("click",function(){
+      var v=f.getAttribute("data-f");
+      [].forEach.call(document.querySelectorAll(".filter"),function(x){x.setAttribute("aria-pressed",x===f)});
+      [].forEach.call(grid.children,function(c){c.hidden = v!=="all" && c.getAttribute("data-s")!==v});
+    });
+  });
+
+  function val(id){return document.getElementById(id).value.trim()}
+  function check(){
+    var ok=true;
+    [["fName",function(v){return v.length>1}],["fLink",function(v){return /^https?:\/\/\S+\.\S+/.test(v)}],["fPrice",function(v){return v.length>0}],["fDur",function(v){return v.length>0}]].forEach(function(r){
+      var good=r[1](val(r[0])); document.getElementById(r[0]).parentNode.classList.toggle("bad",!good);
+      if(!good&&ok){document.getElementById(r[0]).focus();ok=false}
+    });
+    return ok;
+  }
+  function message(){
+    var w=WORKS.filter(function(x){return x.id===sel.value})[0];
+    var lines=["عرض مستقل - رايا لوب","العمل: "+(w?w.title:""),"الاسم: "+val("fName")];
+    if(val("fPhone")) lines.push("رقم التواصل: "+val("fPhone"));
+    lines.push("رابط الأعمال السابقة: "+val("fLink"),"السعر المقترح: "+val("fPrice")+" ريال","المدة المقترحة: "+val("fDur"));
+    if(val("fNote")) lines.push("ملاحظات: "+val("fNote"));
+    return lines.join("\n");
+  }
+  var toast=document.getElementById("toast");
+  document.getElementById("offerForm").addEventListener("submit",function(e){
+    e.preventDefault(); if(!check()) return;
+    window.open("https://wa.me/"+WHATSAPP+"?text="+encodeURIComponent(message()),"_blank","noopener");
+  });
+  document.getElementById("copyBtn").addEventListener("click",function(){
+    if(!check()) return;
+    var t=message();
+    (navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(function(){toast.textContent="تم نسخ العرض"},function(){toast.textContent="تعذر النسخ، انسخ النص يدويًا"});
+    setTimeout(function(){toast.textContent=""},3000);
+  });
+
+  var h=document.querySelector(".site-header");
+  addEventListener("scroll",function(){h.classList.toggle("scrolled",scrollY>8)},{passive:true});
+  var b=document.getElementById("menuBtn"),n=document.getElementById("navLinks");
+  b.addEventListener("click",function(){var o=n.classList.toggle("open");b.setAttribute("aria-expanded",o)});
+  n.addEventListener("click",function(e){if(e.target.tagName==="A"){n.classList.remove("open");b.setAttribute("aria-expanded","false")}});
+  document.getElementById("yr").textContent=new Date().getFullYear();
+})();
 </script>
 </body>
 </html>
