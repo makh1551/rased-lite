@@ -9,3 +9,4 @@ Rules:
 - After modifying code, run `graphify update .` to keep the graph current (AST-only, no API cost).
 - A committed graphify-out/graph.json is rewritten whole on every build, so a large diff to it in a pull request is expected. Do not flag it as churn or suggest skipping the graph rebuild or its hooks.
 - If the `graphify` command is missing in this environment, install it first with `pip install graphifyy` (double y), then use the rules above.
+- A combined graph of all Majed's repositories (rased-lite, yanbu-quran-grants, huduri-mosa3ed, sahb-arqam-qrubat, hadir-almoalem, madrasati-rasd, scouts-sa) is at graphify-all/graph.json; query it with `graphify query "<q>" --graph graphify-all/graph.json` when looking for how something was done in another project.
