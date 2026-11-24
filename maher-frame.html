@@ -31,17 +31,18 @@ textarea{min-height:120px;resize:vertical;line-height:1.6}
 .save{background:var(--chip);border-radius:12px;padding:10px 14px;font-size:.92rem;text-align:center}
 button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 .dlb{display:inline-block;background:var(--navy);color:#fff;text-decoration:none;padding:11px 22px;border-radius:12px;font-weight:600}.back{color:var(--accent);text-decoration:none;font-size:.9rem}
-body{margin:0}[hidden]{display:none!important}</style></head><body>
+body{margin:0}[hidden]{display:none!important}.tpls{display:grid;grid-template-columns:1fr 1fr;gap:8px}.tp{font:inherit;text-align:right;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--fg);cursor:pointer;display:flex;flex-direction:column;gap:2px}.tp b{font-size:.95rem}.tp small{color:var(--muted);font-size:.78rem}.tp:hover{border-color:var(--accent)}</style></head><body>
 <div class="wrap">
 <header><img src="assets/img/mark-color.svg" alt=""><div><h1>مولد إطارات ماهر الجعيد</h1><p><a class="back" href="maher">→ حقيبة ماهر</a></p><p>اكتب نصًا أو ارفع صورة، وتطلع جاهزة بهوية رايا لوب للنشر في القروبات</p></div></header>
 <div class="grid">
 <div class="panel">
+<div class="f"><span class="lab">قوالب أسبوعية</span><div class="tpls"><button type="button" class="tp" data-t="sunday"><b>فائدة الأحد</b><small>نصيحة حوكمة قصيرة كل أحد</small></button><button type="button" class="tp" data-t="thursday"><b>سؤال الخميس</b><small>سؤال يفتح النقاش كل خميس</small></button></div></div>
  <div class="f"><span class="lab">نوع المحتوى</span><div class="seg" id="mode"><button type="button" data-v="text" aria-pressed="true">نص</button><button type="button" data-v="image" aria-pressed="false">صورة</button></div></div>
  <div class="f" id="textBox"><label for="txt">النص</label><textarea id="txt">الحوكمة الرشيدة ليست أوراقًا تُحفظ، بل ممارسة يومية تبني الثقة بين الجمعية ومجتمعها.</textarea></div>
  <div class="f" id="imgBox" hidden><span class="lab">الصورة</span><label class="drop" for="file">اختر صورة من جهازك<input type="file" id="file" accept="image/*"></label>
   <div class="f"><label for="cap">تعليق تحت الصورة (اختياري)</label><input type="text" id="cap" placeholder="مثال: دورة أخصائي حوكمة تبدأ الأحد"></div>
   <div class="seg" id="fit"><button type="button" data-v="contain" aria-pressed="true">الصورة كاملة</button><button type="button" data-v="cover" aria-pressed="false">تعبئة الإطار</button></div></div>
- <div class="f"><label for="tag">العنوان الصغير</label><select id="tag"><option value="">بدون</option><option>إعلان</option><option>تنبيه مهم</option><option>فائدة في الحوكمة</option><option selected>اقتباس</option><option>فرصة جديدة</option><option>دورة جديدة</option><option>تهنئة</option></select></div>
+ <div class="f"><label for="tag">العنوان الصغير</label><select id="tag"><option value="">بدون</option><option>إعلان</option><option>تنبيه مهم</option><option>فائدة في الحوكمة</option><option selected>اقتباس</option><option>فرصة جديدة</option><option>دورة جديدة</option><option>تهنئة</option><option>فائدة الأسبوع · الأحد</option><option>سؤال الأسبوع · الخميس</option></select></div>
  <div class="f"><span class="lab">المقاس</span><div class="seg" id="size"><button type="button" data-v="sq" aria-pressed="true">مربع</button><button type="button" data-v="post" aria-pressed="false">منشور طولي</button><button type="button" data-v="story" aria-pressed="false">حالة واتساب</button></div></div>
  <div class="f"><span class="lab">اللون</span><div class="seg" id="theme"><button type="button" data-v="navy" aria-pressed="true">كحلي</button><button type="button" data-v="blue" aria-pressed="false">أزرق</button><button type="button" data-v="light" aria-pressed="false">فاتح</button></div></div>
  <div class="f"><label for="nm">الاسم والصفة</label><input type="text" id="nm" value="ماهر الجعيد"><input type="text" id="role" value="مستشار حوكمة"></div>
@@ -57,6 +58,12 @@ blue:{g:['#2463B0','#1B5296','#0B2B55'],fg:'#FFFFFF',ac:'#E6EAF0',mk:'w',chip:'r
 light:{g:['#FFFFFF','#F3F5F9','#E6EAF0'],fg:'#0B2B55',ac:'#1B5296',mk:'c',chip:'rgba(11,43,85,.07)'}};
 const imgs={};function load(src){return new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.onerror=()=>r(null);i.src=src})}
 let userImg=null;
+const TPL={sunday:{tag:'فائدة الأحد',theme:'navy',text:'قبل أي قرار مالي في الجمعية، تأكد أن له مرجعًا في اللائحة وصلاحية معتمدة من المجلس. وضوح الصلاحيات أول خطوة في الحوكمة.',opt:'فائدة الأسبوع · الأحد'},
+thursday:{tag:'سؤال الخميس',theme:'blue',text:'ما أكبر تحدٍّ يواجه جمعيتكم في تطبيق معايير الحوكمة؟\nشاركونا آراءكم في المجموعة',opt:'سؤال الأسبوع · الخميس'}};
+function pick(seg,v){document.querySelectorAll('#'+seg+' button').forEach(x=>x.setAttribute('aria-pressed',x.dataset.v===v));st[seg]=v}
+function useTpl(k){const t=TPL[k];if(!t)return;pick('mode','text');$('textBox').hidden=false;$('imgBox').hidden=true;pick('theme',t.theme);$('tag').value=t.opt;$('txt').value=t.text.replace(/\\n/g,'\n');draw()}
+document.querySelectorAll('.tp').forEach(b=>b.addEventListener('click',()=>useTpl(b.dataset.t)));
+
 document.querySelectorAll('.seg').forEach(g=>g.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
  g.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b));st[g.id]=b.dataset.v;
  if(g.id==='mode'){$('textBox').hidden=st.mode!=='text';$('imgBox').hidden=st.mode!=='image'}draw()}));
@@ -96,5 +103,5 @@ async function draw(){
  }
  const u=cv.toDataURL('image/png');$('res').src=u;$('dl').href=u;
 }
-(async()=>{imgs.w=await load(MW);imgs.c=await load(MC);try{await document.fonts.load("700 40px 'IBM Plex Sans Arabic'");await document.fonts.load("500 40px 'IBM Plex Sans Arabic'");await document.fonts.load("600 40px 'IBM Plex Sans Arabic'")}catch(e){}draw();document.fonts.ready.then(draw)})();
+(async()=>{imgs.w=await load(MW);imgs.c=await load(MC);try{await document.fonts.load("700 40px 'IBM Plex Sans Arabic'");await document.fonts.load("500 40px 'IBM Plex Sans Arabic'");await document.fonts.load("600 40px 'IBM Plex Sans Arabic'")}catch(e){}if(TPL[location.hash.slice(1)])useTpl(location.hash.slice(1));else draw();document.fonts.ready.then(draw)})();
 </script></body></html>
