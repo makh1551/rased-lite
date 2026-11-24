@@ -19,11 +19,18 @@ section{padding:26px 0 6px}h2{font-size:1.25rem;margin:0 0 4px;color:var(--navy)
 figcaption{font-weight:600;font-size:.92rem;margin:6px 0}.dl{display:flex;gap:6px;justify-content:center}.dl a{font-size:.8rem;color:var(--blue);background:var(--chip);padding:4px 10px;border-radius:8px;text-decoration:none;font-weight:600}
 .how{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px 18px}.how ol{margin:6px 0 0;padding-inline-start:20px}.how li{margin:4px 0}
 .gen{display:flex;gap:16px;align-items:center;flex-wrap:wrap;background:linear-gradient(135deg,#1B5296,#0B2B55);color:#fff;border-radius:18px;padding:20px}.gen div{flex:1 1 240px;min-width:0}.gen h2{color:#fff}.gen p{margin:0;color:#E6EAF0}.gen .btn{background:#fff;color:var(--navy)}
+.duo{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.wk{display:flex;flex-direction:column;gap:4px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;text-decoration:none;color:var(--fg)}.wk b{color:var(--navy);font-size:1.05rem}.wk span{color:var(--muted);font-size:.9rem;overflow-wrap:anywhere}.wk em{font-style:normal;color:var(--blue);font-weight:600;font-size:.9rem;margin-top:4px}
+.qrb{align-items:center;text-align:center}.qrb img{width:120px}.qrb a{color:var(--blue);font-size:.85rem;font-weight:600}
+.txs{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+.tx{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px;min-width:0}.txh{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;gap:8px}.txh b{color:var(--navy);font-size:.95rem}
+.cp{font:inherit;font-size:.85rem;font-weight:600;background:var(--navy);color:#fff;border:0;border-radius:9px;padding:6px 14px;cursor:pointer}
+.tx textarea{width:100%;font:inherit;font-size:.92rem;line-height:1.7;border:1px solid var(--line);border-radius:10px;padding:10px;background:#F8FAFC;color:var(--fg);resize:vertical}
 footer{padding:30px 0;color:var(--muted);font-size:.85rem;text-align:center}
 a:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
 </style></head><body>
-<header class="hero"><div class="in"><img src="assets/img/mark-white.svg" alt=""><div><h1>حقيبة ماهر الجعيد</h1><p>ملصقات وأيقونات ومولد إطارات بهوية رايا لوب للمشاركة في القروبات</p></div></div>
-<div class="in"><nav><a href="#how">طريقة الإضافة</a><a href="#replies">ملصقات الردود</a><a href="#admin">ملصقات المشرف</a><a href="#icons">الأيقونات</a><a href="maher-frame">مولد الإطارات</a></nav></div></header>
+<header class="hero"><div class="in"><img src="assets/img/mark-white.svg" alt=""><div><h1>حقيبة ماهر الجعيد</h1><p>كل ما يحتاجه ماهر لحضوره في القروبات بهوية رايا لوب: ملصقات، قوالب، رسائل جاهزة، بطاقة تواصل</p></div></div>
+<div class="in"><nav><a href="#how">طريقة الإضافة</a><a href="#replies">ملصقات الردود</a><a href="#admin">ملصقات المشرف</a><a href="#icons">الأيقونات</a><a href="maher-frame">مولد الإطارات</a><a href="#weekly">القوالب الأسبوعية</a><a href="#welcome">رسالة الترحيب</a><a href="#group">هوية القروبات</a><a href="maher-card">بطاقة التواصل</a><a href="#business">واتساب للأعمال</a></nav></div></header>
 <main class="in">
 <section id="how"><div class="how"><h2>طريقة إضافة الملصق في واتساب</h2><ol>
 <li>اضغط مطولًا على صورة الملصق هنا واختر «إضافة إلى الصور» (أو اضغط PNG لتحميله).</li>
@@ -31,6 +38,43 @@ a:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
 <li>اختر صورة الملصق من الصور، واضغط إرسال. بعدها يبقى محفوظًا في ملصقاتك.</li></ol>
 <p class="sub" style="margin:8px 0 0">ملفات WebP هي صيغة ملصقات واتساب الرسمية، وتفيد مع تطبيقات حزم الملصقات على أندرويد.</p></div></section>
 <section class="gen"><div><h2>مولد الإطارات</h2><p>اكتب نصًا أو ارفع صورة، وتطلع لك بطاقة جاهزة باسمك وهوية رايا لوب.</p></div><a class="btn" href="maher-frame">افتح المولد</a></section>
+
+<section id="weekly"><h2>القوالب الأسبوعية</h2><p class="sub">منشوران ثابتان كل أسبوع في القروبات، يجهزان من المولد بضغطة.</p><div class="duo">
+<a class="wk" href="maher-frame#sunday"><b>فائدة الأحد</b><span>نصيحة حوكمة قصيرة تبدأ بها الأسبوع</span><em>افتح القالب</em></a>
+<a class="wk" href="maher-frame#thursday"><b>سؤال الخميس</b><span>سؤال يفتح النقاش ويرفع التفاعل</span><em>افتح القالب</em></a></div></section>
+<section id="welcome"><h2>رسالة الترحيب بالأعضاء الجدد</h2><p class="sub">انسخها وأرسلها مع ملصق «أهلًا وسهلًا» عند انضمام عضو جديد.</p><div class="tx"><div class="txh"><b>رسالة الترحيب</b><button type="button" class="cp" data-for="w1">نسخ</button></div><textarea id="w1" rows="11" readonly>أهلًا وسهلًا بك في مجموعتنا 🌿
+يسعدنا انضمامك إلى مجتمع يهتم بالحوكمة وتطوير القطاع غير الربحي.
+
+• نرجو الالتزام بموضوع المجموعة والاحترام المتبادل.
+• الإعلانات والروابط بعد التنسيق مع المشرف.
+• شاركنا تجربتك وأسئلتك، فكل مشاركة تثري الجميع.
+
+للتعرف على خدمات الحوكمة والتطوير المؤسسي: rayaloop.com
+
+ماهر الجعيد | مشرف المجموعة</textarea></div></section>
+<section id="group"><h2>هوية القروبات</h2><p class="sub">وصف موحد وصورة موحدة لكل القروبات. من إعدادات المجموعة: «تعديل الوصف» و«تغيير الصورة».</p>
+<div class="tx"><div class="txh"><b>وصف المجموعة</b><button type="button" class="cp" data-for="g-desc">نسخ</button></div><textarea id="g-desc" rows="12" readonly>مجموعة مختصة بالحوكمة وتطبيقاتها في القطاع غير الربحي، لتبادل المعرفة والتجارب والفرص.
+
+قوانين المجموعة:
+١. الالتزام بموضوع المجموعة.
+٢. الاحترام المتبادل في الحوار.
+٣. لا إعلانات أو روابط دون إذن المشرف.
+٤. التواصل الخاص مع الأعضاء بعد استئذانهم.
+
+بإشراف ماهر الجعيد | رايا لوب
+rayaloop.com</textarea></div>
+<div class="grid" style="margin-top:12px">
+<figure class="ic"><img src="dl/maher/group/group-navy.png" alt="صورة المجموعة كحلي" loading="lazy"><figcaption>كحلي</figcaption><div class="dl"><a href="dl/maher/group/group-navy.png" download>تحميل</a></div></figure>
+<figure class="ic"><img src="dl/maher/group/group-light.png" alt="صورة المجموعة فاتح" loading="lazy"><figcaption>فاتح</figcaption><div class="dl"><a href="dl/maher/group/group-light.png" download>تحميل</a></div></figure>
+<figure class="ic"><img src="dl/maher/group/group-mark.png" alt="صورة المجموعة بالشعار" loading="lazy"><figcaption>الشعار فقط</figcaption><div class="dl"><a href="dl/maher/group/group-mark.png" download>تحميل</a></div></figure>
+</div></section>
+<section id="card"><h2>بطاقة التواصل الرقمية</h2><p class="sub">رابط واحد فيه الرقم والبريد والموقع وزر حفظ جهة الاتصال. ضعه في النبذة أو أرسله لمن يطلب التواصل.</p>
+<div class="duo"><a class="wk" href="maher-card"><b>افتح البطاقة</b><span>rayaloop.wasl.uk/maher-card</span><em>عرض</em></a>
+<div class="wk qrb"><img src="dl/maher/qr-card.png" alt="رمز QR للبطاقة"><span>رمز QR للبطاقة</span><a href="dl/maher/qr-card.png" download>تحميل الرمز</a> · <a href="dl/maher/maher-aljuaid.vcf" download>ملف جهة الاتصال</a></div></div></section>
+<section id="business"><h2>حزمة واتساب للأعمال</h2><p class="sub">من واتساب للأعمال: الإعدادات ثم «أدوات الأعمال» ثم «الملف الشخصي للنشاط التجاري». الرقم: 0553813109، البريد: info@rayaloop.com، الموقع: rayaloop.com</p>
+<div class="grid" style="margin-bottom:12px"><figure class="ic"><img src="dl/maher/wa/business-photo.png" alt="صورة الملف التجاري" loading="lazy"><figcaption>صورة الملف</figcaption><div class="dl"><a href="dl/maher/wa/business-photo.png" download>تحميل</a></div></figure></div>
+<div class="txs"><div class="tx"><div class="txh"><b>اسم النشاط</b><button type="button" class="cp" data-for="bz-name">نسخ</button></div><textarea id="bz-name" rows="1" readonly>ماهر الجعيد | رايا لوب</textarea></div><div class="tx"><div class="txh"><b>الفئة</b><button type="button" class="cp" data-for="bz-cat">نسخ</button></div><textarea id="bz-cat" rows="1" readonly>خدمات استشارية</textarea></div><div class="tx"><div class="txh"><b>النبذة (الحالة)</b><button type="button" class="cp" data-for="bz-about">نسخ</button></div><textarea id="bz-about" rows="2" readonly>مستشار حوكمة | رايا لوب للحلول الاستشارية والتنموية</textarea></div><div class="tx"><div class="txh"><b>وصف النشاط</b><button type="button" class="cp" data-for="bz-desc">نسخ</button></div><textarea id="bz-desc" rows="4" readonly>مستشار حوكمة في رايا لوب، مؤسسة سعودية متخصصة في الحلول الاستشارية والتنموية والتشغيلية لتطوير المنظمات وتمكينها، بتركيز رئيس على القطاع غير الربحي.</textarea></div><div class="tx"><div class="txh"><b>رسالة الترحيب</b><button type="button" class="cp" data-for="bz-greet">نسخ</button></div><textarea id="bz-greet" rows="3" readonly>أهلًا بك، معك ماهر الجعيد من رايا لوب. كيف أقدر أخدمك في الحوكمة أو تطوير جمعيتك؟</textarea></div><div class="tx"><div class="txh"><b>رسالة الغياب</b><button type="button" class="cp" data-for="bz-away">نسخ</button></div><textarea id="bz-away" rows="4" readonly>شكرًا لتواصلك. أنا خارج أوقات العمل حاليًا، وسأرد عليك في أقرب وقت بإذن الله.
+للاطلاع على خدماتنا: rayaloop.com</textarea></div><div class="tx"><div class="txh"><b>رد سريع: /خدمات</b><button type="button" class="cp" data-for="bz-q1">نسخ</button></div><textarea id="bz-q1" rows="3" readonly>تقدم رايا لوب خدمات الحوكمة والتطوير المؤسسي والحلول التشغيلية للجمعيات والمنظمات. التفاصيل: rayaloop.com</textarea></div><div class="tx"><div class="txh"><b>رد سريع: /بطاقة</b><button type="button" class="cp" data-for="bz-q2">نسخ</button></div><textarea id="bz-q2" rows="2" readonly>بطاقتي للتواصل وحفظ الرقم: https://rayaloop.wasl.uk/maher-card</textarea></div></div></section>
 <section id="replies"><h2>ملصقات الردود والمشاركة</h2><p class="sub">للرد والتفاعل داخل القروبات.</p><div class="cta"><a class="btn" href="dl/maher/maher-stickers-1.zip" download>تحميل الكل (ZIP)</a></div><div class="grid">
 <figure class="st"><img src="dl/maher/s/01-thanks.png" alt="شكرًا لك" loading="lazy" width="512" height="512"><figcaption>شكرًا لك</figcaption><div class="dl"><a href="dl/maher/s/01-thanks.png" download>PNG</a><a href="dl/maher/s/01-thanks.webp" download>WebP</a></div></figure>
 <figure class="st"><img src="dl/maher/s/02-well-done.png" alt="أحسنت" loading="lazy" width="512" height="512"><figcaption>أحسنت</figcaption><div class="dl"><a href="dl/maher/s/02-well-done.png" download>PNG</a><a href="dl/maher/s/02-well-done.webp" download>WebP</a></div></figure>
@@ -67,4 +111,4 @@ a:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
 <figure class="ic"><img src="dl/maher/icons/icon-BL.png" alt="أيقونة فاتح مع الشعار" loading="lazy"><figcaption>فاتح مع الشعار</figcaption><div class="dl"><a href="dl/maher/icons/icon-BL.png" download>تحميل</a></div></figure>
 <figure class="ic"><img src="dl/maher/icons/icon-CL.png" alt="أيقونة أحرف مع الشعار" loading="lazy"><figcaption>أحرف مع الشعار</figcaption><div class="dl"><a href="dl/maher/icons/icon-CL.png" download>تحميل</a></div></figure>
 </div></section>
-</main><footer>رايا لوب · مؤسسة رايا لوب التجارية</footer></body></html>
+</main><footer>رايا لوب · مؤسسة رايا لوب التجارية</footer><script>document.querySelectorAll('.cp').forEach(b=>b.addEventListener('click',async()=>{const t=document.getElementById(b.dataset.for);try{await navigator.clipboard.writeText(t.value)}catch(e){t.focus();t.select();try{document.execCommand('copy')}catch(_){}}const o=b.textContent;b.textContent='تم النسخ';setTimeout(()=>b.textContent=o,1600)}));</script></body></html>
