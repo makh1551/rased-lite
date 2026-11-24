@@ -23,7 +23,10 @@
 <meta name="description" content="رايا لوب مؤسسة سعودية متخصصة في الحلول الاستشارية والتنموية والتشغيلية المتكاملة لتطوير المنظمات وتمكينها، بتركيز رئيس على القطاع غير الربحي وامتداد إلى القطاعين الحكومي والخاص.">
 <meta name="theme-color" content="#0B2B55">
 <link rel="icon" type="image/svg+xml" href="assets/img/mark-color.svg">
+<link rel="alternate" hreflang="ar" href="https://rayaloop.com/">
+<link rel="alternate" hreflang="en" href="https://rayaloop.com/en">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap"><link rel="stylesheet" href="assets/style.css">
+<link rel="stylesheet" href="assets/extras.css?v=1">
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"Organization","name":"رايا لوب | RAYA LOOP","alternateName":"Raya Loop","url":"https://rayaloop.com","email":"info@rayaloop.com","telephone":"+966553813109","address":{"@type":"PostalAddress","addressCountry":"SA"},"slogan":"نصنع الفرص.. ونستدام بالأثر"}
 </script>
@@ -41,12 +44,16 @@
       <li><a href="#method">كيف نعمل</a></li>
       <li><a href="#models">نماذج التعاون</a></li>
       <li><a href="#why">لماذا رايا لوب</a></li>
+      <li class="only-m"><a href="#request" data-req="service">اطلب خدمة</a></li>
       <li><a href="#contact">تواصل معنا</a></li>
     </ul>
-    <a href="#contact" class="btn btn-primary">ابدأ شراكتك</a>
+    <div class="nav-end">
+    <a href="/en" class="lang" lang="en" hreflang="en" aria-label="English version">EN</a>
+    <a href="#request" class="btn btn-primary" data-req="service">اطلب خدمة</a>
     <button class="menu-btn" id="menuBtn" aria-label="القائمة" aria-expanded="false" aria-controls="navLinks">
       <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
     </button>
+    </div>
   </div>
 </header>
 
@@ -315,6 +322,66 @@
   </div>
 </section>
 
+<!-- ============ REQUEST A SERVICE ============ -->
+<section id="request" class="bg-ice">
+  <div class="container req">
+    <div class="req-aside reveal">
+      <span class="kicker">اطلب خدمة</span>
+      <h2>أخبرنا عن احتياجكم.. ونعود إليكم بخطوة واضحة</h2>
+      <p>عبّئ النموذج باسم جهتكم والخدمة التي تحتاجونها، وتصل رسالتكم مباشرة إلى فريق رايا لوب على info@rayaloop.com.</p>
+      <ul class="req-points">
+        <li><i>1</i><span>نراجع طلبكم ونتواصل معكم خلال يومي عمل.</span></li>
+        <li><i>2</i><span>نعقد جلسة تعريفية قصيرة لفهم الاحتياج والسياق.</span></li>
+        <li><i>3</i><span>نقدّم مقترحًا عمليًا بنطاق واضح وخطة تنفيذ.</span></li>
+      </ul>
+    </div>
+    <div class="req-card reveal" id="contact-form">
+      <form id="reqForm" novalidate>
+        <div id="reqBody">
+          <div class="seg" role="group" aria-label="نوع الرسالة">
+            <button type="button" data-type="service" aria-pressed="true">طلب خدمة</button>
+            <button type="button" data-type="contact" aria-pressed="false">راسلنا</button>
+          </div>
+          <div class="fgrid">
+            <div class="f"><label for="f-org">اسم الجهة <span class="opt" data-only="contact">(اختياري)</span></label><input id="f-org" name="org" autocomplete="organization" maxlength="160" placeholder="جمعية، مؤسسة، شركة…"><span class="err"></span></div>
+            <div class="f"><label for="f-name">الاسم</label><input id="f-name" name="name" autocomplete="name" maxlength="120" placeholder="اسم المسؤول عن التواصل"><span class="err"></span></div>
+            <div class="f full" data-only="service"><label for="f-service">الخدمة المطلوبة</label>
+              <select id="f-service" name="service">
+                <option value="">اختر الخدمة</option>
+                <optgroup label="مسارات الخدمة">
+                  <option>الاستشارات والتطوير المؤسسي</option>
+                  <option>صناعة الفرص والاستدامة</option>
+                  <option>إدارة المشاريع والتشغيل</option>
+                  <option>التمكين والتحول الرقمي</option>
+                </optgroup>
+                <optgroup label="نماذج التعاون">
+                  <option>الشراكة التشغيلية</option>
+                  <option>التمكين والتدريب</option>
+                </optgroup>
+                <option>أخرى / غير متأكد</option>
+              </select><span class="err"></span></div>
+            <div class="f"><label for="f-phone">رقم الجوال</label><input id="f-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" maxlength="20" placeholder="05xxxxxxxx"><span class="err"></span></div>
+            <div class="f"><label for="f-email">البريد الإلكتروني</label><input id="f-email" name="email" type="email" autocomplete="email" maxlength="160" placeholder="name@example.com"><span class="err"></span></div>
+            <div class="f full"><label for="f-msg">الرسالة <span class="opt" data-only="service">(اختياري: نبذة عن الاحتياج)</span></label><textarea id="f-msg" name="message" maxlength="3000"></textarea><span class="err"></span></div>
+            <div class="hp" aria-hidden="true"><label for="f-web">Website</label><input id="f-web" name="website" tabindex="-1" autocomplete="off"></div>
+          </div>
+          <div class="req-foot">
+            <small>بياناتكم تُستخدم للتواصل بخصوص طلبكم فقط.</small>
+            <button type="submit" class="btn btn-primary"><span class="spin" aria-hidden="true"></span><span class="lbl">إرسال الطلب</span></button>
+          </div>
+          <div class="req-msg" id="reqMsg" role="alert"></div>
+        </div>
+      </form>
+      <div class="req-done" id="reqDone" hidden>
+        <div class="tick"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></div>
+        <h3>وصلتنا رسالتكم، شكرًا لكم</h3>
+        <p>سيتواصل معكم فريق رايا لوب قريبًا. وللتواصل السريع: 0553813109</p>
+        <button type="button" class="btn btn-line" id="reqAgain">إرسال طلب آخر</button>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- ============ CONTACT ============ -->
 <section id="contact" style="padding-top:20px">
   <div class="container">
@@ -327,7 +394,7 @@
         <h2>لنجعل من تحديات اليوم فرصًا لمستقبل أكثر استدامة</h2>
         <p>نرافقكم في رحلة التطوير، ونربط الأفكار بالإمكانات، ونحوّل التحديات إلى فرص، والفرص إلى مشاريع تحقق القيمة والنمو والأثر المستدام.</p>
         <div class="hero-actions" style="margin-top:24px">
-          <a class="btn btn-silver" href="mailto:info@rayaloop.com?subject=%D8%B7%D9%84%D8%A8%20%D8%AA%D9%88%D8%A7%D8%B5%D9%84%20-%20%D8%B1%D8%A7%D9%8A%D8%A7%20%D9%84%D9%88%D8%A8">راسلنا الآن</a>
+          <a class="btn btn-silver" href="#contact-form" data-req="contact">راسلنا الآن</a>
           <a class="btn btn-ghost" href="https://wa.me/966553813109" target="_blank" rel="noopener">واتساب</a>
         </div>
       </div>
@@ -355,6 +422,9 @@
   </div>
 </footer>
 
+<a class="wa-float" href="https://wa.me/966553813109" target="_blank" rel="noopener" aria-label="تواصل معنا عبر واتساب 0553813109"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16.04 3C8.86 3 3.03 8.82 3.03 16c0 2.3.6 4.53 1.74 6.5L3 29l6.68-1.74A12.95 12.95 0 0 0 16.04 29C23.2 29 29 23.18 29 16S23.2 3 16.04 3Zm0 23.7c-2.02 0-3.98-.54-5.7-1.57l-.41-.24-3.96 1.04 1.06-3.86-.27-.4A10.66 10.66 0 0 1 5.34 16c0-5.9 4.8-10.7 10.7-10.7 5.89 0 10.67 4.8 10.67 10.7 0 5.9-4.78 10.7-10.67 10.7Zm5.86-8c-.32-.16-1.9-.94-2.2-1.04-.29-.11-.5-.16-.72.16-.21.32-.83 1.04-1.01 1.25-.19.21-.37.24-.69.08-.32-.16-1.36-.5-2.59-1.6-.96-.85-1.6-1.9-1.79-2.22-.19-.32-.02-.5.14-.65.14-.14.32-.37.48-.56.16-.19.21-.32.32-.53.1-.21.05-.4-.03-.56-.08-.16-.72-1.73-.98-2.37-.26-.62-.52-.54-.72-.55h-.61c-.21 0-.56.08-.85.4-.29.32-1.12 1.09-1.12 2.66s1.15 3.09 1.31 3.3c.16.21 2.26 3.45 5.47 4.84.77.33 1.36.53 1.83.68.77.24 1.47.21 2.02.13.62-.09 1.9-.78 2.17-1.53.27-.75.27-1.39.19-1.53-.08-.13-.29-.21-.61-.37Z"/></svg><span class="tip">واتساب 0553813109</span></a>
+
+<script src="assets/js/request.js?v=1" defer></script>
 <script>
   (function(){
     var h=document.querySelector('.site-header');
