@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>برنامج أصل | مركز المراجعات</title>
+<meta name="description" content="برنامج مقترح من رايا لوب لتأسيس وحدات الاستثمار الاجتماعي في الجمعيات وتشغيل أول مشروع مدر للدخل.">
+<meta name="robots" content="noindex,nofollow">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="ar_SA">
+<meta property="og:site_name" content="مركز المراجعات · رايا لوب">
+<meta property="og:url" content="https://rayaloop.wasl.uk/asl">
+<meta property="og:title" content="برنامج «أصل» | مركز المراجعات">
+<meta property="og:description" content="برنامج مقترح من رايا لوب لتأسيس وحدات الاستثمار الاجتماعي في الجمعيات وتشغيل أول مشروع مدر للدخل.">
+<meta property="og:image" content="https://rayaloop.wasl.uk/og/asl.jpg">
+<meta property="og:image:secure_url" content="https://rayaloop.wasl.uk/og/asl.jpg">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="برنامج «أصل» | مركز المراجعات">
+<meta name="twitter:description" content="برنامج مقترح من رايا لوب لتأسيس وحدات الاستثمار الاجتماعي في الجمعيات وتشغيل أول مشروع مدر للدخل.">
+<meta name="twitter:image" content="https://rayaloop.wasl.uk/og/asl.jpg">
+<meta name="theme-color" content="#16171B">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23FF5A1F'/%3E%3Cpath d='M9 10h14M9 16h14M9 22h8' stroke='%2316171B' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@300;400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+:root{--bg:#EDECE7;--panel:#fff;--ink:#16171B;--ink2:#2A2C33;--mute:#6B6E76;--line:#DAD8D1;--soft:#F6F5F1;--acc:#FF5A1F;--acc-soft:#FFE9DF;--wait:#C98A00;--wait-soft:#FFF4D6;--ok:#178A4C;--ok-soft:#E2F4E9;--blue:#2D5BFF;
+--font:'Readex Pro',system-ui,'Segoe UI',Tahoma,sans-serif;--mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:120px}
+body{margin:0;font-family:var(--font);color:var(--ink);background:var(--bg);background-image:radial-gradient(#cfcdc5 1px,transparent 1px);background-size:22px 22px;line-height:1.8;font-size:16px;-webkit-font-smoothing:antialiased}
+img{max-width:100%;display:block}
+a{color:inherit;text-decoration:none}
+h1,h2,h3{line-height:1.35;margin:0 0 .5em;color:var(--ink);font-weight:600}
+p{margin:0 0 1em}
+.mono{font-family:var(--mono);letter-spacing:.02em}
+/* top bar */
+.top{position:sticky;top:0;z-index:60;background:var(--ink);color:#fff;height:56px;display:flex;align-items:center;gap:14px;padding:0 18px}
+.ws{display:flex;align-items:center;gap:10px;font-weight:600;font-size:15px}
+.ws .sq{width:30px;height:30px;border-radius:8px;background:var(--acc);display:grid;place-items:center;font-family:var(--mono);font-weight:700;font-size:14px;color:#16171B}
+.ws small{color:#9A9DA6;font-weight:400;font-size:13px}
+.top .sp{flex:1}
+.envtag{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;color:#C9CBD1;border:1px solid #3A3C44;border-radius:6px;padding:4px 10px}
+.envtag::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--acc);box-shadow:0 0 0 3px rgba(255,90,31,.25)}
+.top .wa{font-size:13.5px;color:#16171B;background:#fff;border-radius:7px;padding:6px 12px;font-weight:600}
+.band{background:repeating-linear-gradient(-45deg,#FFD9C9 0 10px,#FFE9DF 10px 20px);color:#7A2A0B;font-size:13px;text-align:center;padding:6px 14px;border-bottom:1px solid #F5C3AE}
+/* layout */
+.shell{display:grid;grid-template-columns:260px 1fr;min-height:calc(100vh - 56px)}
+.side{background:var(--panel);border-inline-end:1px solid var(--line);padding:18px 12px;position:sticky;top:56px;height:calc(100vh - 56px);overflow:auto}
+.side .lbl{font-size:12px;color:var(--mute);padding:4px 10px 8px;text-transform:uppercase}
+.side a{display:grid;grid-template-columns:28px 1fr auto;align-items:center;gap:8px;padding:9px 10px;border-radius:8px;font-size:14.5px;color:var(--ink2);margin-bottom:2px}
+.side a:hover{background:var(--soft)}
+.side a.on{background:var(--ink);color:#fff}
+.side a .n{font-family:var(--mono);font-size:12px;color:var(--mute)}
+.side a.on .n{color:#9A9DA6}
+.dot{width:8px;height:8px;border-radius:50%}
+.d-wait{background:var(--wait)}.d-live{background:var(--ok)}.d-hub{background:var(--acc)}
+.legend{margin-top:18px;padding:12px 10px;border-top:1px dashed var(--line);font-size:12.5px;color:var(--mute);display:grid;gap:6px}
+.legend span{display:flex;align-items:center;gap:8px}
+.side .back{margin-top:10px;font-size:13px;color:var(--mute);grid-template-columns:1fr}
+main{min-width:0;padding:26px 30px 60px}
+.wrap{max-width:1080px;margin-inline:auto}
+/* page head */
+.phead{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:26px 28px;margin-bottom:22px;position:relative;overflow:hidden}
+.phead::after{content:"";position:absolute;inset-inline-start:0;top:0;bottom:0;width:5px;background:var(--acc)}
+.crumb{font-family:var(--mono);font-size:12px;color:var(--mute);letter-spacing:.06em;margin-bottom:12px;direction:ltr;text-align:right}
+.phead h1{font-size:clamp(26px,3.4vw,38px);margin-bottom:10px;font-weight:600}
+.phead h1 br{display:none}
+.phead h1 .shine{color:var(--acc)}
+.phead .lead{color:var(--mute);font-size:16.5px;max-width:760px;margin-bottom:14px}
+.meta{display:flex;flex-wrap:wrap;gap:8px}
+.pill{display:inline-flex;align-items:center;gap:6px;font-size:13px;padding:5px 11px;border-radius:7px;background:var(--soft);border:1px solid var(--line);color:var(--ink2)}
+.pill b{font-weight:600}
+.pill.st{background:var(--wait-soft);border-color:#F0D58A;color:#7A5400}
+.pill.st::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--wait)}
+/* blocks */
+section.in{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:26px 28px;margin-bottom:22px}
+.container{width:100%}
+.section-head{max-width:800px;margin-bottom:22px}
+.kicker{display:inline-block;font-size:13px;color:var(--acc);margin-bottom:6px;font-weight:600}
+.section-head h2{font-size:clamp(21px,2.4vw,27px)}
+.section-head p{color:var(--mute)}
+.note{font-size:13.5px;color:var(--mute)}
+.btn{display:inline-flex;align-items:center;gap:8px;border-radius:8px;padding:10px 18px;font-weight:600;font-size:14.5px;border:0;cursor:pointer;font-family:inherit;transition:background .15s}
+.btn-primary{background:var(--ink);color:#fff}
+.btn-primary:hover{background:#000}
+.btn-line{background:#fff;color:var(--ink);box-shadow:inset 0 0 0 1px var(--line)}
+.btn-line:hover{box-shadow:inset 0 0 0 1px var(--ink)}
+.btn-sm{padding:7px 14px;font-size:13.5px}
+/* prose */
+.prose{max-width:860px;font-size:16.5px}
+.prose h2{font-size:clamp(21px,2.6vw,26px);margin-top:1.6em;padding-top:1em;border-top:1px dashed var(--line)}
+.prose h2:first-of-type{margin-top:.6em}
+.prose h3{font-size:18.5px;margin-top:1.4em}
+.prose ol,.prose ul{padding-inline-start:22px}
+.prose li{margin-bottom:.5em}
+.prose a{color:var(--blue);text-decoration:underline;text-underline-offset:3px;word-break:break-word}
+.prose strong{color:var(--ink);font-weight:600}
+.prose blockquote{margin:1em 0;padding:12px 18px;border-inline-start:3px solid var(--acc);background:var(--soft);border-radius:8px}
+.toc{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px}
+.tbl{overflow-x:auto;margin:1em 0 1.4em;border:1px solid var(--line);border-radius:10px;-webkit-overflow-scrolling:touch}
+.tbl table{border-collapse:collapse;width:100%;min-width:640px;font-size:14px;line-height:1.7}
+.tbl th{background:var(--soft);color:var(--ink);font-weight:600;text-align:start;padding:9px 12px;white-space:nowrap;border-bottom:1px solid var(--line);font-size:13px}
+.tbl td{padding:9px 12px;border-top:1px solid #ECEBE6;vertical-align:top}
+.tbl tr:hover td{background:#FBFAF7}
+.tag{display:inline-block;font-size:12.5px;padding:3px 10px;border-radius:6px;background:var(--soft);border:1px solid var(--line);color:var(--ink2)}
+.tag.d{background:var(--ink);color:#fff;border-color:var(--ink);font-family:var(--mono)}
+/* review hub */
+.cards{display:grid;gap:12px}
+.card{display:grid;grid-template-columns:54px 1fr auto;gap:6px 18px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:12px;padding:18px 20px;transition:border-color .15s,box-shadow .15s}
+.card:hover{border-color:var(--ink);box-shadow:0 6px 18px -12px rgba(0,0,0,.35)}
+.card .ic{grid-row:span 2;width:54px;height:54px;border-radius:10px;background:var(--soft);border:1px solid var(--line);display:grid;place-items:center;font-family:var(--mono);font-weight:700;font-size:18px}
+.card h3{margin:0;font-size:18px}
+.card p{margin:0;color:var(--mute);font-size:14.5px;grid-column:2}
+.card .go{grid-row:1/span 2;grid-column:3}
+.card .note{grid-column:2;font-family:var(--mono);font-size:12px}
+.card .stt{font-size:12px;font-weight:600;padding:2px 9px;border-radius:5px;margin-inline-start:8px;vertical-align:middle}
+.stt.wait{background:var(--wait-soft);color:#7A5400}.stt.live{background:var(--ok-soft);color:var(--ok)}
+.flow{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:6px}
+.flow div{border:1px dashed var(--line);border-radius:10px;padding:14px 16px;background:var(--soft);font-size:14.5px}
+.flow b{display:block;font-family:var(--mono);font-size:12px;color:var(--acc);margin-bottom:4px}
+/* campaign */
+.post{display:grid;grid-template-columns:300px 1fr;gap:26px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:20px;margin-bottom:16px}
+.post img{width:100%;border-radius:8px;border:1px solid var(--line)}
+.post .meta{margin-bottom:10px}
+.post h3{font-size:20px;margin:0 0 12px}
+.tabs{display:inline-flex;gap:0;margin-bottom:10px;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.tabs button{font-family:inherit;font-size:13.5px;font-weight:600;padding:7px 16px;border:0;background:#fff;color:var(--ink);cursor:pointer}
+.tabs button[aria-selected=true]{background:var(--ink);color:#fff}
+.copytext{white-space:pre-wrap;background:var(--soft);border:1px solid #ECEBE6;border-radius:8px;padding:14px 16px;font-size:15px;line-height:1.9;margin:0}
+.pnote{font-size:13px;color:var(--mute);margin:0 0 8px}
+.row-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;align-items:center}
+.week{font-size:20px;margin:30px 0 14px;display:flex;align-items:center;gap:10px}
+.week::before{content:"";width:18px;height:2px;background:var(--acc)}
+.week:first-child{margin-top:0}
+.cal td:first-child{font-family:var(--mono);font-weight:700}
+.steps{counter-reset:s;list-style:none;padding:0;margin:0;display:grid;gap:8px}
+.steps li{counter-increment:s;display:grid;grid-template-columns:30px 1fr;gap:12px;align-items:start;padding:12px 14px;background:var(--soft);border:1px solid #ECEBE6;border-radius:10px;font-size:15px}
+.steps li::before{content:"0" counter(s);font-family:var(--mono);font-weight:700;color:var(--acc);font-size:13px;padding-top:3px}
+/* clients */
+.filters{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;align-items:center}
+.filters input{font-family:inherit;font-size:14.5px;padding:8px 12px;border:1px solid var(--line);border-radius:8px;min-width:220px;flex:1;max-width:340px;background:var(--soft)}
+.filters button{font-family:inherit;font-size:13.5px;font-weight:500;padding:7px 13px;border-radius:8px;border:1px solid var(--line);background:#fff;color:var(--ink);cursor:pointer}
+.filters button[aria-pressed=true]{background:var(--ink);color:#fff;border-color:var(--ink)}
+.clients{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.client{background:#fff;border:1px solid var(--line);border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:8px}
+.client .top2{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.client h3{margin:0;font-size:17px}
+.pri{flex:none;font-weight:600;font-size:12px;padding:3px 9px;border-radius:6px}
+.pri-أ{background:var(--ok-soft);color:var(--ok)}.pri-ب{background:var(--wait-soft);color:#7A5400}.pri-ج{background:var(--soft);color:var(--mute);border:1px solid var(--line)}
+.client dl{display:grid;grid-template-columns:auto 1fr;gap:3px 12px;margin:4px 0 0;font-size:14px;padding-top:8px;border-top:1px dashed var(--line)}
+.client dt{color:var(--mute)}
+.client dd{margin:0;color:var(--ink2);word-break:break-word}
+.client dd a{color:var(--blue)}
+.client .why{font-size:14.5px;color:var(--ink2);margin:0}
+.client .svc{font-size:14px;background:var(--acc-soft);border-radius:8px;padding:7px 11px;color:#7A2A0B}
+.msg{background:var(--soft);border:1px solid #ECEBE6;border-radius:12px;padding:18px;margin-bottom:12px}
+.msg h3{font-size:16.5px;margin:0 0 10px}
+.msg .copytext{background:#fff}
+footer.mini{margin-top:10px;font-size:12.5px;color:var(--mute);font-family:var(--mono);display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:9px 18px;border-radius:8px;font-size:14px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:99}
+.toast.on{opacity:1}
+@media (max-width:980px){
+  .shell{grid-template-columns:1fr}
+  .side{position:sticky;top:56px;z-index:50;height:auto;display:flex;gap:6px;overflow-x:auto;padding:8px 12px;border-inline-end:0;border-bottom:1px solid var(--line);scrollbar-width:none}
+  .side .lbl,.side .legend,.side .back{display:none}
+  .side a{flex:none;display:flex;gap:7px;padding:7px 12px;margin:0;border:1px solid var(--line);font-size:13.5px}
+  .side a.on{border-color:var(--ink)}
+  main{padding:16px 14px 40px}
+  .post{grid-template-columns:1fr}.post img{max-width:280px}
+  .clients{grid-template-columns:1fr}
+  .flow{grid-template-columns:1fr}
+}
+@media (max-width:600px){
+  .top{padding:0 12px;gap:10px}.envtag{display:none}.ws small{display:none}
+  .phead,section.in{padding:18px 16px;border-radius:12px}
+  .card{grid-template-columns:44px 1fr;padding:14px}
+  .card .ic{width:44px;height:44px;font-size:15px}
+  .card .go{grid-row:auto;grid-column:1/-1;justify-self:start}
+  .card p,.card .note{grid-column:1/-1}
+  .post{padding:14px}
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <a class="ws" href="/review"><span class="sq">م</span>مركز المراجعات <small>/ رايا لوب</small></a>
+  <span class="sp"></span>
+  <span class="envtag">بيئة مراجعة · غير منشورة</span>
+  <a class="wa" href="https://wa.me/966553813109">ملاحظة</a>
+</header>
+<div class="band">منطقة عمل داخلية: المحتوى هنا مسودات للمراجعة، وما يُعتمد يُنقل إلى موقع رايا لوب</div>
+<div class="shell">
+<nav class="side" aria-label="مركز المراجعات">
+  <div class="lbl">قيد المراجعة</div>
+  <a href="/review"><span class="n">00</span><span>مركز المراجعات</span><span class="dot d-hub"></span></a><a href="/market"><span class="n">01</span><span>دراسة السوق</span><span class="dot d-wait"></span></a><a href="/campaign"><span class="n">02</span><span>الحملة التعريفية</span><span class="dot d-wait"></span></a><a href="/clients"><span class="n">03</span><span>العملاء المستهدفون</span><span class="dot d-wait"></span></a><a href="/freelance"><span class="n">04</span><span>فرص المستقلين</span><span class="dot d-live"></span></a><a href="/grants"><span class="n">05</span><span>تحليل المناسب وسوق المنح</span><span class="dot d-wait"></span></a><a href="/asl" class=on><span class="n">07</span><span>برنامج «أصل»</span><span class="dot d-wait"></span></a>
+  <div class="legend"><span><i class="dot d-wait"></i>بانتظار الاعتماد</span><span><i class="dot d-live"></i>منشور على الموقع</span></div>
+  <a class="back" href="/">← موقع رايا لوب الرئيسي</a>
+</nav>
+<main><div class="wrap">
+<header class="phead">
+  <div class="crumb">WORKSPACE / REVIEW / 07 · ASL PROGRAM</div>
+  <h1>برنامج «أصل».. <span class="shine">من الأصل إلى الدخل</span></h1>
+  <p class="lead">برنامج مقترح بهوية رايا لوب في الاستثمار الاجتماعي للجمعيات، صُمم ردًا على برنامج «رَكيز» من بوصلة حلول الأعمال. الفرق الجوهري: رَكيز يدرّب الجمعية على تأسيس وحدة الاستثمار، و«أصل» يؤسسها معها ويشغّل أول مشروع مدر للدخل حتى يتحقق العائد.</p>
+  <div class="meta"><span class="pill st">بانتظار الاعتماد</span><span class="pill">الإصدار: <b>مسودة أولى، 23 نوفمبر 2026</b></span><span class="pill">الحالة: <b>داخلية</b></span></div>
+</header>
+<section class="in"><div class="container"><div class="prose"><div><div class="toc"><a class="tag" href="#s1">الإعلان</a><a class="tag" href="#s2">فكرة البرنامج</a><a class="tag" href="#s3">المراحل الأربع</a><a class="tag" href="#s4">أصل مقابل رَكيز</a><a class="tag" href="#s5">نص المنشور</a><a class="tag" href="#s6">قرارات قبل النشر</a></div></div>
+<h2 id="s1">الإعلان</h2>
+<p><img src="/img/asl/asl-poster.jpg" alt="إعلان برنامج أصل من رايا لوب" style="width:100%;max-width:560px;border-radius:12px;border:1px solid var(--line);display:block"></p>
+<p><a class="btn btn-primary btn-sm" href="/img/asl/asl-poster.jpg" download="raya-loop-asl-poster.jpg">تحميل الإعلان (دقة عالية)</a> <a class="btn btn-sm" href="/img/asl/asl-poster-1080.jpg" download="raya-loop-asl-poster-1080.jpg">نسخة 1080×1350 للمنصات</a></p>
+<h2 id="s2">فكرة البرنامج</h2>
+<p>كثير من الجمعيات تملك <strong>أصلًا غير مستغل</strong>: مبنى، أرض، وقف، قاعة، أو خبرة يمكن بيعها. «أصل» يحوّل هذا الأصل إلى دخل مستدام عبر وحدة استثمار اجتماعي محوكمة، ولا ينتهي عند التدريب أو الخطة، بل يبقى مع الجمعية في التشغيل 90 يومًا بمؤشرات واضحة. هذا تطبيق مباشر لوعد رايا لوب: «لا نكتفي بتقديم الحلول.. بل نشارك في تحويلها إلى واقع».</p>
+<h2 id="s3">المراحل الأربع</h2>
+<div class="tbl"><table><thead><tr><th>المرحلة</th><th>ما يحدث</th><th>المخرج</th><th>المدة المقترحة</th></tr></thead><tbody>
+<tr><td><strong>01 تشخيص الجاهزية</strong> (مجاني)</td><td>استبيان قصير ومكالمة مع الإدارة عن الحوكمة والأصول والموارد</td><td>تقرير من صفحتين: الجاهزية المؤسسية وأقرب فرصة</td><td>48 ساعة</td></tr>
+<tr><td><strong>02 اكتشاف الفرصة</strong></td><td>حصر أصول الجمعية واختيار فرصة واحدة ودراسة جدواها</td><td>دراسة جدوى مختصرة وقرار مجلس</td><td>3 أسابيع</td></tr>
+<tr><td><strong>03 تأسيس الوحدة</strong></td><td>لائحة الوحدة، مصفوفة الصلاحيات، فصل الحسابات، تأهيل الفريق</td><td>وحدة استثمار اجتماعي معتمدة وفريق مدرب</td><td>5 أسابيع</td></tr>
+<tr><td><strong>04 تشغيل مشترك</strong></td><td>إطلاق المشروع وتشغيله مع الجمعية ومتابعة أسبوعية</td><td>مشروع يعمل ولوحة مؤشرات للمجلس وتقرير أثر</td><td>90 يومًا</td></tr>
+</tbody></table></div>
+<h2 id="s4">أصل مقابل رَكيز</h2>
+<div class="tbl"><table><thead><tr><th>المعيار</th><th>«رَكيز» – بوصلة</th><th>«أصل» – رايا لوب</th></tr></thead><tbody>
+<tr><td>الهدف</td><td>تأهيل الجمعية لتأسيس الوحدة</td><td>تأسيس الوحدة وتشغيل أول مشروع معها</td></tr>
+<tr><td>التشخيص</td><td>جزء من البرنامج المدفوع</td><td>مجاني وخلال 48 ساعة</td></tr>
+<tr><td>الصيغة</td><td>3 أيام حضورية في الرياض + عن بُعد</td><td>في مقر الجمعية أو عن بُعد، لكل جمعية على حدة</td></tr>
+<tr><td>المدة</td><td>6 أسابيع</td><td>8 أسابيع تأسيس + 90 يومًا تشغيل</td></tr>
+<tr><td>النهاية</td><td>خطة وأدوات وجلستان استشاريتان</td><td>مشروع يعمل ومؤشرات وعائد أول</td></tr>
+<tr><td>السعر</td><td>1,499 ريال</td><td>يحدده المالك (مقترح: تشخيص مجاني ثم باقة «تبدأ من»)</td></tr>
+</tbody></table></div>
+<h2 id="s5">نص المنشور</h2>
+<div class="tbl" style="padding:16px 18px;min-width:0"><p id="post" style="margin:0;white-space:pre-line">جمعيتك تملك أصلًا.. فهل يدرّ عليها دخلًا؟
+برنامج «أصل» من رايا لوب: نؤسس مع جمعيتك وحدة استثمار اجتماعي بحوكمة واضحة، ثم نشغّل معها أول مشروع مدر للدخل حتى يتحقق العائد.
+01 تشخيص جاهزية مجاني خلال 48 ساعة
+02 اكتشاف الفرصة ودراسة جدواها
+03 تأسيس الوحدة وحوكمتها
+04 تشغيل مشترك 90 يومًا بمؤشرات
+لا نكتفي بالتدريب.. نؤسس معك ونشغّل.
+ابدأ بتشخيص مجاني: 0553813109
+rayaloop.wasl.uk</p></div>
+<p><button class="btn btn-primary btn-sm" data-copy="post">نسخ النص</button></p>
+<h2 id="s6">قرارات قبل النشر</h2>
+<ol>
+<li><strong>السعر:</strong> هل نعلن «يبدأ من» أم نكتفي بالتشخيص المجاني؟ الإعلان الحالي بلا سعر.</li>
+<li><strong>المدد:</strong> 48 ساعة للتشخيص، 8 أسابيع للتأسيس، 90 يومًا للتشغيل. هذه مقترحات قابلة للتعديل حسب قدرة الفريق.</li>
+<li><strong>شريك معروف:</strong> شعار شريك واحد (غرفة تجارية، مجلس جمعيات، جهة مانحة) يرفع الثقة كثيرًا. يمكن إضافته إلى الإعلان متى توفر.</li>
+<li><strong>دفعة أولى بموعد:</strong> رَكيز يعلن تاريخًا محددًا. إن أردنا دفعة (مثلًا 5 جمعيات في يناير) نضيف التاريخ وعدد المقاعد.</li>
+<li><strong>الاسم:</strong> «أصل» قصير ومرتبط بالفكرة. بدائل إن لم يعجبكم: «مورد»، «غلّة».</li>
+</ol>
+<p class="note">التفاصيل الكاملة عن رَكيز ومقارنته في <a href="/market#s9">دراسة السوق، القسم 7</a>.</p>
+</div></div></section>
+<footer class="mini"><span>مركز المراجعات · رايا لوب · غير مفهرسة في محركات البحث</span><span>v1 · 23.11.2026</span></footer>
+</div></main>
+
+</div>
+
+<div class="toast" id="toast">تم النسخ</div>
+<script>
+function toast(t){var e=document.getElementById('toast');e.textContent=t||'تم النسخ';e.classList.add('on');setTimeout(function(){e.classList.remove('on')},1600)}
+function copyText(t){if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(t).then(function(){toast()},function(){fb(t)})}else fb(t)}
+function fb(t){var a=document.createElement('textarea');a.value=t;a.style.position='fixed';a.style.opacity='0';document.body.appendChild(a);a.select();try{document.execCommand('copy');toast()}catch(e){toast('تعذّر النسخ')}a.remove()}
+document.addEventListener('click',function(e){var b=e.target.closest('[data-copy]');if(!b)return;var el=document.getElementById(b.getAttribute('data-copy'));if(el)copyText(el.innerText)});
+var on=document.querySelector('.side a.on');if(on&&on.scrollIntoView&&innerWidth<980)on.scrollIntoView({inline:'center',block:'nearest'});
+</script>
+
+</body>
+</html>
