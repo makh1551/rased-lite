@@ -33,7 +33,7 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 .dlb{display:inline-block;background:var(--navy);color:#fff;text-decoration:none;padding:11px 22px;border-radius:12px;font-weight:600}.back{color:var(--accent);text-decoration:none;font-size:.9rem}
 body{margin:0}[hidden]{display:none!important}.tpls{display:grid;grid-template-columns:1fr 1fr;gap:8px}.tp{font:inherit;text-align:right;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--fg);cursor:pointer;display:flex;flex-direction:column;gap:2px}.tp b{font-size:.95rem}.tp small{color:var(--muted);font-size:.78rem}.tp:hover{border-color:var(--accent)}</style></head><body>
 <div class="wrap">
-<header><img src="assets/img/mark-color.svg" alt=""><div><h1>مولد إطارات ماهر الجعيد</h1><p><a class="back" href="maher">→ حقيبة ماهر</a></p><p>اكتب نصًا أو ارفع صورة، وتطلع جاهزة بهوية رايا لوب للنشر في القروبات</p></div></header>
+<header><img src="assets/img/mark-color.svg" alt=""><div><h1>مولد إطارات ماهر الجعيد</h1><p><a class="back" href="mj">→ كل أدوات ماهر</a></p><p>اكتب نصًا أو ارفع صورة، وتطلع جاهزة بهوية رايا لوب للنشر في القروبات</p></div></header>
 <div class="grid">
 <div class="panel">
 <div class="f"><span class="lab">قوالب أسبوعية</span><div class="tpls"><button type="button" class="tp" data-t="sunday"><b>فائدة الأحد</b><small>نصيحة حوكمة قصيرة كل أحد</small></button><button type="button" class="tp" data-t="thursday"><b>سؤال الخميس</b><small>سؤال يفتح النقاش كل خميس</small></button></div></div>
@@ -58,14 +58,14 @@ const st={brand:'r',mode:'text',fit:'contain',size:'sq',theme:'navy'},S={sq:[108
 const TH={navy:{g:['#123A6E','#0B2B55','#051631'],fg:'#FFFFFF',ac:'#C9CFD9',mk:'w',chip:'rgba(255,255,255,.12)'},
 blue:{g:['#2463B0','#1B5296','#0B2B55'],fg:'#FFFFFF',ac:'#E6EAF0',mk:'w',chip:'rgba(255,255,255,.14)'},
 light:{g:['#FFFFFF','#F3F5F9','#E6EAF0'],fg:'#0B2B55',ac:'#1B5296',mk:'c',chip:'rgba(11,43,85,.07)'}};
-const THP={navy:{g:['#3B3731','#23211D','#141311'],fg:'#F6F1E7',ac:'#C9A45C',mk:'sd',chip:'rgba(201,164,92,.14)'},
-blue:{g:['#D4B272','#C9A45C','#A9843F'],fg:'#23211D',ac:'#3B3731',mk:'si',chip:'rgba(35,33,29,.12)'},
-light:{g:['#FFFDF8','#F6F1E7','#ECE3D1'],fg:'#23211D',ac:'#A9843F',mk:'sl',chip:'rgba(35,33,29,.07)'}};
+const THP={navy:{g:['#4A2A20','#33190F','#1F0F09'],fg:'#F7F1E6',ac:'#96BEA0',mk:'ml',chip:'rgba(247,241,230,.09)'},
+blue:{g:['#557A62','#3F5D4A','#2C4334'],fg:'#F7F1E6',ac:'#E8D9BF',mk:'ml',chip:'rgba(247,241,230,.11)'},
+light:{g:['#FFFFFF','#F7F4EE','#EDE3D3'],fg:'#4A251C',ac:'#3F5D4A',mk:'mc',chip:'rgba(74,37,28,.06)'}};
 const imgs={};function load(src){return new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.onerror=()=>r(null);i.src=src})}
 let userImg=null;
 const TPL={sunday:{tag:'فائدة الأحد',theme:'navy',text:'قبل أي قرار مالي في الجمعية، تأكد أن له مرجعًا في اللائحة وصلاحية معتمدة من المجلس. وضوح الصلاحيات أول خطوة في الحوكمة.',opt:'فائدة الأسبوع · الأحد'},
 thursday:{tag:'سؤال الخميس',theme:'blue',text:'ما أكبر تحدٍّ يواجه جمعيتكم في تطبيق معايير الحوكمة؟\nشاركونا آراءكم في المجموعة',opt:'سؤال الأسبوع · الخميس'}};
-function pick(seg,v){document.querySelectorAll('#'+seg+' button').forEach(x=>x.setAttribute('aria-pressed',x.dataset.v===v));st[seg]=v}
+function pick(seg,v){document.querySelectorAll('#'+seg+' button').forEach(x=>x.setAttribute('aria-pressed',x.dataset.v===v));st[seg]=v;if(seg==='brand')relabel()}
 function useTpl(k){const t=TPL[k];if(!t)return;pick('mode','text');$('textBox').hidden=false;$('imgBox').hidden=true;pick('theme',t.theme);$('tag').value=t.opt;$('txt').value=t.text.replace(/\\n/g,'\n');draw()}
 const CAL=[["حوكمة", "الحوكمة ليست أوراقًا تُحفظ في الأدراج، بل ممارسة يومية تبني الثقة بين الجمعية ومجتمعها."], ["حوكمة", "وضّح الصلاحيات قبل أي قرار: من يعتمد؟ ومن ينفذ؟ ومن يراجع؟ وضوح الأدوار يقطع نصف الطريق."], ["موارد", "تنويع مصادر الدخل أمان للجمعية. الاعتماد على داعم واحد مخاطرة مهما كان كريمًا."], ["حوكمة", "سياسة تعارض المصالح تحمي الجمعية وتحمي أعضاء المجلس أنفسهم. حدّثها ووقّع عليها سنويًا."], ["موارد", "المانح لا يدعم الاحتياج فقط، بل يدعم جهة يثق في قدرتها على التنفيذ. اعرض إنجازك قبل طلبك."], ["حوكمة", "محضر الاجتماع الجيد يذكر القرار والمسؤول عن تنفيذه وموعده، لا النقاش فقط."], ["سؤال", "ما أكبر تحدٍّ يواجه جمعيتكم في تطبيق معايير الحوكمة؟"], ["حوكمة", "الإفصاح والشفافية يبدآن من الموقع الإلكتروني: نشر التقارير والقوائم المالية والتشكيل الإداري."], ["موارد", "الوقف من أقوى أدوات الاستدامة المالية، لأنه يحوّل التبرع المؤقت إلى عائد مستمر."], ["حوكمة", "اللوائح الداخلية ليست نسخة مكررة من جهة أخرى. صُغها بما يناسب حجم جمعيتك وطبيعة عملها."], ["موارد", "تقرير الأثر الواضح للمانح هو أفضل طلب لدعم جديد. أرقام دقيقة وقصص حقيقية وصور معبرة."], ["حوكمة", "إدارة المخاطر تبدأ بسؤال بسيط: ما أسوأ ما يمكن أن يحدث لبرامجنا هذا العام؟ وماذا أعددنا له؟"], ["موارد", "الشراكة الناجحة تقوم على قيمة متبادلة. اسأل: ماذا يكسب الشريك من دعم برنامجنا؟"], ["سؤال", "ما مصدر الدخل الذي تتمنون أن تبنوه في جمعيتكم خلال العام القادم؟"], ["حوكمة", "الجمعية العمومية ليست اجتماعًا شكليًا. هي صاحبة الصلاحية الأعلى، فأعطها حقها في التحضير والعرض."], ["موارد", "المشاريع المدرة للدخل تحتاج دراسة جدوى حقيقية، لا حماسًا فقط. ابدأ صغيرًا وقِس النتائج."], ["حوكمة", "فصل المهام المالية ضمانة: من يطلب الصرف ليس من يعتمده، ومن يعتمده ليس من ينفذه."], ["موارد", "قاعدة بيانات المتبرعين ثروة. تواصل معهم بعد التبرع، لا عند الحاجة فقط."], ["حوكمة", "التقييم الذاتي الدوري يكشف الفجوات قبل أن تكشفها جهة الإشراف."], ["موارد", "المنح التنافسية تُكسب بالاستعداد المسبق: ملف تعريفي محدث، وتقارير جاهزة، ومشاريع مدروسة."], ["سؤال", "هل لدى جمعيتكم خطة استراتيجية محدثة؟ وكم مرة تراجعونها في السنة؟"], ["حوكمة", "مؤشرات الأداء تحول الأهداف إلى أرقام يمكن متابعتها. ما لا يُقاس يصعب تحسينه."], ["موارد", "الاستدامة المالية لا تعني جمع المال فقط، بل إنفاقه بكفاءة وتقليل الهدر."], ["حوكمة", "تدريب أعضاء مجلس الإدارة على مسؤولياتهم استثمار يرفع جودة القرار في الجمعية."], ["موارد", "المسؤولية الاجتماعية للشركات باب واسع. اربط برنامجك بأهداف الشركة واحتياج المجتمع معًا."], ["حوكمة", "التوثيق عادة مؤسسية: قرار بلا توثيق كأنه لم يكن، وإنجاز بلا توثيق يضيع أثره."], ["موارد", "التطوع مورد حقيقي له قيمة مالية. احسب ساعات المتطوعين وأبرزها في تقاريرك."], ["سؤال", "ما أكثر خدمة استشارية تحتاجها جمعيتكم الآن: الحوكمة، أم الموارد المالية، أم التخطيط؟"], ["حوكمة", "الحوكمة الرشيدة ترفع تقييم الجمعية، والتقييم الأعلى يفتح أبواب الدعم والشراكات."], ["موارد", "خطط لمواردك سنويًا كما تخطط لبرامجك: الأهداف، والمصادر، والمسؤول، والجدول الزمني."]];
 const CT={'حوكمة':['فائدة في الحوكمة','navy'],'موارد':['تنمية الموارد','blue'],'سؤال':['سؤال للنقاش','light']};
@@ -89,8 +89,8 @@ async function draw(){
  const fh=150,fy=H-fh-40;c.fillStyle=t.chip;rr(c,50,fy,W-100,fh,30);c.fill();
  c.fillStyle=t.fg;c.textAlign='right';c.textBaseline='alphabetic';c.font=`700 50px ${F}`;c.fillText($('nm').value,W-90,fy+70);
  c.fillStyle=t.ac;c.font=`500 32px ${F}`;c.fillText($('role').value,W-90,fy+118);
- if(st.brand==='p'){const cy=fy+fh/2,sh=104,sw=sh*1.6;if(mk)c.drawImage(mk,76,cy-sh/2,sw,sh);
-  const ph=$('ph').value.trim();if(ph){c.fillStyle=t.fg;c.font=`600 30px ${F}`;c.direction='ltr';c.textAlign='left';c.fillText(ph,76+sw+24,cy+12);c.direction='rtl'}}
+ if(st.brand==='p'){const cy=fy+fh/2,sh=128,sw=mk?sh*mk.width/mk.height:0;if(mk)c.drawImage(mk,80,cy-sh/2,sw,sh);
+  const ph=$('ph').value.trim();if(ph){c.fillStyle=t.fg;c.font=`600 30px ${F}`;c.direction='ltr';c.textAlign='left';c.fillText(ph,80+sw+24,cy+12);c.direction='rtl'}}
  else if(mk){const mh=78,mw=mh*mk.width/mk.height;c.drawImage(mk,90,fy+(fh-mh)/2-14,mw,mh);c.fillStyle=t.fg;c.font=`600 26px ${F}`;c.textAlign='center';c.fillText('رايا لوب',90+mw/2,fy+fh-22)}
  // tag
  let top=70;const tag=$('tag').value;
@@ -114,5 +114,8 @@ async function draw(){
  }
  const u=cv.toDataURL('image/png');$('res').src=u;$('dl').href=u;
 }
-(async()=>{imgs.w=await load(MW);imgs.c=await load(MC);const SB='dl/maher/personal/brand/maher-signature-';[imgs.sd,imgs.si,imgs.sl]=await Promise.all(['dark','ink','light'].map(k=>load(SB+k+'.png')));try{await document.fonts.load("700 40px 'IBM Plex Sans Arabic'");await document.fonts.load("500 40px 'IBM Plex Sans Arabic'");await document.fonts.load("600 40px 'IBM Plex Sans Arabic'")}catch(e){}let hh=location.hash.slice(1);if(hh.startsWith('p-')||hh==='personal'){pick('brand','p');hh=hh.replace(/^p-|^personal$/,'')}if(TPL[hh])useTpl(hh);else if(/^d\d+$/.test(hh))useDay(+hh.slice(1));else draw();document.fonts.ready.then(draw)})();
+(async()=>{imgs.w=await load(MW);imgs.c=await load(MC);const SB='dl/maher/personal/brand/maher-mark-';[imgs.ml,imgs.mc]=await Promise.all(['light','color'].map(k=>load(SB+k+'-web.png')));try{await document.fonts.load("700 40px 'IBM Plex Sans Arabic'");await document.fonts.load("500 40px 'IBM Plex Sans Arabic'");await document.fonts.load("600 40px 'IBM Plex Sans Arabic'")}catch(e){}let hh=location.hash.slice(1);if(hh.startsWith('p-')||hh==='personal'){pick('brand','p');hh=hh.replace(/^p-|^personal$/,'')}if(TPL[hh])useTpl(hh);else if(/^d\d+$/.test(hh))useDay(+hh.slice(1));else draw();document.fonts.ready.then(draw)})();
+
+function relabel(){const L=st.brand==='p'?['بني','أخضر','عاجي']:['كحلي','أزرق','فاتح'];document.querySelectorAll('#theme button').forEach((b,i)=>b.textContent=L[i])}
+$('brand').addEventListener('click',()=>setTimeout(relabel,0));
 </script></body></html>
